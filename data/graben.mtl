@@ -1,12 +1,12 @@
 # Blender MTL File: 'graben2.blend'
 # Material Count: 1
-newmtl sandmat_heightmap-test.pn.000
+newmtl sand
 Ns 0.000000
-Ka 0.000000 0.000000 0.000000
-Kd 0.640000 0.640000 0.640000
+Ka 0.900000 0.900000 0.900000
+Kd 0.00000 0.0000 0.0000
 Ks 0.000000 0.000000 0.000000
-Ni 1.000000
-d 1.000000
+Ni 0.000000
+d 0.000000
 illum 1
 map_Ka sand.jpg
 
