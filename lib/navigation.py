@@ -133,23 +133,19 @@ class GameControllerDevice(FourDofInputDevice):
         self.time_sav = time.time()
 
         # translation
-        _x = self.filter_channel(self.device_sensor.Value0.value, 0, -0.76, 0.77, 30, 30)
-        _y = self.filter_channel(self.device_sensor.Value2.value, 0, -0.58, 0.75, 30, 30)
+        _y = self.filter_channel(self.device_sensor.Value0.value, 0, -0.58, 0.75, 30, 30)
         _z = self.filter_channel(self.device_sensor.Value1.value, 0, -0.88, 0.82, 30, 30)
 
         # rotation
-        _rx = self.filter_channel(self.device_sensor.Value3.value, 0, -0.75, 0.8, 25, 25) # pitch
-        _ry = self.filter_channel(self.device_sensor.Value5.value, 0, -0.65, 0.68, 25, 25) # head
-        _rz = self.filter_channel(self.device_sensor.Value4.value, 0, -0.72, 0.84, 25, 25) # roll
+        #_rx = self.filter_channel(self.device_sensor.Value3.value, 0, -0.75, 0.8, 25, 25) # pitch
+        _ry = self.filter_channel(self.device_sensor.Value2.value, 0, -0.65, 0.68, 25, 25) # head
+        #_rz = self.filter_channel(self.device_sensor.Value4.value, 0, -0.72, 0.84, 25, 25) # roll
         
 
         # forward data --> multi field connection
-        self.dof_out.value[0] = _x * _fr_scale_factor
         self.dof_out.value[1] = _y * _fr_scale_factor * -1.0
         self.dof_out.value[2] = _z * _fr_scale_factor
-        self.dof_out.value[3] = _rx * _fr_scale_factor
         self.dof_out.value[4] = _ry * _fr_scale_factor * -1.0
-        self.dof_out.value[5] = _rz * _fr_scale_factor
 
 class Navigation(avango.script.Script):
 
