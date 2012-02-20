@@ -26,7 +26,7 @@
 
 # import modules from vr application library
 from vr_lib.menu import *
-from vr_lib.viewing import *
+from lib.viewing import *
 from vr_lib.simple_navigation import *
 
 # import modules from local library
@@ -43,7 +43,6 @@ class Application:
 
 		self.Scene = Scene(self.Menu)
 
-		self.ViewingSetup = ViewingSetup(self.Scene, self.Menu)
 
 		# init lights (if no lights are defined --> default OpenGL headlight is applied)
 		self.Scene.make_light(avango.osg.Vec4(0.0,0.0,0.0,1.0), avango.osg.Vec4(0.65,0.65,0.65,1.0), avango.osg.Vec4(0.2,0.2,0.2,1.0), avango.osg.Vec4(-80,15,-50,1.0))
@@ -127,19 +126,12 @@ class Application:
 #		self.passat = avango.osg.nodes.LoadFile(Filename = "/opt/3d_models/cars/passat/passat.3ds", Matrix = _mat)
 #		self.Scene.object_root.Children.value.append(self.passat)
 
-		_mat = 	avango.osg.make_scale_mat(0.06,0.06,0.06) * \
-				avango.osg.make_rot_mat(math.pi*0.5,-1,0,0) * \
-				avango.osg.make_rot_mat(math.radians(135),0,1,0) * \
+		_mat = 	avango.osg.make_scale_mat(.01,.01,.01) * \
+				avango.osg.make_rot_mat(math.radians(180),1,0,0) * \
+				avango.osg.make_rot_mat(math.radians(0),0,1,0) * \
 				avango.osg.make_trans_mat(-1.0,0.0,4.0)
-		self.landscape = avango.osg.nodes.LoadFile(Filename = "data/graben.obj", Matrix = _mat)
+		self.landscape = avango.osg.nodes.LoadFile(Filename = "data/Map/graben.obj", Matrix = _mat)
 		self.Scene.environment_root.Children.value.append(self.landscape)
-
-		_mat = 	avango.osg.make_scale_mat(1.0,1.0,1.0) * \
-				avango.osg.make_rot_mat(math.pi*0.5,-1,0,0) * \
-				avango.osg.make_rot_mat(math.radians(135),0,1,0) * \
-				avango.osg.make_trans_mat(-1.0,0.0,4.0)
-		self.yellow_submarine = avango.osg.nodes.LoadFile(Filename = "./data/Submarine/My_YellowSubmarine.obj", Matrix = _mat)
-		self.Scene.object_root.Children.value.append(self.yellow_submarine)
 
 		self.Scene.navigation_transform.Matrix.value = avango.osg.make_trans_mat(0.0,1.2,3.2)
 
@@ -147,12 +139,15 @@ class Application:
 		#self.Spacemouse = SpacemouseDevice()
 		self.ImpactController = GameControllerDevice()
 
-		self.Navigation = Navigation()
-		self.Navigation.my_constructor(self.Scene, self.ViewingSetup, self.ImpactController)
+		#self.Navigation = Navigation()
+		#self.Navigation.my_constructor(self.Scene, self.ViewingSetup, self.ImpactController)
 
+		self.Scene.Player0 = Player()
+		self.Scene.Player0.my_constructor(self.Scene, self.ImpactController, "./data/Submarine/My_YellowSubmarine.obj")
 
 
 		#####  run evaluation and render loop  #####		
+		self.ViewingSetup = ViewingSetup(self.Scene, self.Menu)
 		self.ViewingSetup.start_render_loop()
 
 

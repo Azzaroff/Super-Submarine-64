@@ -92,7 +92,8 @@ class DesktopSetup:
 		self.camera.BackgroundColor.value = gl_background_color
 
 		# init field connections
-		self.camera.ViewerTransform.connect_from(SCENE.navigation_transform.Matrix)
+		#self.camera.ViewerTransform.connect_from(SCENE.navigation_transform.Matrix)
+		self.camera.ViewerTransform.connect_from(SCENE.Player0.camera_absolute.AbsoluteMatrix)
 
 		if gl_headtracking_flag == True:
 			self.tracking_sensor = avango.daemon.nodes.DeviceSensor(DeviceService = avango.daemon.DeviceService(), Station = "tracking-head", TransmitterOffset = gl_transmitter_offset) # init tracking sensor

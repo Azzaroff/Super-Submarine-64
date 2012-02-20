@@ -46,40 +46,6 @@ def init_pst_tracking():
 	print "PST Tracking started!"
 
 
-
-def init_spacemouse():
-
-	_string = os.popen("/opt/avango/vr_application_lib/tools/list-ev -s | grep \"3Dconnexion SpaceNavigator\" | sed -e \'s/\"//g\'  | cut -d\" \" -f4").read()
-
-	if len(_string) == 0:
-		_string = os.popen("/opt/avango/vr_application_lib/tools/list-ev -s | grep \"3Dconnexion SpaceTraveler USB\" | sed -e \'s/\"//g\'  | cut -d\" \" -f4").read()
-    
-	if len(_string) > 0:	
-		_string = _string.split()[0]
-	
-		_spacemouse = avango.daemon.HIDInput()
-		_spacemouse.station = avango.daemon.Station('device-spacemouse') # create a station to propagate the input events
-		_spacemouse.device = _string
-
-		# map incoming spacemouse events to station values
-		_spacemouse.values[0] = "EV_ABS::ABS_X"   # trans X
-		_spacemouse.values[1] = "EV_ABS::ABS_Y"   # trans Y
-		_spacemouse.values[2] = "EV_ABS::ABS_Z"   # trans Z
-		_spacemouse.values[3] = "EV_ABS::ABS_RX"  # rotate X
-		_spacemouse.values[4] = "EV_ABS::ABS_RY"  # rotate Y
-		_spacemouse.values[5] = "EV_ABS::ABS_RZ"  # rotate Z
-
-		# buttons
-		_spacemouse.buttons[0] = "EV_KEY::BTN_0" # left button
-		_spacemouse.buttons[1] = "EV_KEY::BTN_1" # right button
-
-		device_list.append(_spacemouse)
-		print "SpaceMouse started at:", _string
-
-	else:
-		print "SpaceMouse NOT found !"
-
-
 def init_impact_controller():
 
 	_string = os.popen("/opt/avango/vr_application_lib/tools/list-ev -s | grep \"Mega World USB Game Controllers\" | sed -e \'s/\"//g\'  | cut -d\" \" -f4").read()
@@ -228,7 +194,7 @@ if gl_viewing_setup == "desktop" or gl_viewing_setup == "anaglyph" or gl_viewing
 	init_pst_tracking()
 
 # init input devices
-init_spacemouse()
+#init_spacemouse()
 init_keyboard()
 init_mouse()
 init_impact_controller()
