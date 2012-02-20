@@ -80,6 +80,52 @@ class SixDofInputDevice(avango.script.Script):
 
         return VALUE
         
+class ThreeDofInputDevice(avango.script.Script):
+      
+    # output fields
+    dof_out = avango.MFFloat()
+    dof_out.value = [0.0,0.0,0.0,0.0,0.0,0.0] # init six channels
+
+    button1_out = avango.SFBool()
+    button2_out = avango.SFBool()
+       
+    # constructor
+    def __init__(self):
+        self.super(ThreeDofInputDevice).__init__()
+
+        # sensor
+        self.device_sensor = avango.daemon.nodes.DeviceSensor(DeviceService = avango.daemon.DeviceService())
+
+        # field connections
+        self.button1_out.connect_from(self.device_sensor.Button0)
+        self.button2_out.connect_from(self.device_sensor.Button1)
+
+        # variables
+        self.time_sav = time.time()
+        
+        self.always_evaluate(True) # activate evaluate callback
+        
+    # functions
+    def filter_channel(self, VALUE, OFFSET, MIN, MAX, NEG_THRESHOLD, POS_THRESHOLD):
+        VALUE = VALUE - OFFSET
+        MIN = MIN - OFFSET
+        MAX = MAX - OFFSET
+
+        if VALUE > 0:
+            _pos = MAX * POS_THRESHOLD * 0.01
+            if VALUE > _pos: # above positive threshold
+                VALUE = min( (VALUE - _pos) / (MAX - _pos), 1) # normalize interval
+            else: # beneath positive threshold
+                VALUE = 0       
+
+        elif VALUE < 0:
+            _neg = MIN * NEG_THRESHOLD * 0.01
+            if VALUE < -_neg:
+                VALUE = max( ((VALUE + _neg) / (MIN + _neg)) * -1, -1)
+            else: # beneath negative threshold
+                VALUE = 0
+
+        return VALUE
     
 
 
@@ -117,7 +163,7 @@ class SpacemouseDevice(SixDofInputDevice):
         self.dof_out.value[4] = _ry * _fr_scale_factor * -1.0
         self.dof_out.value[5] = _rz * _fr_scale_factor
 
-class GameControllerDevice(FourDofInputDevice):
+class GameControllerDevice(ThreeDofInputDevice):
 
     # constructor
     def __init__(self):
@@ -133,12 +179,12 @@ class GameControllerDevice(FourDofInputDevice):
         self.time_sav = time.time()
 
         # translation
-        _y = self.filter_channel(self.device_sensor.Value0.value, 0, -0.58, 0.75, 30, 30)
+        _y = self.filter_channel(self.device_sensor.Value2.value, 0, -0.58, 0.75, 30, 30)
         _z = self.filter_channel(self.device_sensor.Value1.value, 0, -0.88, 0.82, 30, 30)
 
         # rotation
         #_rx = self.filter_channel(self.device_sensor.Value3.value, 0, -0.75, 0.8, 25, 25) # pitch
-        _ry = self.filter_channel(self.device_sensor.Value2.value, 0, -0.65, 0.68, 25, 25) # head
+        _ry = self.filter_channel(self.device_sensor.Value0.value, 0, -0.65, 0.68, 25, 25) # head
         #_rz = self.filter_channel(self.device_sensor.Value4.value, 0, -0.72, 0.84, 25, 25) # roll
         
 
@@ -146,6 +192,79 @@ class GameControllerDevice(FourDofInputDevice):
         self.dof_out.value[1] = _y * _fr_scale_factor * -1.0
         self.dof_out.value[2] = _z * _fr_scale_factor
         self.dof_out.value[4] = _ry * _fr_scale_factor * -1.0
+        
+#class Player(Controller, ID):
+#    # input fields
+#    dof_in = avango.MFFloat()
+#    
+#    # constructor
+#    def __init__(self):
+#        self.super(Navigation).__init__()
+#        self.reference_point = avango.osg.Vec3()
+#       
+#    def my_constructor(self, SCENE, VIEWING_SETUP, INPUT_DEVICE):
+#
+#        # references
+#        self.SCENE = SCENE
+#        self.mat_out.value = SCENE.navigation_transform.Matrix.value # initial navigation values
+#        self.nav_trans = SCENE.navigation_transform.Matrix.value
+#
+#        # init field connections    
+#        self.dof_in.connect_from(INPUT_DEVICE.dof_out)
+#
+#        SCENE.navigation_transform.Matrix.connect_from(self.mat_out)
+#
+#        # init further device sensors
+#        self.keyboard_sensor = avango.daemon.nodes.DeviceSensor(Station = "device-keyboard", DeviceService = gl_device_service)
+#        self.mouse_sensor = avango.daemon.nodes.DeviceSensor(Station = "device-mouse", DeviceService = gl_device_service)
+#        
+#         # functions
+#    def navigate(self):
+#        
+#        factor = 0.1
+#        translation_threshold_min = 0.015
+#        translation_threshold_max = 0.5
+#        rot_factor = 0.008
+#
+#        #transferfunktion anstatt starrer skalierungswerte nutzen!
+#
+#        # translations
+#        #_x = self.dof_in.value[0] * factor
+#        #_y = self.dof_in.value[1] * factor
+#        #_z = self.dof_in.value[2] * factor    
+#        
+#        _x = self.transfer(self.dof_in.value[0])
+#        _y = self.transfer(self.dof_in.value[1])
+#        _z = self.transfer(self.dof_in.value[2])
+#
+#        #print "x: ", _x, " y: ", _y, " z: ", _z
+#
+#        # rotations
+#        _yaw = self.dof_in.value[4] * rot_factor
+#        _pitch = self.dof_in.value[3] * rot_factor
+#        _roll = self.dof_in.value[5] * rot_factor
+#            
+#        if math.fabs(_x) > translation_threshold_min or math.fabs(_y) > translation_threshold_min or math.fabs(_z) > translation_threshold_min:
+#            self.nav_trans = avango.osg.make_trans_mat(_x,_y,_z)
+#        else:
+#            self.nav_trans = avango.osg.make_ident_mat()
+#        
+#        
+#        self.nav_rot_roll = avango.osg.make_rot_mat(_roll, 0, 0, 1)
+#        
+#        if math.fabs(_yaw) > math.fabs(_pitch):
+#            self.nav_rot_yaw = avango.osg.make_rot_mat(_yaw, 0, 1, 0)
+#            self.nav_rot_pitch = avango.osg.make_ident_mat()
+#        else:
+#            self.nav_rot_pitch = avango.osg.make_rot_mat(_pitch, 1, 0, 0)
+#            self.nav_rot_yaw = avango.osg.make_ident_mat()
+#
+#        if self.space_button1.value:
+#            self.mat_out.value = self.nav_rot_pitch * self.nav_rot_yaw * self.nav_rot_roll * self.mat_out.value
+#        else:
+#            self.mat_out.value = self.nav_rot_pitch * self.nav_rot_yaw * self.nav_trans * self.mat_out.value
+
+              
 
 class Navigation(avango.script.Script):
 
