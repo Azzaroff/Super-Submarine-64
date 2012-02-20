@@ -1,9 +1,9 @@
-# Blender MTL File: 'graben.blend'
+# Blender MTL File: ''
 # Material Count: 1
-newmtl heightmap-test.png_heightmap-test.png
+newmtl Material_heightmap-test.pn.000
 Ns 96.078431
 Ka 0.000000 0.000000 0.000000
-Kd 0.108889 0.056688 0.039869
+Kd 0.432258 0.432258 0.432258
 Ks 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
