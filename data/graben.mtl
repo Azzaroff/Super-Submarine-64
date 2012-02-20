@@ -1,6 +1,6 @@
 # Blender MTL File: 'graben.blend'
 # Material Count: 1
-newmtl heightmap-test.png_heightmap-test.png
+newmtl sand
 Ns 96.078431
 Ka 0.000000 0.000000 0.000000
 Kd 0.108889 0.056688 0.039869
@@ -8,6 +8,6 @@ Ks 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 1
-map_Kd /home/azzaroff/workspace/Bilder/heightmap-test.png
+map_Kd sand.png
 
 
