@@ -97,8 +97,8 @@ class ThreeDofInputDevice(avango.script.Script):
         self.device_sensor = avango.daemon.nodes.DeviceSensor(DeviceService = avango.daemon.DeviceService())
 
         # field connections
-        self.button1_out.connect_from(self.device_sensor.Button0)
-        self.button2_out.connect_from(self.device_sensor.Button1)
+        self.button1_out.connect_from(self.device_sensor.Button5)
+        self.button2_out.connect_from(self.device_sensor.Button7)
 
         # variables
         self.time_sav = time.time()
@@ -208,6 +208,16 @@ class Player(avango.script.Script):
     camera = avango.osg.nodes.MatrixTransform()
     camera_absolute = avango.osg.nodes.AbsoluteTransform()
     
+    camerabutton = avango.SFBool()
+    cameratoggle = avango.SFBool()
+    camerabuttonlast = avango.SFBool()
+    camera2 = avango.osg.nodes.MatrixTransform()   
+    
+    camerabutton2 = avango.SFBool()
+    cameratoggle2 = avango.SFBool()
+    camerabuttonlast2 = avango.SFBool()
+    camera3 = avango.osg.nodes.MatrixTransform()   
+    
     #navigation
     model_transform = avango.osg.nodes.MatrixTransform()
     pitchthreshold = 25 # rund 45 Grad
@@ -215,6 +225,14 @@ class Player(avango.script.Script):
     
     pitch = 0
     roll = 0
+    
+    acceleration = 0.0
+    accelerationstep = .5
+    
+    #pickraylength
+    raylength = 10.
+    ray_absolute = avango.osg.nodes.AbsoluteTransform()
+    
     
     
     # constructor
@@ -231,6 +249,8 @@ class Player(avango.script.Script):
 
         # init field connections    
         self.dof_in.connect_from(INPUT_DEVICE.dof_out)
+        self.camerabutton.connect_from(INPUT_DEVICE.button1_out)
+        self.camerabutton2.connect_from(INPUT_DEVICE.button2_out)
 
         SCENE.Player0.group.Matrix.connect_from(self.mat_out)
 
@@ -240,6 +260,8 @@ class Player(avango.script.Script):
         
         #move camera
         self.camera.Matrix.value = avango.osg.make_trans_mat(.0, 2.0, 15.0)
+        self.camera2.Matrix.value = avango.osg.make_trans_mat(.0, -2.0, -2.0)
+        self.camera3.Matrix.value = avango.osg.make_rot_mat(math.radians(90), 0, -1, 0) * avango.osg.make_trans_mat(.0, -2.0, -20.0)
         
         #load modell        
         self._mat =     avango.osg.make_scale_mat(.3,.3,.3) * \
@@ -257,6 +279,16 @@ class Player(avango.script.Script):
         #append all objects to scene
         SCENE.navigation_transform.Children.value.append(self.group)
         
+        #ground following
+        # pick selector for definition of reference point
+        self.pick_selector1 = avango.tools.nodes.PickSelector(PickTrigger = True, TransitionOnly = False, EveryFrame = True, RootNode = self.SCENE.root, CreateIntersections = True, PickRayLength = self.raylength)
+        self.pick_selector1.PickRayTransform.connect_from(self.ray_absolute.AbsoluteMatrix)
+        
+        # ray geometry for target-based navigation
+        self.ray_geometry = avango.osg.nodes.LoadFile(Filename = 'data/cylinder.obj')
+        self.ray_geometry.add_field(avango.SFUInt(), "PickMask") # disable object for intersection
+        self.group.Children.value.append(self.ray_geometry)
+        
         # callbacks
     def evaluate(self):
         self.navigate()
@@ -273,7 +305,8 @@ class Player(avango.script.Script):
          # functions
     def navigate(self):
         
-        factor = 0.1
+        factor = 0.2
+        z_factor = .8
         translation_threshold_min = 0.015
         translation_threshold_max = 0.5
         rot_factor = 0.008
@@ -282,12 +315,23 @@ class Player(avango.script.Script):
 
         # translations
         _x = self.dof_in.value[0] * factor
-        _z = self.dof_in.value[2] * factor
+        _z = self.dof_in.value[2] * z_factor
         
         if self.dof_in.value[2] < 0.0:
             _y = -self.dof_in.value[1] * factor
         else:    
             _y = self.dof_in.value[1] * factor
+            
+        #acceleration
+        _z *= self.acceleration
+        self.acceleration += self.accelerationstep * self.accelerationstep
+        if self.acceleration > 1.0:
+            self.acceleration = 1.0
+        if self.acceleration < -1.0:
+            self.acceleration = -1.0
+        if math.fabs(self.acceleration) < 0.1:
+            self.acceleration = 0.0
+            
             
         #_x = self.transfer(self.dof_in.value[0])
         #_y = self.transfer(self.dof_in.value[1])
@@ -295,10 +339,12 @@ class Player(avango.script.Script):
 
         #print "x: ", _x, " y: ", _y, " z: ", _z
         
-        print _y
-        
         # rotations
-        _yaw = self.dof_in.value[4] * rot_factor
+        
+        if self.dof_in.value[2] <= 0.0:
+            _yaw = self.dof_in.value[4] * rot_factor
+        else:
+            _yaw = -self.dof_in.value[4] * rot_factor
         _pitch = self.dof_in.value[3] * rot_factor
         _roll = self.dof_in.value[5] * rot_factor
                     
@@ -373,6 +419,33 @@ class Player(avango.script.Script):
                     
         self.model_transform.Matrix.value = avango.osg.make_rot_mat(math.radians(self.pitch), 1, 0, 0) *\
                                             avango.osg.make_rot_mat(math.radians(self.roll), 0, 0, 1)
+                                    
+        #camera toggle
+        if self.camerabutton.value == True and self.camerabuttonlast.value != self.camerabutton.value:
+            self.cameratoggle.value = not self.cameratoggle.value
+            if self.cameratoggle.value == True:
+                help = self.camera.Matrix.value
+                self.camera.Matrix.value = self.camera2.Matrix.value
+                self.camera2.Matrix.value = help            
+            else:
+                help = self.camera2.Matrix.value
+                self.camera2.Matrix.value = self.camera.Matrix.value
+                self.camera.Matrix.value = help
+        
+        if self.camerabutton2.value == True and self.camerabuttonlast2.value != self.camerabutton2.value:
+            self.cameratoggle2.value = not self.cameratoggle2.value
+            if self.cameratoggle2.value == True:
+                help = self.camera.Matrix.value
+                self.camera.Matrix.value = self.camera3.Matrix.value
+                self.camera3.Matrix.value = help            
+            else:
+                help = self.camera3.Matrix.value
+                self.camera3.Matrix.value = self.camera.Matrix.value
+                self.camera.Matrix.value = help
+                
+        self.camerabuttonlast.value = self.camerabutton.value
+        self.camerabuttonlast2.value = self.camerabutton2.value
+
 
 #class Navigation(avango.script.Script):
 #
