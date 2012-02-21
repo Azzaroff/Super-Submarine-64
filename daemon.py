@@ -73,7 +73,8 @@ def init_impact_controller():
 		_controller.buttons[3] = "EV_KEY::BTN_THUMB2" # button 3
 		_controller.buttons[4] = "EV_KEY::BTN_TOP" # button 4
 		_controller.buttons[5] = "EV_KEY::BTN_TOP2" # button 5
-		_controller.buttons[6] = "EV_KEY::BTN_PINKIE" # button 6 
+		_controller.buttons[6] = "EV_KEY::BTN_PINKIE" # button 6
+		_controller.buttons[7] = "EV_KEY::BTN_BASE" # button LX  
 		
 				# =========================================
 		# For codes, run 

@@ -27,7 +27,26 @@ class Scene:
 		self.environment_uniform3 = avango.osg.nodes.Uniform(Values = [1], Type = avango.osg.uniformtype.INT, UniformName = "NumLights")		
 		
 		self.environment_state = avango.osg.nodes.StateSet(RescaleNormalMode = 1, NormalizeMode = 1, CullFaceMode = 0, Program = self.environment_prog, Uniforms = [self.environment_uniform1, self.environment_uniform2, self.environment_uniform3])
+		
+		self.vshader = avango.osg.nodes.Shader(Type = avango.osg.shadertype.VERTEX, FileName = "./shader_example/phong.vert")
+		self.fshader = avango.osg.nodes.Shader(Type = avango.osg.shadertype.FRAGMENT, FileName = "./shader_example/phong.frag")
+		
+		self.prog = avango.osg.nodes.Program(ShaderList = [self.vshader, self.fshader])
+		
+		self.uniform1 = avango.osg.nodes.Uniform(Values = [0], Type = avango.osg.uniformtype.INT, UniformName = "color_map")
+		self.uniform2 = avango.osg.nodes.Uniform(Values = [1], Type = avango.osg.uniformtype.INT, UniformName = "NumLights")
+		
+		self.state = avango.osg.nodes.StateSet(RescaleNormalMode = 1, NormalizeMode = 1, Program = self.prog, Uniforms = [self.uniform1, self.uniform2])
 
+		self.map_vshader = avango.osg.nodes.Shader(Type = avango.osg.shadertype.VERTEX, FileName = "./shader_example/phong_texture.vert")
+		self.map_fshader = avango.osg.nodes.Shader(Type = avango.osg.shadertype.FRAGMENT, FileName = "./shader_example/phong_texture.frag")
+		
+		self.prog = avango.osg.nodes.Program(ShaderList = [self.map_vshader, self.map_fshader])
+		
+		self.map_uniform1 = avango.osg.nodes.Uniform(Values = [0], Type = avango.osg.uniformtype.INT, UniformName = "color_map")
+		self.map_uniform2 = avango.osg.nodes.Uniform(Values = [1], Type = avango.osg.uniformtype.INT, UniformName = "NumLights")
+		
+		self.map_state = avango.osg.nodes.StateSet(RescaleNormalMode = 1, NormalizeMode = 1, Program = self.prog, Uniforms = [self.map_uniform1, self.map_uniform2])
 
 		# setup shader (phong lighting + texturing + diffuse color override)
 		self.object_vshader = avango.osg.nodes.Shader(Type = avango.osg.shadertype.VERTEX, FileName = "/opt/avango/vr_application_lib/shader/phong_material_override.vert")
@@ -44,7 +63,7 @@ class Scene:
 		# scene structure
 		self.root = avango.osg.nodes.Group() # root node
 
-		self.environment_root = avango.osg.nodes.Group(StateSet = self.environment_state, Name = "environment_root")
+		self.environment_root = avango.osg.nodes.Group(StateSet = self.map_state, Name = "environment_root")
 		self.root.Children.value.append(self.environment_root)
 		
 		self.object_root = avango.osg.nodes.Group(StateSet = self.object_state, Name = "object_root")
@@ -53,7 +72,7 @@ class Scene:
 		self.interface_root = avango.osg.nodes.Group(StateSet = self.object_state, Name = "interface_root")
 		self.root.Children.value.append(self.interface_root)
 																				
-		self.navigation_transform = avango.osg.nodes.MatrixTransform(Name = "navigation_transform")
+		self.navigation_transform = avango.osg.nodes.MatrixTransform(StateSet = self.state, Name = "navigation_transform")
 		self.root.Children.value.append(self.navigation_transform)
 
 		self.menu_navigation_transform = avango.osg.nodes.MatrixTransform(Name = "menu_navigation_transform")
@@ -79,6 +98,8 @@ class Scene:
 		self.light_number += 1
 		
 		self.environment_uniform3.Values.value = [self.light_number] # forward light number to shader
+		self.map_uniform2.Values.value = [self.light_number] # forward light number to shader
+		self.uniform2.Values.value = [self.light_number] # forward light number to shader
 		self.object_uniform1.Values.value = [self.light_number] # forward light number to shader
 		
 		# light source visualization
