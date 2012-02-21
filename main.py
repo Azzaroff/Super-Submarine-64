@@ -138,7 +138,7 @@ class Application:
                 self.skybox = avango.osg.nodes.LoadFile(Filename = "data/skybox.obj", Matrix = _mat)
                 self.Scene.environment_root.Children.value.append(self.skybox)
 
-		self.Scene.navigation_transform.Matrix.value = avango.osg.make_trans_mat(0.0,1.2,3.2)
+		self.Scene.navigation_transform.Matrix.value = avango.osg.make_trans_mat(0.0,0.0,0.0)
 
 
 		#self.Spacemouse = SpacemouseDevice()

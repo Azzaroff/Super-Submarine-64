@@ -230,8 +230,10 @@ class Player(avango.script.Script):
     accelerationstep = .5
     
     #pickraylength
-    raylength = 10.
-    ray_absolute = avango.osg.nodes.AbsoluteTransform()
+    raylength = 100.
+    ray_transform_y = avango.osg.nodes.MatrixTransform()
+    ray_absolute_y = avango.osg.nodes.AbsoluteTransform()
+    selected_targets_y = avango.tools.MFTargetHolder()
     
     
     
@@ -280,19 +282,24 @@ class Player(avango.script.Script):
         SCENE.navigation_transform.Children.value.append(self.group)
         
         #ground following
-        # pick selector for definition of reference point
-        self.pick_selector1 = avango.tools.nodes.PickSelector(PickTrigger = True, TransitionOnly = False, EveryFrame = True, RootNode = self.SCENE.root, CreateIntersections = True, PickRayLength = self.raylength)
-        self.pick_selector1.PickRayTransform.connect_from(self.ray_absolute.AbsoluteMatrix)
-        
         # ray geometry for target-based navigation
-        self.ray_geometry = avango.osg.nodes.LoadFile(Filename = 'data/cylinder.obj')
-        self.ray_geometry.add_field(avango.SFUInt(), "PickMask") # disable object for intersection
-        self.group.Children.value.append(self.ray_geometry)
+        #self.ray_geometry_y = avango.osg.nodes.LoadFile(Filename = "data/cylinder.obj", Matrix = avango.osg.make_scale_mat(0.025, 0.025, self.raylength) * avango.osg.make_trans_mat(0.0, 0.0, self.raylength * -0.5))
+        #self.ray_geometry_y.add_field(avango.SFUInt(), "PickMask") # disable object for intersection
+        #self.ray_transform_y.Children.value.append(self.ray_geometry_y)
+        self.ray_transform_y.Children.value.append(self.ray_absolute_y)
+        
+        # pick selector for definition of reference point
+        self.pick_selector1 = avango.tools.nodes.PickSelector(PickTrigger = True, TransitionOnly = False, EveryFrame = True, RootNode = self.SCENE.environment_root, CreateIntersections = True, PickRayLength = self.raylength)
+        self.pick_selector1.PickRayTransform.connect_from(self.ray_absolute_y.AbsoluteMatrix)
+        self.selected_targets_y.connect_from(self.pick_selector1.SelectedTargets)
+    
+        #self.ray_transform.Matrix.value = avango.osg.make_rot_mat(math.radians(90), -1, 0, 0)
+                
+        self.group.Children.value.append(self.ray_transform_y)
         
         # callbacks
     def evaluate(self):
         self.navigate()
-        #self.yellow_submarine.Matrix.value *= avango.osg.make_rot_mat(math.radians(1), 0, 0, 1);
         
     def transfer(self, val):
         if (math.fabs(val) <= self.transfer_treshold):
@@ -445,6 +452,15 @@ class Player(avango.script.Script):
                 
         self.camerabuttonlast.value = self.camerabutton.value
         self.camerabuttonlast2.value = self.camerabutton2.value
+        
+        # verhindert durchstossen des bodens
+        ytargets = self.selected_targets_y.value
+        if len(ytargets) > 0:
+            intersection_point = (ytargets[0].Intersection.value.Point.value - self.mat_out.value.get_translate())
+            if intersection_point.length() < 0.75:
+                #print self.mat_out.value.get_translate()
+                #print ytargets[0].Intersection.value.Point.value
+                self.mat_out.value *= avango.osg.make_trans_mat(0, -_y, 0)
 
 
 #class Navigation(avango.script.Script):
