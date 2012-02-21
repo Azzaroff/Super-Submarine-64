@@ -133,7 +133,7 @@ class Application:
 		self.landscape = avango.osg.nodes.LoadFile(Filename = "data/Map/graben.obj", Matrix = _mat)
 		self.Scene.environment_root.Children.value.append(self.landscape)
 
-		self.Scene.navigation_transform.Matrix.value = avango.osg.make_trans_mat(0.0,1.2,3.2)
+		self.Scene.navigation_transform.Matrix.value = avango.osg.make_trans_mat(0.0,0.0,0.0)
 
 
 		#self.Spacemouse = SpacemouseDevice()
