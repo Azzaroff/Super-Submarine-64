@@ -461,7 +461,9 @@ class Player(avango.script.Script):
                 #print self.mat_out.value.get_translate()
                 #print ytargets[0].Intersection.value.Point.value
                 self.mat_out.value *= avango.osg.make_trans_mat(0, -_y, 0)
-
+        
+        if self.mat_out.value.get_translate().y > 40.0:
+            self.mat_out.value *= avango.osg.make_trans_mat(0, -_y, 0)
 
 #class Navigation(avango.script.Script):
 #
