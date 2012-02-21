@@ -22,7 +22,7 @@ Ks 0.200000 0.200000 0.200000
 Ns 1.000000
 d 1.000000
 illum 1
-map_Kd plain_sky_front.jpg
+map_Kd plain_sky_back.jpg
 
 newmtl south
 Ka 0.000000 0.000000 0.000000
@@ -40,7 +40,7 @@ Ks 0.200000 0.200000 0.200000
 Ns 1.000000
 d 1.000000
 illum 1
-map_Kd plain_sky_left.jpg
+map_Kd plain_sky_right.jpg
 
 newmtl west
 Ka 0.000000 0.000000 0.000000
