@@ -89,7 +89,8 @@ class DesktopSetup:
 		# init camera
 		self.camera = avango.osg.viewer.nodes.Camera(Window = self.window)
 		self.camera.ScreenTransform.value = gl_screen_transform
-		self.camera.BackgroundColor.value = gl_background_color
+		self.camera.BackgroundColor.value = avango.osg.Vec4(0,0.1,1,1)#gl_background_color
+		self.camera.Far.value = 40000000
 
 		# init field connections
 		#self.camera.ViewerTransform.connect_from(SCENE.navigation_transform.Matrix)
