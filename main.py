@@ -126,7 +126,7 @@ class Application:
 #		self.passat = avango.osg.nodes.LoadFile(Filename = "/opt/3d_models/cars/passat/passat.3ds", Matrix = _mat)
 #		self.Scene.object_root.Children.value.append(self.passat)
 
-		_mat = 	avango.osg.make_scale_mat(.01,.01,.01) * \
+		_mat = 	avango.osg.make_scale_mat(.1,.1,.1) * \
 				avango.osg.make_rot_mat(math.radians(180),1,0,0) * \
 				avango.osg.make_rot_mat(math.radians(0),0,1,0) * \
 				avango.osg.make_trans_mat(-1.0,0.0,4.0)
