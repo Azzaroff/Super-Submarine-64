@@ -282,14 +282,20 @@ class Player(avango.script.Script):
 
         # translations
         _x = self.dof_in.value[0] * factor
-        _y = self.dof_in.value[1] * factor
-        _z = self.dof_in.value[2] * factor    
+        _z = self.dof_in.value[2] * factor
         
+        if self.dof_in.value[2] < 0.0:
+            _y = -self.dof_in.value[1] * factor
+        else:    
+            _y = self.dof_in.value[1] * factor
+            
         #_x = self.transfer(self.dof_in.value[0])
         #_y = self.transfer(self.dof_in.value[1])
         #_z = self.transfer(self.dof_in.value[2])
 
         #print "x: ", _x, " y: ", _y, " z: ", _z
+        
+        print _y
         
         # rotations
         _yaw = self.dof_in.value[4] * rot_factor
