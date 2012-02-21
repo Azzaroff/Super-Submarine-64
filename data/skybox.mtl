@@ -1,0 +1,19 @@
+mtl file
+
+newmtl up
+map_Kd plain_sky_top.jpg
+
+newmtl down
+map_Kd plain_sky_top.jpg
+
+newmtl north
+map_Kd plain_sky_front.jpg
+
+newmtl south
+map_Kd plain_sky_back.jpg
+
+newmtl east
+map_Kd plain_sky_right.jpg
+
+newmtl west
+map_Kd plain_sky_left.jpg
