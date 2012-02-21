@@ -216,6 +216,7 @@ class Player(avango.script.Script):
     pitch = 0
     roll = 0
     
+    
     # constructor
     def __init__(self):
         self.super(Player).__init__()
@@ -280,13 +281,13 @@ class Player(avango.script.Script):
         #transferfunktion anstatt starrer skalierungswerte nutzen!
 
         # translations
-        #_x = self.dof_in.value[0] * factor
-        #_y = self.dof_in.value[1] * factor
-        #_z = self.dof_in.value[2] * factor    
+        _x = self.dof_in.value[0] * factor
+        _y = self.dof_in.value[1] * factor
+        _z = self.dof_in.value[2] * factor    
         
-        _x = self.transfer(self.dof_in.value[0])
-        _y = self.transfer(self.dof_in.value[1])
-        _z = self.transfer(self.dof_in.value[2])
+        #_x = self.transfer(self.dof_in.value[0])
+        #_y = self.transfer(self.dof_in.value[1])
+        #_z = self.transfer(self.dof_in.value[2])
 
         #print "x: ", _x, " y: ", _y, " z: ", _z
         
@@ -314,43 +315,55 @@ class Player(avango.script.Script):
 
         # pitch animation
         if math.fabs(_y) > 0.01:
-            #nach oben neigen
-            if self.pitch <= self.pitchthreshold and _y > 0.01:
+            #nach oben neigen bei vorwaertsfahrt
+            if self.pitch <= self.pitchthreshold and _y > 0.01 and _z < 0.0:
                 self.pitch += 5*_y 
-            # nach unten neigen
-            elif self.pitch >= -self.pitchthreshold and _y < -0.01:
+            # nach unten neigen bei vorwaertsfahrt
+            elif self.pitch >= -self.pitchthreshold and _y < -0.01 and _z < 0.0:
                 self.pitch += 5*_y
+            #nach oben neigen bei rueckwaertsfahrt
+            elif self.pitch >= -self.pitchthreshold and _y > 0.01 and _z > 0.0:
+                self.pitch += -5*_y 
+            # nach unten neigen bei rueckwaertsfahrt
+            elif self.pitch <= self.pitchthreshold and _y < -0.01 and _z > 0.0:
+                self.pitch += -5*_y
         # auf null zurueck
         elif math.fabs(self.pitch) > 0.0:
             if self.pitch > 0:
-                self.pitch -= .5
+                self.pitch -= 1.2
                 if self.pitch < 0.0:
                     self.pitch = 0
             else:
-                self.pitch += .5
+                self.pitch += 1.2
                 if self.pitch > 0.0:
                     self.pitch = 0
 
-        print _yaw
 
         # roll animation
         if math.fabs(_yaw) > 0.0005:
-            #nach oben neigen
-            if self.roll <= self.rollthreshold and _yaw > 0.0005:
+            #nach links neigen bei vorwaertsfahrt
+            if self.roll <= self.rollthreshold and _yaw > 0.0005 and _z < 0.0:
                 self.roll += 80*_yaw 
-            # nach unten neigen
-            elif self.roll >= -self.rollthreshold and _yaw < -0.0005:
+            # nach rechts neigen  bei vorwaertsfahrt
+            elif self.roll >= -self.rollthreshold and _yaw < -0.0005 and _z < 0.0:
                 self.roll += 80*_yaw
+            #nach links neigen bei rueckwaertsfahrt
+            elif self.roll >= -self.rollthreshold and _yaw > 0.0005 and _z > 0.0:
+                self.roll += -80*_yaw 
+            # nach rechts neigen  bei rueckwaertsfahrt
+            elif self.roll <= self.rollthreshold and _yaw < -0.0005 and _z > 0.0:
+                self.roll += -80*_yaw
         # auf null zurueck
         elif math.fabs(self.roll) > 0.0:
             if self.roll > 0:
-                self.roll -= .1
+                self.roll -= .5
                 if self.roll < 0.0:
                     self.roll = 0
             else:
-                self.roll += .1
+                self.roll += .5
                 if self.roll > 0.0:
                     self.roll = 0
+        
                     
         self.model_transform.Matrix.value = avango.osg.make_rot_mat(math.radians(self.pitch), 1, 0, 0) *\
                                             avango.osg.make_rot_mat(math.radians(self.roll), 0, 0, 1)
