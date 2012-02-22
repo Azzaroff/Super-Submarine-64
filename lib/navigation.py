@@ -329,11 +329,11 @@ class Player(avango.script.Script):
          # functions
     def navigate(self):
         
-        factor = 0.2
-        z_factor = .8
+        factor = 2
+        z_factor = 6
         translation_threshold_min = 0.015
         translation_threshold_max = 0.5
-        rot_factor = 0.008
+        rot_factor = 0.01
 
         #transferfunktion anstatt starrer skalierungswerte nutzen!
 

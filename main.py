@@ -128,10 +128,10 @@ class Application:
 
 
 		_mat = 	avango.osg.make_scale_mat(.1,.1,.1) * \
-				avango.osg.make_rot_mat(math.radians(180),1,0,0) * \
-				avango.osg.make_rot_mat(math.radians(0),0,1,0) * \
-				avango.osg.make_trans_mat(120.0,-60.0,-50.0)
-		self.landscape = avango.osg.nodes.LoadFile(Filename = "data/Map/graben_reduced.obj", Matrix = _mat)
+				avango.osg.make_rot_mat(math.radians(0),1,0,0) * \
+				avango.osg.make_rot_mat(math.radians(-90),1,0,0) * \
+				avango.osg.make_trans_mat(120.0, -200.0,250.0)
+		self.landscape = avango.osg.nodes.LoadFile(Filename = "data/Map/graben_new.obj", Matrix = _mat)
 		self.Scene.environment_root.Children.value.append(self.landscape)
         	_mat = avango.osg.make_scale_mat(10000,10000,10000) * \
         		avango.osg.make_rot_mat(math.radians(180),1,0,0) * \
