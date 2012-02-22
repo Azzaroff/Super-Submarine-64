@@ -31,10 +31,10 @@ from avango.script import field_has_changed
 
 # import modules from local library
 from lib.globals import *
-
+from lib.hud import *
 
 class SixDofInputDevice(avango.script.Script):
-      
+    
     # output fields
     dof_out = avango.MFFloat()
     dof_out.value = [0.0,0.0,0.0,0.0,0.0,0.0] # init six channels
@@ -254,7 +254,7 @@ class Player(avango.script.Script):
         self.super(Player).__init__()
         self.reference_point = avango.osg.Vec3()
        
-    def my_constructor(self, SCENE, INPUT_DEVICE, MODELPATH, REDUCED_COLLISION_MAP):
+    def my_constructor(self, SCENE, INPUT_DEVICE, MODELPATH, REDUCED_COLLISION_MAP, ID):
 
         # references
         self.SCENE = SCENE
@@ -262,6 +262,7 @@ class Player(avango.script.Script):
         self.nav_trans = SCENE.Player0.group.Matrix.value
         self.reduced_collison_map = avango.osg.nodes.MatrixTransform()
         self.reduced_collison_map.Children.value.append(REDUCED_COLLISION_MAP)
+        self.ID = ID
 
         # init field connections    
         self.dof_in.connect_from(INPUT_DEVICE.dof_out)
@@ -364,6 +365,10 @@ class Player(avango.script.Script):
         self.group.Children.value.append(self.ray_transform_neg_z)
         self.group.Children.value.append(self.ray_transform_pos_x)
         self.group.Children.value.append(self.ray_transform_neg_x)
+        
+        #append hud
+        self.hud = HUD()
+        self.hud.my_constructor(self.SCENE, self.camera, self.ID)
         
         # callbacks
     def evaluate(self):

@@ -158,7 +158,7 @@ class Application:
 		#self.Navigation.my_constructor(self.Scene, self.ViewingSetup, self.ImpactController)
         
         	self.Scene.Player0 = Player()
-	        self.Scene.Player0.my_constructor(self.Scene, self.ImpactController, "./data/Submarine/My_YellowSubmarine.obj", self.collision_landscape)
+	        self.Scene.Player0.my_constructor(self.Scene, self.ImpactController, "./data/Submarine/My_YellowSubmarine.obj", self.collision_landscape, 0)
 
 
 		#####  run evaluation and render loop  #####		
