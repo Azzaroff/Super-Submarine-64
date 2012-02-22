@@ -150,14 +150,14 @@ class Application:
         	#self.Scene.navigation_transform.Matrix.value = avango.osg.make_trans_mat(0.0,0.0,0.0)
 
 
-		#self.Spacemouse = SpacemouseDevice()
-        	self.ImpactController = GameControllerDevice()
+		self.Spacemouse = SpacemouseDevice()
+#        	self.ImpactController = GameControllerDevice()
 
 		#self.Navigation = Navigation()
 		#self.Navigation.my_constructor(self.Scene, self.ViewingSetup, self.ImpactController)
         
         	self.Scene.Player0 = Player()
-	        self.Scene.Player0.my_constructor(self.Scene, self.ImpactController, "./data/Submarine/My_YellowSubmarine.obj", self.collision_landscape)
+	        self.Scene.Player0.my_constructor(self.Scene, self.Spacemouse, "./data/Submarine/My_YellowSubmarine.obj", self.collision_landscape)
 
 
 		#####  run evaluation and render loop  #####		
