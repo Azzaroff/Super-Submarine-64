@@ -144,7 +144,7 @@ class Application:
         	_mat = avango.osg.make_scale_mat(10000,10000,10000) * \
         		avango.osg.make_rot_mat(math.radians(180),1,0,0) * \
         		avango.osg.make_rot_mat(math.radians(90),1,0,0)
-        	self.skybox = avango.osg.nodes.LoadFile(Filename = "data/skybox.obj", Matrix = _mat)
+        	self.skybox = avango.osg.nodes.LoadFile(Filename = "data/Skybox/skybox.obj", Matrix = _mat)
         	self.Scene.skybox_root.Children.value.append(self.skybox)
 
         	#self.Scene.navigation_transform.Matrix.value = avango.osg.make_trans_mat(0.0,0.0,0.0)
