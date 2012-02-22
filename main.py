@@ -133,6 +133,13 @@ class Application:
 				avango.osg.make_trans_mat(120.0, -200.0,250.0)
 		self.landscape = avango.osg.nodes.LoadFile(Filename = "data/Map/graben_new.obj", Matrix = _mat)
 		self.Scene.environment_root.Children.value.append(self.landscape)
+		
+		_mat = 	avango.osg.make_scale_mat(.1,.1,.1) * \
+				avango.osg.make_rot_mat(math.radians(0),1,0,0) * \
+				avango.osg.make_rot_mat(math.radians(-90),1,0,0) * \
+				avango.osg.make_trans_mat(120.0, -200.0,250.0)
+		self.collision_landscape = avango.osg.nodes.LoadFile(Filename = "data/Map/graben_new_reduced.obj", Matrix = _mat)
+		#self.Scene.environment_root.Children.value.append(self.collision_landscape)
         
         	_mat = avango.osg.make_scale_mat(10000,10000,10000) * \
         		avango.osg.make_rot_mat(math.radians(180),1,0,0) * \
@@ -150,7 +157,7 @@ class Application:
 		#self.Navigation.my_constructor(self.Scene, self.ViewingSetup, self.ImpactController)
         
         	self.Scene.Player0 = Player()
-	        self.Scene.Player0.my_constructor(self.Scene, self.ImpactController, "./data/Submarine/My_YellowSubmarine.obj")
+	        self.Scene.Player0.my_constructor(self.Scene, self.ImpactController, "./data/Submarine/My_YellowSubmarine.obj", self.collision_landscape)
 
 
 		#####  run evaluation and render loop  #####		
