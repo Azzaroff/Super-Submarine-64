@@ -33,6 +33,8 @@ from vr_lib.simple_navigation import *
 from lib.scene import *
 from lib.navigation import *
 
+import time
+
 class Application:
 
 	# constructor
@@ -156,9 +158,11 @@ class Application:
 
 		#self.Navigation = Navigation()
 		#self.Navigation.my_constructor(self.Scene, self.ViewingSetup, self.ImpactController)
+		
+		self.time_sav = time.time()
         
         	self.Scene.Player0 = Player()
-	        self.Scene.Player0.my_constructor(self.Scene, self.ImpactController, "./data/Submarine/My_YellowSubmarine.obj", self.collision_landscape, 0)
+	        self.Scene.Player0.my_constructor(self.Scene, self.ImpactController, "./data/Submarine/My_YellowSubmarine.obj", self.collision_landscape, 0, self.time_sav)
 
 
 		#####  run evaluation and render loop  #####		

@@ -25,7 +25,7 @@
 
 import avango
 import avango.osg
-import time
+
 
 from avango.script import field_has_changed
 
@@ -261,7 +261,7 @@ class Player(avango.script.Script):
         self.super(Player).__init__()
         self.reference_point = avango.osg.Vec3()
        
-    def my_constructor(self, SCENE, INPUT_DEVICE, MODELPATH, REDUCED_COLLISION_MAP, ID):
+    def my_constructor(self, SCENE, INPUT_DEVICE, MODELPATH, REDUCED_COLLISION_MAP, ID, STARTTIME):
 
         # references
         self.SCENE = SCENE
@@ -270,6 +270,7 @@ class Player(avango.script.Script):
         self.reduced_collison_map = avango.osg.nodes.MatrixTransform()
         self.reduced_collison_map.Children.value.append(REDUCED_COLLISION_MAP)
         self.ID = ID
+        self.starttime = STARTTIME
 
         # init field connections    
         self.dof_in.connect_from(INPUT_DEVICE.dof_out)
@@ -285,7 +286,7 @@ class Player(avango.script.Script):
         #move camera
         self.camera.Matrix.value = avango.osg.make_trans_mat(.0, 2.0, 15.0)
         self.camera2.Matrix.value = avango.osg.make_trans_mat(.0, -2.0, -2.0)
-        self.camera3.Matrix.value = avango.osg.make_rot_mat(math.radians(180), 0, 1, 0) * avango.osg.make_trans_mat(0.0, 2.0, -15.0)
+        self.camera3.Matrix.value = avango.osg.make_rot_mat(math.radians(90), 0, 1, 0) * avango.osg.make_trans_mat(10.0, -2.0, 0.0)
         
         #load modell        
         self._mat =     avango.osg.make_scale_mat(.3,.3,.3) * \
@@ -389,11 +390,12 @@ class Player(avango.script.Script):
         
         #append hud
         self.hud = HUD()
-        self.hud.my_constructor(self.SCENE, self.camera, self.ID)
+        self.hud.my_constructor(self.SCENE, self.camera_absolute, self.ID)
         
         # callbacks
     def evaluate(self):
         self.navigate()
+        self.update_HUD()
         
     def transfer(self, val):
         if (math.fabs(val) <= self.transfer_treshold):
@@ -410,7 +412,7 @@ class Player(avango.script.Script):
         z_factor = 6
         translation_threshold_min = 0.015
         translation_threshold_max = 0.5
-        rot_factor = 0.01
+        rot_factor = 0.02
 
         #transferfunktion anstatt starrer skalierungswerte nutzen!
 
@@ -474,6 +476,9 @@ class Player(avango.script.Script):
             ip = self.selected_targets_neg_y.value[0].Intersection.value.Point.value
             dist_vec = (ip - self.group.Matrix.value.get_translate())
             #print self.old_dist, dist_vec.length()
+            
+            if(dist_vec.length() < 5 and math.fabs(_y) < 0.002):
+                self.mat_out.value *= avango.osg.make_trans_mat(.0, 5-dist_vec.length(), .0)
             
             if (dist_vec.length() < 5 and self.old_dist > _y):
                 old_dist = _y
@@ -706,6 +711,19 @@ class Player(avango.script.Script):
         #maximale hoehe
         if self.mat_out.value.get_translate().y > 60.0:
             self.mat_out.value *= avango.osg.make_trans_mat(0, -_y, 0)
+            
+    def update_HUD(self):
+        self.update_time()
+            
+    def update_time(self):
+        currenttime = time.time() - self.starttime
+        seconds = math.floor(currenttime)
+        minutes = math.floor(seconds / 60)
+        milliseconds = math.floor((currenttime - seconds)*100)
+        seconds = seconds - (minutes * 60)
+        text = "%02d%s%02d%s%02d" % (minutes, ":", seconds, ":", milliseconds)
+        self.hud.change_text(2, text)
+            
 
 #class Navigation(avango.script.Script):
 #
