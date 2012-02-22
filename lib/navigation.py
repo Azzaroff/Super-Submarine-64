@@ -229,9 +229,13 @@ class Player(avango.script.Script):
     
     #pickraylength
     raylength = 20.
-    ray_transform_y = avango.osg.nodes.MatrixTransform()
-    ray_absolute_y = avango.osg.nodes.AbsoluteTransform()
-    selected_targets_y = avango.tools.MFTargetHolder()
+    ray_transform_pos_y = avango.osg.nodes.MatrixTransform()
+    ray_absolute_pos_y = avango.osg.nodes.AbsoluteTransform()
+    selected_targets_pos_y = avango.tools.MFTargetHolder()
+    
+    ray_transform_neg_y = avango.osg.nodes.MatrixTransform()
+    ray_absolute_neg_y = avango.osg.nodes.AbsoluteTransform()
+    selected_targets_neg_y = avango.tools.MFTargetHolder()
     
     ray_transform_pos_z = avango.osg.nodes.MatrixTransform()
     ray_absolute_pos_z = avango.osg.nodes.AbsoluteTransform()
@@ -248,6 +252,9 @@ class Player(avango.script.Script):
     ray_transform_neg_x = avango.osg.nodes.MatrixTransform()
     ray_absolute_neg_x = avango.osg.nodes.AbsoluteTransform()
     selected_targets_neg_x = avango.tools.MFTargetHolder()
+    
+    #distance for previous collision
+    old_dist = 0
     
     # constructor
     def __init__(self):
@@ -297,15 +304,15 @@ class Player(avango.script.Script):
         
         #ground following
         # ray geometry for target-based navigation
-        self.ray_geometry_y = avango.osg.nodes.LoadFile(Filename = "data/cylinder.obj", Matrix = avango.osg.make_scale_mat(0.025, 0.025, self.raylength) * avango.osg.make_trans_mat(0.0, 0.0, self.raylength * -0.5))
-        self.ray_geometry_y.add_field(avango.SFUInt(), "PickMask") # disable object for intersection
-        self.ray_transform_y.Children.value.append(self.ray_geometry_y)
-        self.ray_transform_y.Children.value.append(self.ray_absolute_y)
+        self.ray_geometry_neg_y = avango.osg.nodes.LoadFile(Filename = "data/cylinder.obj", Matrix = avango.osg.make_scale_mat(0.025, 0.025, self.raylength) * avango.osg.make_trans_mat(0.0, 0.0, self.raylength * -0.5))
+        self.ray_geometry_neg_y.add_field(avango.SFUInt(), "PickMask") # disable object for intersection
+        self.ray_transform_neg_y.Children.value.append(self.ray_geometry_neg_y)
+        self.ray_transform_neg_y.Children.value.append(self.ray_absolute_neg_y)
         
         # pick selector for definition of reference point
         self.pick_selector1 = avango.tools.nodes.PickSelector(FirstHitOnly = True, PickTrigger = True, TransitionOnly = False, EveryFrame = True, RootNode = self.reduced_collison_map, CreateIntersections = True, PickRayLength = self.raylength)
-        self.pick_selector1.PickRayTransform.connect_from(self.ray_absolute_y.AbsoluteMatrix)
-        self.selected_targets_y.connect_from(self.pick_selector1.SelectedTargets)
+        self.pick_selector1.PickRayTransform.connect_from(self.ray_absolute_neg_y.AbsoluteMatrix)
+        self.selected_targets_neg_y.connect_from(self.pick_selector1.SelectedTargets)
     
         #ground following
         # ray geometry for target-based navigation
@@ -352,14 +359,28 @@ class Player(avango.script.Script):
         self.pick_selector5 = avango.tools.nodes.PickSelector(FirstHitOnly = True, PickTrigger = True, TransitionOnly = False, EveryFrame = True, RootNode = self.reduced_collison_map, CreateIntersections = True, PickRayLength = self.raylength)
         self.pick_selector5.PickRayTransform.connect_from(self.ray_absolute_neg_x.AbsoluteMatrix)
         self.selected_targets_neg_x.connect_from(self.pick_selector5.SelectedTargets)
+        
+        #ground following
+        # ray geometry for target-based navigation
+        self.ray_geometry_pos_y = avango.osg.nodes.LoadFile(Filename = "data/cylinder.obj", Matrix = avango.osg.make_scale_mat(0.025, 0.025, self.raylength) * avango.osg.make_trans_mat(0.0, 0.0, self.raylength * -0.5))
+        self.ray_geometry_pos_y.add_field(avango.SFUInt(), "PickMask") # disable object for intersection
+        self.ray_transform_pos_y.Children.value.append(self.ray_geometry_pos_y)
+        self.ray_transform_pos_y.Children.value.append(self.ray_absolute_pos_y)
+        
+        # pick selector for definition of reference point
+        self.pick_selector6 = avango.tools.nodes.PickSelector(FirstHitOnly = True, PickTrigger = True, TransitionOnly = False, EveryFrame = True, RootNode = self.reduced_collison_map, CreateIntersections = True, PickRayLength = self.raylength)
+        self.pick_selector6.PickRayTransform.connect_from(self.ray_absolute_pos_y.AbsoluteMatrix)
+        self.selected_targets_pos_y.connect_from(self.pick_selector6.SelectedTargets)
     
     
-        self.ray_transform_y.Matrix.value = avango.osg.make_rot_mat(math.radians(90), -1, 0, 0)
+        self.ray_transform_neg_y.Matrix.value = avango.osg.make_rot_mat(math.radians(90), -1, 0, 0)
+        self.ray_transform_pos_y.Matrix.value = avango.osg.make_rot_mat(math.radians(90),  1, 0, 0)
         self.ray_transform_neg_z.Matrix.value = avango.osg.make_rot_mat(math.radians(180), 0, 1, 0)
         self.ray_transform_pos_x.Matrix.value = avango.osg.make_rot_mat(math.radians(90), 0, 1, 0)
         self.ray_transform_neg_x.Matrix.value = avango.osg.make_rot_mat(math.radians(90), 0, -1, 0)
                 
-        self.group.Children.value.append(self.ray_transform_y)
+        self.group.Children.value.append(self.ray_transform_pos_y)
+        self.group.Children.value.append(self.ray_transform_neg_y)
         self.group.Children.value.append(self.ray_transform_pos_z)
         self.group.Children.value.append(self.ray_transform_neg_z)
         self.group.Children.value.append(self.ray_transform_pos_x)
@@ -406,86 +427,158 @@ class Player(avango.script.Script):
             self.acceleration = -1.0
         if math.fabs(self.acceleration) < 0.1:
             self.acceleration = 0.0
-            
         
-        # verhindert durchstossen in positiver z richtung
-        pos_ztargets = self.selected_targets_pos_z.value
-        if len(pos_ztargets) > 0:
-            old_local_intersection_point = (avango.osg.make_trans_mat(pos_ztargets[0].Intersection.value.Point.value) * avango.osg.make_inverse_mat(self.ray_absolute_pos_z.get_absolute_transform(self.ray_absolute_pos_z))).get_translate()  
-            new_local_intersection_point = (avango.osg.make_trans_mat(pos_ztargets[0].Intersection.value.Point.value - avango.osg.Vec3(_x, _y, _z)) * avango.osg.make_inverse_mat(self.ray_absolute_pos_z.get_absolute_transform(self.ray_absolute_pos_z))).get_translate()
+        # z+ collision
+        if len(self.selected_targets_pos_z.value) > 0:
+            ip = self.selected_targets_pos_z.value[0].Intersection.value.Point.value
+            dist_vec = (ip - self.group.Matrix.value.get_translate())
+            #print self.old_dist, dist_vec.length()
             
-#            if old_local_intersection_point.z - new_local_intersection_point.z < 0:
-#                print "old intersection point: ", old_local_intersection_point
-#                print "new intersection point: ", new_local_intersection_point
-#                print "delta z: ", old_local_intersection_point.z - new_local_intersection_point.z
+            if (dist_vec.length() < 5 and self.old_dist > _z):
+                old_dist = _z
+                dist_vec.normalize()
+                self.mat_out.value *= avango.osg.make_trans_mat(dist_vec * _z)
+                old_dist = dist_vec.length()
+        
+        # z- collision
+        if len(self.selected_targets_neg_z.value) > 0:
+            ip = self.selected_targets_neg_z.value[0].Intersection.value.Point.value
+            dist_vec = (ip - self.group.Matrix.value.get_translate())
+            #print self.old_dist, dist_vec.length()
             
-            if old_local_intersection_point.z  < -5. and \
-                new_local_intersection_point.z > old_local_intersection_point.z:
-                _x = -0.1 * _x
-                _y = -0.1 * _y
-                _z = -0.1 * _z
-                
-        # verhindert durchstossen in negativer z richtung
-        neg_ztargets = self.selected_targets_neg_z.value
-        if len(neg_ztargets) > 0:
-            old_local_intersection_point = (avango.osg.make_trans_mat(neg_ztargets[0].Intersection.value.Point.value) * avango.osg.make_inverse_mat(self.ray_absolute_neg_z.get_absolute_transform(self.ray_absolute_neg_z))).get_translate()  
-            new_local_intersection_point = (avango.osg.make_trans_mat(neg_ztargets[0].Intersection.value.Point.value + avango.osg.Vec3(_x, _y, _z)) * avango.osg.make_inverse_mat(self.ray_absolute_neg_z.get_absolute_transform(self.ray_absolute_neg_z))).get_translate()
+            if (dist_vec.length() < 5 and self.old_dist > -_z):
+                old_dist = -_z
+                dist_vec.normalize()
+                self.mat_out.value *= avango.osg.make_trans_mat(dist_vec * -_z)
+                old_dist = dist_vec.length()
+
+        # y+ collision
+        if len(self.selected_targets_pos_y.value) > 0:
+            ip = self.selected_targets_pos_y.value[0].Intersection.value.Point.value
+            dist_vec = (ip - self.group.Matrix.value.get_translate())
+            #print self.old_dist, dist_vec.length()
             
+            if (dist_vec.length() < 5 and self.old_dist > -_y):
+                old_dist = -_y
+                dist_vec.normalize()
+                self.mat_out.value *= avango.osg.make_trans_mat(dist_vec * -_y)
+                old_dist = dist_vec.length()
+        
+        # y- collision
+        if len(self.selected_targets_neg_y.value) > 0:
+            ip = self.selected_targets_neg_y.value[0].Intersection.value.Point.value
+            dist_vec = (ip - self.group.Matrix.value.get_translate())
+            #print self.old_dist, dist_vec.length()
+            
+            if (dist_vec.length() < 5 and self.old_dist > _y):
+                old_dist = _y
+                dist_vec.normalize()
+                self.mat_out.value *= avango.osg.make_trans_mat(dist_vec * _y)
+                old_dist = dist_vec.length()
+             
+        # x+ collision
+        if len(self.selected_targets_pos_x.value) > 0:
+            ip = self.selected_targets_pos_x.value[0].Intersection.value.Point.value
+            dist_vec = (ip - self.group.Matrix.value.get_translate())
+            #print self.old_dist, dist_vec.length()
+            
+            if (dist_vec.length() < 5 and self.old_dist > _x):
+                old_dist = _x
+                dist_vec.normalize()
+                self.mat_out.value *= avango.osg.make_trans_mat(dist_vec * _x)
+                old_dist = dist_vec.length()
+        
+        # x- collision
+        if len(self.selected_targets_neg_x.value) > 0:
+            ip = self.selected_targets_neg_x.value[0].Intersection.value.Point.value
+            dist_vec = (ip - self.group.Matrix.value.get_translate())
+            #print self.old_dist, dist_vec.length()
+            
+            if (dist_vec.length() < 5 and self.old_dist > -_x):
+                old_dist = -_x
+                dist_vec.normalize()
+                self.mat_out.value *= avango.osg.make_trans_mat(dist_vec * -_x)
+                old_dist = dist_vec.length()
+        
+        
+#        # verhindert durchstossen in positiver z richtung
+#        pos_ztargets = self.selected_targets_pos_z.value
+#        if len(pos_ztargets) > 0:
+#            old_local_intersection_point = (avango.osg.make_trans_mat(pos_ztargets[0].Intersection.value.Point.value) * avango.osg.make_inverse_mat(self.ray_absolute_pos_z.get_absolute_transform(self.ray_absolute_pos_z))).get_translate()  
+#            new_local_intersection_point = (avango.osg.make_trans_mat(pos_ztargets[0].Intersection.value.Point.value - avango.osg.Vec3(_x, _y, _z)) * avango.osg.make_inverse_mat(self.ray_absolute_pos_z.get_absolute_transform(self.ray_absolute_pos_z))).get_translate()
+#            
+##            if old_local_intersection_point.z - new_local_intersection_point.z < 0:
+##                print "old intersection point: ", old_local_intersection_point
+##                print "new intersection point: ", new_local_intersection_point
+##                print "delta z: ", old_local_intersection_point.z - new_local_intersection_point.z
+#            
+#            if old_local_intersection_point.z  < -5. and \
+#                new_local_intersection_point.z > old_local_intersection_point.z:
+#                _x = -0.1 * _x
+#                _y = -0.1 * _y
+#                _z = -0.1 * _z
+#                
+#        # verhindert durchstossen in negativer z richtung
+#        neg_ztargets = self.selected_targets_neg_z.value
+#        if len(neg_ztargets) > 0:
+#            old_local_intersection_point = (avango.osg.make_trans_mat(neg_ztargets[0].Intersection.value.Point.value) * avango.osg.make_inverse_mat(self.ray_absolute_neg_z.get_absolute_transform(self.ray_absolute_neg_z))).get_translate()  
+#            new_local_intersection_point = (avango.osg.make_trans_mat(neg_ztargets[0].Intersection.value.Point.value + avango.osg.Vec3(_x, _y, _z)) * avango.osg.make_inverse_mat(self.ray_absolute_neg_z.get_absolute_transform(self.ray_absolute_neg_z))).get_translate()
+#            
+##            if old_local_intersection_point.z - new_local_intersection_point.z < 0:
+##                print "old intersection point: ", old_local_intersection_point.z
+##                print "new intersection point: ", new_local_intersection_point.z
+##                print "delta z: ", old_local_intersection_point.z - new_local_intersection_point.z
+#            
+#            if old_local_intersection_point.z  > -10. and new_local_intersection_point.z > old_local_intersection_point.z:
+#                _x = -0.1 * _x
+#                _y = -0.1 * _y
+#                _z = -0.1 * _z
+#        
+#        # verhindert durchstossen in positiver x richtung
+#        pos_xtargets = self.selected_targets_pos_x.value
+#        if len(pos_xtargets) > 0:
+#            old_local_intersection_point = (avango.osg.make_trans_mat(pos_xtargets[0].Intersection.value.Point.value) * avango.osg.make_inverse_mat(self.ray_absolute_pos_x.get_absolute_transform(self.ray_absolute_pos_x))).get_translate()  
+#            new_local_intersection_point = (avango.osg.make_trans_mat(pos_xtargets[0].Intersection.value.Point.value - avango.osg.Vec3(_x, _y, _z)) * avango.osg.make_inverse_mat(self.ray_absolute_pos_x.get_absolute_transform(self.ray_absolute_pos_x))).get_translate()
+#            
+##            if old_local_intersection_point.z - new_local_intersection_point.z < 0:
+##                print "old intersection point: ", old_local_intersection_point
+##                print "new intersection point: ", new_local_intersection_point
+##                print "delta z: ", old_local_intersection_point.z - new_local_intersection_point.z
+#            
+#            if old_local_intersection_point.z  < -5. and \
+#                new_local_intersection_point.z > old_local_intersection_point.z:
+#                _x = -0.1 * _x
+#                _y = -0.1 * _y
+#                _z = -0.1 * _z
+#                
+#        # verhindert durchstossen in negativer x richtung
+#        neg_xtargets = self.selected_targets_neg_x.value
+#        if len(neg_xtargets) > 0:
+#            old_local_intersection_point = (avango.osg.make_trans_mat(neg_xtargets[0].Intersection.value.Point.value) * avango.osg.make_inverse_mat(self.ray_absolute_neg_x.get_absolute_transform(self.ray_absolute_neg_x))).get_translate()  
+#            new_local_intersection_point = (avango.osg.make_trans_mat(neg_xtargets[0].Intersection.value.Point.value + avango.osg.Vec3(_x, _y, _z)) * avango.osg.make_inverse_mat(self.ray_absolute_neg_x.get_absolute_transform(self.ray_absolute_neg_x))).get_translate()
+#            
 #            if old_local_intersection_point.z - new_local_intersection_point.z < 0:
 #                print "old intersection point: ", old_local_intersection_point.z
 #                print "new intersection point: ", new_local_intersection_point.z
 #                print "delta z: ", old_local_intersection_point.z - new_local_intersection_point.z
-            
-            if old_local_intersection_point.z  > -10. and new_local_intersection_point.z > old_local_intersection_point.z:
-                _x = -0.1 * _x
-                _y = -0.1 * _y
-                _z = -0.1 * _z
-        
-        # verhindert durchstossen in positiver x richtung
-        pos_xtargets = self.selected_targets_pos_x.value
-        if len(pos_xtargets) > 0:
-            old_local_intersection_point = (avango.osg.make_trans_mat(pos_xtargets[0].Intersection.value.Point.value) * avango.osg.make_inverse_mat(self.ray_absolute_pos_x.get_absolute_transform(self.ray_absolute_pos_x))).get_translate()  
-            new_local_intersection_point = (avango.osg.make_trans_mat(pos_xtargets[0].Intersection.value.Point.value - avango.osg.Vec3(_x, _y, _z)) * avango.osg.make_inverse_mat(self.ray_absolute_pos_x.get_absolute_transform(self.ray_absolute_pos_x))).get_translate()
-            
-#            if old_local_intersection_point.z - new_local_intersection_point.z < 0:
-#                print "old intersection point: ", old_local_intersection_point
-#                print "new intersection point: ", new_local_intersection_point
-#                print "delta z: ", old_local_intersection_point.z - new_local_intersection_point.z
-            
-            if old_local_intersection_point.z  < -5. and \
-                new_local_intersection_point.z > old_local_intersection_point.z:
-                _x = -0.1 * _x
-                _y = -0.1 * _y
-                _z = -0.1 * _z
-                
-        # verhindert durchstossen in negativer x richtung
-        neg_xtargets = self.selected_targets_neg_x.value
-        if len(neg_xtargets) > 0:
-            old_local_intersection_point = (avango.osg.make_trans_mat(neg_xtargets[0].Intersection.value.Point.value) * avango.osg.make_inverse_mat(self.ray_absolute_neg_x.get_absolute_transform(self.ray_absolute_neg_x))).get_translate()  
-            new_local_intersection_point = (avango.osg.make_trans_mat(neg_xtargets[0].Intersection.value.Point.value + avango.osg.Vec3(_x, _y, _z)) * avango.osg.make_inverse_mat(self.ray_absolute_neg_x.get_absolute_transform(self.ray_absolute_neg_x))).get_translate()
-            
-            if old_local_intersection_point.z - new_local_intersection_point.z < 0:
-                print "old intersection point: ", old_local_intersection_point.z
-                print "new intersection point: ", new_local_intersection_point.z
-                print "delta z: ", old_local_intersection_point.z - new_local_intersection_point.z
-            
-            if old_local_intersection_point.z  > -10. and new_local_intersection_point.z > old_local_intersection_point.z:
-                _x = -0.1 * _x
-                _y = -0.1 * _y
-                _z = -0.1 * _z
-        
-        # verhindert durchstossen des bodens
-        ytargets = self.selected_targets_y.value
-        if len(ytargets) > 0:
-            old_intersection_point = (ytargets[0].Intersection.value.Point.value - self.mat_out.value.get_translate())
-            new_intersection_point = (ytargets[0].Intersection.value.Point.value - (self.mat_out.value.get_translate() + avango.osg.Vec3(_x, _y, _z)))
-            #print new_intersection_point.length()
-            if old_intersection_point.length()  < 3.5 and new_intersection_point.length() < old_intersection_point.length():
-                #print self.mat_out.value.get_translate()
-                #print ytargets[0].Intersection.value.Point.value
-                _x = 0.0
-                _y = 0.0
-                _z = 0.0
+#            
+#            if old_local_intersection_point.z  > -10. and new_local_intersection_point.z > old_local_intersection_point.z:
+#                _x = -0.1 * _x
+#                _y = -0.1 * _y
+#                _z = -0.1 * _z
+#        
+#        # verhindert durchstossen des bodens
+#        ytargets = self.selected_targets_y.value
+#        if len(ytargets) > 0:
+#            old_intersection_point = (ytargets[0].Intersection.value.Point.value - self.mat_out.value.get_translate())
+#            new_intersection_point = (ytargets[0].Intersection.value.Point.value - (self.mat_out.value.get_translate() + avango.osg.Vec3(_x, _y, _z)))
+#            #print new_intersection_point.length()
+#            if old_intersection_point.length()  < 3.5 and new_intersection_point.length() < old_intersection_point.length():
+#                #print self.mat_out.value.get_translate()
+#                #print ytargets[0].Intersection.value.Point.value
+#                _x = 0.0
+#                _y = 0.0
+#                _z = 0.0
             
             
         #_x = self.transfer(self.dof_in.value[0])
