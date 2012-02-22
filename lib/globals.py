@@ -57,7 +57,7 @@ elif _host_name == "nestor": # stereo-tv: Samsung 56'
 	gl_display_configuration = 3
 
 elif _host_name == "eris": # stereo-tv: table
-	gl_display_configuration = 5
+	gl_display_configuration = 1 #5
 
 
 
