@@ -27,6 +27,19 @@ class Scene:
 		self.environment_uniform3 = avango.osg.nodes.Uniform(Values = [1], Type = avango.osg.uniformtype.INT, UniformName = "NumLights")		
 		
 		self.environment_state = avango.osg.nodes.StateSet(RescaleNormalMode = 1, NormalizeMode = 1, CullFaceMode = 0, Program = self.environment_prog, Uniforms = [self.environment_uniform1, self.environment_uniform2, self.environment_uniform3])
+		#skybox
+		# setup shader (phong lighting + texturing + diffuse color override)
+		self.sky_vshader = avango.osg.nodes.Shader(Type = avango.osg.shadertype.VERTEX, FileName = "./shader_example/phong_texture_no_material.vert")
+		self.sky_fshader = avango.osg.nodes.Shader(Type = avango.osg.shadertype.FRAGMENT, FileName = "./shader_example/phong_texture_no_material.frag")
+
+		self.sky_prog = avango.osg.nodes.Program(ShaderList = [self.sky_vshader, self.sky_fshader])
+
+		# skybox shader states
+		self.sky_uniform1 = avango.osg.nodes.Uniform(Values = [0], Type = avango.osg.uniformtype.INT, UniformName = "color_map")
+		self.sky_uniform2 = avango.osg.nodes.Uniform(Values = [1], Type = avango.osg.uniformtype.INT, UniformName = "color_map2")
+		self.sky_uniform3 = avango.osg.nodes.Uniform(Values = [1], Type = avango.osg.uniformtype.INT, UniformName = "NumLights")		
+		
+		self.sky_state = avango.osg.nodes.StateSet(RescaleNormalMode = 1, NormalizeMode = 1, CullFaceMode = 0, Program = self.sky_prog, Uniforms = [self.sky_uniform1, self.sky_uniform2, self.sky_uniform3])
 		
 		self.vshader = avango.osg.nodes.Shader(Type = avango.osg.shadertype.VERTEX, FileName = "./shader_example/phong.vert")
 		self.fshader = avango.osg.nodes.Shader(Type = avango.osg.shadertype.FRAGMENT, FileName = "./shader_example/phong.frag")
@@ -66,6 +79,9 @@ class Scene:
 		self.environment_root = avango.osg.nodes.Group(StateSet = self.map_state, Name = "environment_root")
 		self.root.Children.value.append(self.environment_root)
 		
+		self.skybox_root = avango.osg.nodes.Group(StateSet = self.sky_state, Name = "skybox_root")
+		self.root.Children.value.append(self.skybox_root)
+		
 		self.object_root = avango.osg.nodes.Group(StateSet = self.object_state, Name = "object_root")
 		self.root.Children.value.append(self.object_root)
 														
@@ -98,6 +114,7 @@ class Scene:
 		self.light_number += 1
 		
 		self.environment_uniform3.Values.value = [self.light_number] # forward light number to shader
+		self.sky_uniform3.Values.value = [self.light_number] # forward light number to shader
 		self.map_uniform2.Values.value = [self.light_number] # forward light number to shader
 		self.uniform2.Values.value = [self.light_number] # forward light number to shader
 		self.object_uniform1.Values.value = [self.light_number] # forward light number to shader

@@ -133,13 +133,14 @@ class Application:
 				avango.osg.make_trans_mat(120.0, -200.0,250.0)
 		self.landscape = avango.osg.nodes.LoadFile(Filename = "data/Map/graben_new.obj", Matrix = _mat)
 		self.Scene.environment_root.Children.value.append(self.landscape)
+        
         	_mat = avango.osg.make_scale_mat(10000,10000,10000) * \
         		avango.osg.make_rot_mat(math.radians(180),1,0,0) * \
         		avango.osg.make_rot_mat(math.radians(90),1,0,0)
         	self.skybox = avango.osg.nodes.LoadFile(Filename = "data/skybox.obj", Matrix = _mat)
-        	self.Scene.environment_root.Children.value.append(self.skybox)
+        	self.Scene.skybox_root.Children.value.append(self.skybox)
 
-        	self.Scene.navigation_transform.Matrix.value = avango.osg.make_trans_mat(0.0,0.0,0.0)
+        	#self.Scene.navigation_transform.Matrix.value = avango.osg.make_trans_mat(0.0,0.0,0.0)
 
 
 		#self.Spacemouse = SpacemouseDevice()
