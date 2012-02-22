@@ -235,6 +235,9 @@ class Player(avango.script.Script):
     ray_absolute_y = avango.osg.nodes.AbsoluteTransform()
     selected_targets_y = avango.tools.MFTargetHolder()
     
+    ray_transform_z = avango.osg.nodes.MatrixTransform()
+    ray_absolute_z = avango.osg.nodes.AbsoluteTransform()
+    selected_targets_z = avango.tools.MFTargetHolder()
     
     
     # constructor
@@ -293,9 +296,23 @@ class Player(avango.script.Script):
         self.pick_selector1.PickRayTransform.connect_from(self.ray_absolute_y.AbsoluteMatrix)
         self.selected_targets_y.connect_from(self.pick_selector1.SelectedTargets)
     
+        #ground following
+        # ray geometry for target-based navigation
+        self.ray_geometry_z = avango.osg.nodes.LoadFile(Filename = "data/cylinder.obj", Matrix = avango.osg.make_scale_mat(0.025, 0.025, self.raylength) * avango.osg.make_trans_mat(0.0, 0.0, self.raylength * -0.5))
+        self.ray_geometry_z.add_field(avango.SFUInt(), "PickMask") # disable object for intersection
+        self.ray_transform_z.Children.value.append(self.ray_geometry_z)
+        self.ray_transform_z.Children.value.append(self.ray_absolute_z)
+        
+        # pick selector for definition of reference point
+        self.pick_selector2 = avango.tools.nodes.PickSelector(PickTrigger = True, TransitionOnly = False, EveryFrame = True, RootNode = self.SCENE.environment_root, CreateIntersections = True, PickRayLength = self.raylength)
+        self.pick_selector2.PickRayTransform.connect_from(self.ray_absolute_z.AbsoluteMatrix)
+        self.selected_targets_z.connect_from(self.pick_selector2.SelectedTargets)
+    
+    
         #self.ray_transform.Matrix.value = avango.osg.make_rot_mat(math.radians(90), -1, 0, 0)
                 
         self.group.Children.value.append(self.ray_transform_y)
+        self.group.Children.value.append(self.ray_transform_z)
         
         # callbacks
     def evaluate(self):
@@ -338,6 +355,17 @@ class Player(avango.script.Script):
             self.acceleration = -1.0
         if math.fabs(self.acceleration) < 0.1:
             self.acceleration = 0.0
+            
+        
+        # verhindert durchstossen in z richtung
+        ztargets = self.selected_targets_z.value
+        if len(ztargets) > 0:
+            intersection_point = (ztargets[0].Intersection.value.Point.value - (self.mat_out.value.get_translate() + avango.osg.Vec3(_x, _y, _z)))
+            print intersection_point.length()
+            if intersection_point.length() < 2.0:
+                _x = 0.0
+                _y = 0.0
+                _z = 0.0
             
             
         #_x = self.transfer(self.dof_in.value[0])
@@ -462,6 +490,9 @@ class Player(avango.script.Script):
                 #print ytargets[0].Intersection.value.Point.value
                 self.mat_out.value *= avango.osg.make_trans_mat(0, -_y, 0)
         
+
+        
+        #maximale hoehe
         if self.mat_out.value.get_translate().y > 40.0:
             self.mat_out.value *= avango.osg.make_trans_mat(0, -_y, 0)
 
