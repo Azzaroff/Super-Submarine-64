@@ -230,12 +230,18 @@ class Player(avango.script.Script):
     accelerationstep = .5
     
     #pickraylength
-    raylength = 100.
+    raylength = 200.
     ray_transform_y = avango.osg.nodes.MatrixTransform()
     ray_absolute_y = avango.osg.nodes.AbsoluteTransform()
     selected_targets_y = avango.tools.MFTargetHolder()
     
+    ray_transform_pos_z = avango.osg.nodes.MatrixTransform()
+    ray_absolute_pos_z = avango.osg.nodes.AbsoluteTransform()
+    selected_targets_pos_z = avango.tools.MFTargetHolder()
     
+    ray_transform_neg_z = avango.osg.nodes.MatrixTransform()
+    ray_absolute_neg_z = avango.osg.nodes.AbsoluteTransform()
+    selected_targets_neg_z = avango.tools.MFTargetHolder()
     
     # constructor
     def __init__(self):
@@ -263,7 +269,7 @@ class Player(avango.script.Script):
         #move camera
         self.camera.Matrix.value = avango.osg.make_trans_mat(.0, 2.0, 15.0)
         self.camera2.Matrix.value = avango.osg.make_trans_mat(.0, -2.0, -2.0)
-        self.camera3.Matrix.value = avango.osg.make_rot_mat(math.radians(90), 0, -1, 0) * avango.osg.make_trans_mat(.0, -2.0, -20.0)
+        self.camera3.Matrix.value = avango.osg.make_rot_mat(math.radians(90), 0, -1, 0) * avango.osg.make_trans_mat(-10.0, 0.0, 0.0)
         
         #load modell        
         self._mat =     avango.osg.make_scale_mat(.3,.3,.3) * \
@@ -283,9 +289,9 @@ class Player(avango.script.Script):
         
         #ground following
         # ray geometry for target-based navigation
-        #self.ray_geometry_y = avango.osg.nodes.LoadFile(Filename = "data/cylinder.obj", Matrix = avango.osg.make_scale_mat(0.025, 0.025, self.raylength) * avango.osg.make_trans_mat(0.0, 0.0, self.raylength * -0.5))
-        #self.ray_geometry_y.add_field(avango.SFUInt(), "PickMask") # disable object for intersection
-        #self.ray_transform_y.Children.value.append(self.ray_geometry_y)
+        self.ray_geometry_y = avango.osg.nodes.LoadFile(Filename = "data/cylinder.obj", Matrix = avango.osg.make_scale_mat(0.025, 0.025, self.raylength) * avango.osg.make_trans_mat(0.0, 0.0, self.raylength * -0.5))
+        self.ray_geometry_y.add_field(avango.SFUInt(), "PickMask") # disable object for intersection
+        self.ray_transform_y.Children.value.append(self.ray_geometry_y)
         self.ray_transform_y.Children.value.append(self.ray_absolute_y)
         
         # pick selector for definition of reference point
@@ -293,9 +299,35 @@ class Player(avango.script.Script):
         self.pick_selector1.PickRayTransform.connect_from(self.ray_absolute_y.AbsoluteMatrix)
         self.selected_targets_y.connect_from(self.pick_selector1.SelectedTargets)
     
-        #self.ray_transform.Matrix.value = avango.osg.make_rot_mat(math.radians(90), -1, 0, 0)
+        #ground following
+        # ray geometry for target-based navigation
+        self.ray_geometry_pos_z = avango.osg.nodes.LoadFile(Filename = "data/cylinder.obj", Matrix = avango.osg.make_scale_mat(0.025, 0.025, self.raylength) * avango.osg.make_trans_mat(0.0, 0.0, self.raylength * -0.5))
+        self.ray_geometry_pos_z.add_field(avango.SFUInt(), "PickMask") # disable object for intersection
+        self.ray_transform_pos_z.Children.value.append(self.ray_geometry_pos_z)
+        self.ray_transform_pos_z.Children.value.append(self.ray_absolute_pos_z)
+        
+        # pick selector for definition of reference point
+        self.pick_selector2 = avango.tools.nodes.PickSelector(PickTrigger = True, TransitionOnly = False, EveryFrame = True, RootNode = self.SCENE.environment_root, CreateIntersections = True, PickRayLength = self.raylength)
+        self.pick_selector2.PickRayTransform.connect_from(self.ray_absolute_pos_z.AbsoluteMatrix)
+        self.selected_targets_pos_z.connect_from(self.pick_selector2.SelectedTargets)
+    
+        # ray geometry for target-based navigation
+        self.ray_geometry_neg_z = avango.osg.nodes.LoadFile(Filename = "data/cylinder.obj", Matrix = avango.osg.make_scale_mat(0.025, 0.025, self.raylength) * avango.osg.make_trans_mat(0.0, 0.0, self.raylength * -0.5))
+        self.ray_geometry_neg_z.add_field(avango.SFUInt(), "PickMask") # disable object for intersection
+        self.ray_transform_neg_z.Children.value.append(self.ray_geometry_neg_z)
+        self.ray_transform_neg_z.Children.value.append(self.ray_absolute_neg_z)
+        
+        # pick selector for definition of reference point
+        self.pick_selector3 = avango.tools.nodes.PickSelector(PickTrigger = True, TransitionOnly = False, EveryFrame = True, RootNode = self.SCENE.environment_root, CreateIntersections = True, PickRayLength = self.raylength)
+        self.pick_selector3.PickRayTransform.connect_from(self.ray_absolute_neg_z.AbsoluteMatrix)
+        self.selected_targets_neg_z.connect_from(self.pick_selector3.SelectedTargets)
+    
+        self.ray_transform_y.Matrix.value = avango.osg.make_rot_mat(math.radians(90), -1, 0, 0)
+        self.ray_transform_neg_z.Matrix.value = avango.osg.make_rot_mat(math.radians(180), 0, 1, 0)
                 
         self.group.Children.value.append(self.ray_transform_y)
+        self.group.Children.value.append(self.ray_transform_pos_z)
+        self.group.Children.value.append(self.ray_transform_neg_z)
         
         # callbacks
     def evaluate(self):
@@ -312,11 +344,11 @@ class Player(avango.script.Script):
          # functions
     def navigate(self):
         
-        factor = 0.2
-        z_factor = .8
+        factor = 2
+        z_factor = 6
         translation_threshold_min = 0.015
         translation_threshold_max = 0.5
-        rot_factor = 0.008
+        rot_factor = 0.01
 
         #transferfunktion anstatt starrer skalierungswerte nutzen!
 
@@ -338,6 +370,54 @@ class Player(avango.script.Script):
             self.acceleration = -1.0
         if math.fabs(self.acceleration) < 0.1:
             self.acceleration = 0.0
+            
+        
+        # verhindert durchstossen in positiver z richtung
+        pos_ztargets = self.selected_targets_pos_z.value
+        if len(pos_ztargets) > 0:
+            old_local_intersection_point = (avango.osg.make_trans_mat(pos_ztargets[0].Intersection.value.Point.value) * avango.osg.make_inverse_mat(self.ray_absolute_pos_z.get_absolute_transform(self.ray_absolute_pos_z))).get_translate()  
+            new_local_intersection_point = (avango.osg.make_trans_mat(pos_ztargets[0].Intersection.value.Point.value - avango.osg.Vec3(_x, _y, _z)) * avango.osg.make_inverse_mat(self.ray_absolute_pos_z.get_absolute_transform(self.ray_absolute_pos_z))).get_translate()
+            
+#            if old_local_intersection_point.z - new_local_intersection_point.z < 0:
+#                print "old intersection point: ", old_local_intersection_point
+#                print "new intersection point: ", new_local_intersection_point
+#                print "delta z: ", old_local_intersection_point.z - new_local_intersection_point.z
+            
+            if old_local_intersection_point.z  < -5. and \
+                new_local_intersection_point.z > old_local_intersection_point.z:
+                _x = -0.1 * _x
+                _y = -0.1 * _y
+                _z = -0.1 * _z
+                
+        # verhindert durchstossen in negativer z richtung
+        neg_ztargets = self.selected_targets_neg_z.value
+        if len(neg_ztargets) > 0:
+            old_local_intersection_point = (avango.osg.make_trans_mat(neg_ztargets[0].Intersection.value.Point.value) * avango.osg.make_inverse_mat(self.ray_absolute_pos_z.get_absolute_transform(self.ray_absolute_neg_z))).get_translate()  
+            new_local_intersection_point = (avango.osg.make_trans_mat(neg_ztargets[0].Intersection.value.Point.value - avango.osg.Vec3(_x, _y, _z)) * avango.osg.make_inverse_mat(self.ray_absolute_neg_z.get_absolute_transform(self.ray_absolute_neg_z))).get_translate()
+            
+            #if old_local_intersection_point.z - new_local_intersection_point.z < 0:
+            print "old intersection point: ", old_local_intersection_point
+            print "new intersection point: ", new_local_intersection_point
+            print "delta z: ", old_local_intersection_point.z - new_local_intersection_point.z
+            
+            if old_local_intersection_point.z  < 5. and \
+                new_local_intersection_point.z < old_local_intersection_point.z:
+                _x = -0.1 * _x
+                _y = -0.1 * _y
+                _z = -0.1 * _z
+        
+        # verhindert durchstossen des bodens
+        ytargets = self.selected_targets_y.value
+        if len(ytargets) > 0:
+            old_intersection_point = (ytargets[0].Intersection.value.Point.value - self.mat_out.value.get_translate())
+            new_intersection_point = (ytargets[0].Intersection.value.Point.value - (self.mat_out.value.get_translate() + avango.osg.Vec3(_x, _y, _z)))
+            #print new_intersection_point.length()
+            if old_intersection_point.length()  < 3.5 and new_intersection_point.length() < old_intersection_point.length():
+                #print self.mat_out.value.get_translate()
+                #print ytargets[0].Intersection.value.Point.value
+                _x = 0.0
+                _y = 0.0
+                _z = 0.0
             
             
         #_x = self.transfer(self.dof_in.value[0])
@@ -453,15 +533,11 @@ class Player(avango.script.Script):
         self.camerabuttonlast.value = self.camerabutton.value
         self.camerabuttonlast2.value = self.camerabutton2.value
         
-        # verhindert durchstossen des bodens
-        ytargets = self.selected_targets_y.value
-        if len(ytargets) > 0:
-            intersection_point = (ytargets[0].Intersection.value.Point.value - self.mat_out.value.get_translate())
-            if intersection_point.length() < 0.75:
-                #print self.mat_out.value.get_translate()
-                #print ytargets[0].Intersection.value.Point.value
-                self.mat_out.value *= avango.osg.make_trans_mat(0, -_y, 0)
         
+        
+
+        
+        #maximale hoehe
         if self.mat_out.value.get_translate().y > 40.0:
             self.mat_out.value *= avango.osg.make_trans_mat(0, -_y, 0)
 
