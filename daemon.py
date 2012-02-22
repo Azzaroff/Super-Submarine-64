@@ -228,7 +228,7 @@ if gl_viewing_setup == "desktop" or gl_viewing_setup == "anaglyph" or gl_viewing
 	init_pst_tracking()
 
 # init input devices
-init_spacemouse()
+#init_spacemouse()
 init_keyboard()
 init_mouse()
 init_impact_controller()
