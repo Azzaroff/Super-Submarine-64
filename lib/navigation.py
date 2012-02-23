@@ -141,6 +141,7 @@ class SpacemouseDevice(SixDofInputDevice):
     
     buttons_out = avango.MFBool()
     buttons_out.value = [0,0,0,0]
+    
 
     # constructor
     def __init__(self):
@@ -224,6 +225,8 @@ class Player(avango.script.Script):
     buttons_in = avango.MFBool()
     buttons_in.value = [False, False, False, False]
     
+    debug_coll = False
+    
     # output fields
     mat_out = avango.osg.SFMatrix()
         
@@ -289,6 +292,17 @@ class Player(avango.script.Script):
         self.check_point = 0
         self.lap_count = 1
         self.last_lap_time = time.time() - time.time()
+        
+        # submarine bounding spheres
+        # lol sub zero get it?
+        self.sub0 = 0
+        self.sub1 = 0
+        
+        #race position
+        if self.ID==0: 
+            self.race_pos = 2
+        else: 
+            self.race_pos = 1
         
         #pickraylength
         self.raylength = 20.
@@ -374,9 +388,11 @@ class Player(avango.script.Script):
         
         #ground following
         # ray geometry for target-based navigation
+        
         self.ray_geometry_neg_y = avango.osg.nodes.LoadFile(Filename = "data/cylinder.obj", Matrix = avango.osg.make_scale_mat(0.025, 0.025, self.raylength) * avango.osg.make_trans_mat(0.0, 0.0, self.raylength * -0.5))
         self.ray_geometry_neg_y.add_field(avango.SFUInt(), "PickMask") # disable object for intersection
-        self.ray_transform_neg_y.Children.value.append(self.ray_geometry_neg_y)
+        if self.debug_coll: 
+            self.ray_transform_neg_y.Children.value.append(self.ray_geometry_neg_y)
         self.ray_transform_neg_y.Children.value.append(self.ray_absolute_neg_y)
         
         # pick selector for definition of reference point
@@ -388,7 +404,8 @@ class Player(avango.script.Script):
         # ray geometry for target-based navigation
         self.ray_geometry_pos_z = avango.osg.nodes.LoadFile(Filename = "data/cylinder.obj", Matrix = avango.osg.make_scale_mat(0.025, 0.025, self.raylength) * avango.osg.make_trans_mat(0.0, 0.0, self.raylength * -0.5))
         self.ray_geometry_pos_z.add_field(avango.SFUInt(), "PickMask") # disable object for intersection
-        self.ray_transform_pos_z.Children.value.append(self.ray_geometry_pos_z)
+        if self.debug_coll: 
+            self.ray_transform_pos_z.Children.value.append(self.ray_geometry_pos_z)
         self.ray_transform_pos_z.Children.value.append(self.ray_absolute_pos_z)
         
         # pick selector for definition of reference point
@@ -399,7 +416,8 @@ class Player(avango.script.Script):
         # ray geometry for target-based navigation
         self.ray_geometry_neg_z = avango.osg.nodes.LoadFile(Filename = "data/cylinder.obj", Matrix = avango.osg.make_scale_mat(0.025, 0.025, self.raylength) * avango.osg.make_trans_mat(0.0, 0.0, self.raylength * -0.5))
         self.ray_geometry_neg_z.add_field(avango.SFUInt(), "PickMask") # disable object for intersection
-        self.ray_transform_neg_z.Children.value.append(self.ray_geometry_neg_z)
+        if self.debug_coll:
+            self.ray_transform_neg_z.Children.value.append(self.ray_geometry_neg_z)
         self.ray_transform_neg_z.Children.value.append(self.ray_absolute_neg_z)
         
         # pick selector for definition of reference point
@@ -411,7 +429,8 @@ class Player(avango.script.Script):
         # ray geometry for target-based navigation
         self.ray_geometry_pos_x = avango.osg.nodes.LoadFile(Filename = "data/cylinder.obj", Matrix = avango.osg.make_scale_mat(0.025, 0.025, self.raylength) * avango.osg.make_trans_mat(0.0, 0.0, self.raylength * -0.5))
         self.ray_geometry_pos_x.add_field(avango.SFUInt(), "PickMask") # disable object for intersection
-        self.ray_transform_pos_x.Children.value.append(self.ray_geometry_pos_x)
+        if self.debug_coll: 
+            self.ray_transform_pos_x.Children.value.append(self.ray_geometry_pos_x)
         self.ray_transform_pos_x.Children.value.append(self.ray_absolute_pos_x)
         
         # pick selector for definition of reference point
@@ -422,7 +441,8 @@ class Player(avango.script.Script):
         # ray geometry for target-based navigation
         self.ray_geometry_neg_x = avango.osg.nodes.LoadFile(Filename = "data/cylinder.obj", Matrix = avango.osg.make_scale_mat(0.025, 0.025, self.raylength) * avango.osg.make_trans_mat(0.0, 0.0, self.raylength * -0.5))
         self.ray_geometry_neg_x.add_field(avango.SFUInt(), "PickMask") # disable object for intersection
-        self.ray_transform_neg_x.Children.value.append(self.ray_geometry_neg_x)
+        if self.debug_coll:
+            self.ray_transform_neg_x.Children.value.append(self.ray_geometry_neg_x)
         self.ray_transform_neg_x.Children.value.append(self.ray_absolute_neg_x)
         
         # pick selector for definition of reference point
@@ -434,7 +454,8 @@ class Player(avango.script.Script):
         # ray geometry for target-based navigation
         self.ray_geometry_pos_y = avango.osg.nodes.LoadFile(Filename = "data/cylinder.obj", Matrix = avango.osg.make_scale_mat(0.025, 0.025, self.raylength) * avango.osg.make_trans_mat(0.0, 0.0, self.raylength * -0.5))
         self.ray_geometry_pos_y.add_field(avango.SFUInt(), "PickMask") # disable object for intersection
-        self.ray_transform_pos_y.Children.value.append(self.ray_geometry_pos_y)
+        if self.debug_coll:
+            self.ray_transform_pos_y.Children.value.append(self.ray_geometry_pos_y)
         self.ray_transform_pos_y.Children.value.append(self.ray_absolute_pos_y)
         
         # pick selector for definition of reference point
@@ -464,8 +485,9 @@ class Player(avango.script.Script):
     def evaluate(self):
         self.navigate()
         self.update_HUD()
+        self.check_player_coll()
         
-        print self.hud
+        #print self.hud
         #print "player",self.ID,": mat_out: ",self.mat_out.value
         #print self.submarine
         #print self.model_transform
@@ -801,7 +823,31 @@ class Player(avango.script.Script):
             text = "%02d%s%02d%s%02d" % (minutes, ":", seconds, ":", milliseconds)
             self.hud.change_text(3, text)
             self.hud.change_text(0, str(self.lap_count))
+    
+    def check_player_coll(self):
+        if self.ID == 1:
+            self.sub0 = self.SCENE.Player0.group.get_bounding_sphere()
+            self.sub1 = self.SCENE.Player1.group.get_bounding_sphere()
+            
+            player_dist = (self.sub0.get_center() - self.sub1.get_center()).length()
+            print player_dist
+            if player_dist < 400:
+                if self.sub1.get_center().z > self.sub0.get_center().z:
+                    #print "2: erster"
+                    self.SCENE.Player0.race_pos = 2
+                    self.SCENE.Player1.race_pos = 1
+                else:
+                    #print "2: zweiter"
+                    self.SCENE.Player0.race_pos = 1
+                    self.SCENE.Player1.race_pos = 2
+                
+            if self.sub1.intersects(self.sub0):
+                print "hit it!"
+            
+        #print self.race_pos
+        self.hud.change_text(1, str(self.race_pos) + "/2")
 
+        
 #class Navigation(avango.script.Script):
 #
 #    # input fields

@@ -91,7 +91,7 @@ class Application:
 #		_mat = 	avango.osg.make_scale_mat(0.004,0.004,0.004) * \
 #				avango.osg.make_rot_mat(math.pi,-1,0,0)	* \
 #				avango.osg.make_trans_mat(2.15,0.97,-3.55)
-#		self.chess = avango.osg.nodes.LoadFile(Filename = "/opt/3d_models/exhibition/chess-game.obj", Matrix = _mat)
+#		self.chess = avango.osg.nodes.Loaself.SCENE.finish_group.get_bounding_spheredFile(Filename = "/opt/3d_models/exhibition/chess-game.obj", Matrix = _mat)
 #		self.Scene.object_root.Children.value.append(self.chess)
 #
 #		_mat = 	avango.osg.make_scale_mat(0.14,0.14,0.14) * \
