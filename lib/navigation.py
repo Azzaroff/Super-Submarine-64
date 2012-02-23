@@ -265,19 +265,27 @@ class Player(avango.script.Script):
 
         # references
         self.SCENE = SCENE
-        self.mat_out.value = SCENE.Player0.group.Matrix.value # initial navigation values
-        self.nav_trans = SCENE.Player0.group.Matrix.value
+        self.ID = ID
+        
+        if(self.ID == 0):
+            self.mat_out.value = SCENE.Player0.group.Matrix.value # initial navigation values
+            self.nav_trans = SCENE.Player0.group.Matrix.value
+        else:
+            self.mat_out.value = SCENE.Player1.group.Matrix.value # initial navigation values
+            self.nav_trans = SCENE.Player1.group.Matrix.value        
         self.reduced_collison_map = avango.osg.nodes.MatrixTransform()
         self.reduced_collison_map.Children.value.append(REDUCED_COLLISION_MAP)
-        self.ID = ID
         self.starttime = STARTTIME
 
         # init field connections    
         self.dof_in.connect_from(INPUT_DEVICE.dof_out)
         self.camerabutton.connect_from(INPUT_DEVICE.button1_out)
         self.camerabutton2.connect_from(INPUT_DEVICE.button2_out)
-
-        SCENE.Player0.group.Matrix.connect_from(self.mat_out)
+        
+        if self.ID == 0:
+            SCENE.Player0.group.Matrix.connect_from(self.mat_out)
+        else:
+            SCENE.Player1.group.Matrix.connect_from(self.mat_out)
 
         # init further device sensors
         self.keyboard_sensor = avango.daemon.nodes.DeviceSensor(Station = "device-keyboard", DeviceService = gl_device_service)

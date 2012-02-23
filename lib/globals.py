@@ -35,7 +35,7 @@ gl_viewing_setup = "desktop" # default setup
 if len(sys.argv) >= 2: # check for further command line options
 	gl_viewing_setup = str(sys.argv[1])
 
-_supported_viewing_setups = ["desktop", "anaglyph", "checkerboard"]
+_supported_viewing_setups = ["desktop", "anaglyph", "checkerboard", "splitscreen"]
 if _supported_viewing_setups.count(gl_viewing_setup) == 0: # check if viewing setup is supported
 	print "Viewing Setup NOT supported!"
 	sys.exit(1) # terminate application

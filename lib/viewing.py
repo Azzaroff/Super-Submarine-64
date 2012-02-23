@@ -42,6 +42,9 @@ class ViewingSetup:
 	
 		elif gl_viewing_setup == "minicave":
 			self.setup = MiniCaveSetup(SCENE)
+			
+		elif gl_viewing_setup == "splitscreen":
+			self.setup = SplitScreenSetup(SCENE)
 	
 		else: # viewing setup not supported
 
@@ -105,6 +108,82 @@ class DesktopSetup:
 
 		# init viewer
 		self.viewer = avango.osg.viewer.nodes.Viewer(Scene = SCENE.root, MasterCamera = self.camera)
+
+		# init simple mouse events
+		self.events = avango.osg.viewer.nodes.EventFields(View = self.viewer)
+
+		self.window.DragEvent.connect_from(self.events.DragEvent)
+		self.window.MoveEvent.connect_from(self.events.MoveEvent)
+		self.window.ToggleFullScreen.connect_from(self.events.KeyAltReturn)
+
+
+		self.init_ground_plane(SCENE)
+
+	# functions
+	def init_ground_plane(self, SCENE):
+		if gl_ground_flag == True:
+			self.ground_panel = avango.osg.nodes.Panel(PanelColor = avango.osg.Vec4(0.5,0.5,0.3,0.75), Width = 1.0, Height = 1.0)
+			self.ground_geode = avango.osg.nodes.LayerGeode(Drawables = [self.ground_panel], StateSet = avango.osg.nodes.StateSet(BlendMode = 1, LightingMode = 0, RenderingHint = 2))
+			self.ground_transform = avango.osg.nodes.MatrixTransform(Children = [self.ground_geode])
+			self.ground_transform.Matrix.value = gl_ground_plane_transform
+			SCENE.root.Children.value.append(self.ground_transform)
+
+class SplitScreenSetup:
+
+	# contructor
+	def __init__(self, SCENE):
+
+		# parameters
+		self.eye_offset1 = 0.065
+		self.eye_offset2 = 0.065
+		
+		# init window
+		self.window = avango.osg.viewer.nodes.GraphicsWindow()
+		self.window.ScreenIdentifier.value = ":0.0"
+		self.window.ShowCursor.value = False
+		self.window.AutoHeight.value = False
+		self.window.Decoration.value = False
+		self.window.StereoMode.value = avango.osg.viewer.stereo_mode.STEREO_MODE_NONE
+						
+		# screen parameters
+		self.window.WantedWidth.value = gl_pixels_width
+		self.window.WantedHeight.value = gl_pixels_height
+		self.window.WantedPositionX.value = gl_wanted_position_x
+		self.window.WantedPositionY.value = gl_wanted_position_y
+		self.window.RealScreenWidth.value = gl_physical_screen_width
+		self.window.RealScreenHeight.value = gl_physical_screen_height
+
+		# init camera 1
+		self.camera1 = avango.osg.viewer.nodes.Camera(Window = self.window)
+		self.camera1.EyeOffset.value = self.eye_offset1 * 0.5
+		self.camera1.Far.value = 40000000.0
+		self.camera1.ScreenTransform.value = gl_screen_transform
+		self.camera1.BackgroundColor.value = gl_background_color
+		
+		# init camera 2
+		self.camera2 = avango.osg.viewer.nodes.Camera(Window = self.window)
+		self.camera2.EyeOffset.value = self.eye_offset1 * 0.5
+		self.camera2.Far.value = 40000000.0
+		self.camera2.ScreenTransform.value = gl_screen_transform
+		self.camera2.BackgroundColor.value = gl_background_color
+		
+		self.camera1.ViewerTransform.connect_from(SCENE.Player0.camera_absolute.AbsoluteMatrix)
+		self.camera2.ViewerTransform.connect_from(SCENE.Player1.camera_absolute.AbsoluteMatrix)
+
+		if gl_headtracking_flag == True:
+			self.tracking_sensor1 = avango.daemon.nodes.DeviceSensor(DeviceService = avango.daemon.DeviceService(), Station = "tracking-head1", TransmitterOffset = gl_transmitter_offset) # init tracking sensor
+			self.tracking_sensor2 = avango.daemon.nodes.DeviceSensor(DeviceService = avango.daemon.DeviceService(), Station = "tracking-head2", TransmitterOffset = gl_transmitter_offset) # init tracking sensor
+
+			# connect headtracking sensor data with camera EyeTransform here			
+
+		else:
+			self.camera1.EyeTransform.value = gl_eye_transform # fixed head position
+			self.camera2.EyeTransform.value = gl_eye_transform # fixed head position
+
+
+		# init viewer
+		self.viewer = avango.osg.viewer.nodes.Viewer(Scene = SCENE.root, MasterCamera = self.camera1, SlaveCameras = [self.camera2])
+
 
 		# init simple mouse events
 		self.events = avango.osg.viewer.nodes.EventFields(View = self.viewer)
