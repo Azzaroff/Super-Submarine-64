@@ -232,7 +232,7 @@ class Player(avango.script.Script):
         self.super(Player).__init__()
         self.reference_point = avango.osg.Vec3()
        
-    def my_constructor(self, SCENE, INPUT_DEVICE, MODELPATH, REDUCED_COLLISION_MAP, ID, STARTTIME):
+    def my_constructor(self, SCENE, INPUT_DEVICE, MODELPATH, REDUCED_COLLISION_MAP, ID, STARTTIME, MINIMAP):
 
         print "constructor call of player: ",ID
 
@@ -265,7 +265,11 @@ class Player(avango.script.Script):
         #self.camerabutton4 = avango.SFBool()
         self.cameratoggle4 = avango.SFBool()
         self.camerabuttonlast4 = avango.SFBool()
-        self.camera5 = avango.osg.nodes.MatrixTransform() 
+        self.camera5 = avango.osg.nodes.MatrixTransform()
+        
+        #minimap
+        self.minimap = MINIMAP
+        self.minimap_initial_position = avango.osg.make_trans_mat(-2.2, 0, -7)
         
         #navigation
         self.model_transform = avango.osg.nodes.MatrixTransform()
@@ -464,8 +468,8 @@ class Player(avango.script.Script):
     def evaluate(self):
         self.navigate()
         self.update_HUD()
+        self.move_minimap()
         
-        print self.hud
         #print "player",self.ID,": mat_out: ",self.mat_out.value
         #print self.submarine
         #print self.model_transform
@@ -801,6 +805,9 @@ class Player(avango.script.Script):
             text = "%02d%s%02d%s%02d" % (minutes, ":", seconds, ":", milliseconds)
             self.hud.change_text(3, text)
             self.hud.change_text(0, str(self.lap_count))
+            
+    def move_minimap(self):
+        self.minimap.Matrix.value = self.minimap_initial_position * self.mat_out.value
 
 #class Navigation(avango.script.Script):
 #

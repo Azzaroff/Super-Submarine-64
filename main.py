@@ -134,7 +134,7 @@ class Application:
 				avango.osg.make_rot_mat(math.radians(-90),1,0,0) * \
 				avango.osg.make_trans_mat(120.0, -200.0,250.0)
 		self.landscape = avango.osg.nodes.LoadFile(Filename = "data/Map/graben_new.obj", Matrix = _mat)
-		self.Scene.environment_root.Children.value.append(self.landscape)
+		#self.Scene.environment_root.Children.value.append(self.landscape)
 		
 		#Ziel
 		_mat = avango.osg.make_rot_mat(math.radians(270),1,0,0) * avango.osg.make_trans_mat(1170.637451, -84.802658, -63.487019)
@@ -169,7 +169,21 @@ class Application:
 				avango.osg.make_trans_mat(120.0, -200.0,250.0)
 		self.collision_landscape = avango.osg.nodes.LoadFile(Filename = "data/Map/graben_new_reduced.obj", Matrix = _mat)
 		
-		#self.Scene.environment_root.Children.value.append(self.collision_landscape)
+		
+		#minimap
+		_mat = 	avango.osg.make_scale_mat(.00003,.00003,.00003)
+		self.minimap_0 = avango.osg.nodes.LoadFile(Filename = "data/Map/graben_new_reduced.obj", Matrix = _mat)
+		self.mini_player0 = avango.osg.nodes.Sphere()
+		self.mini_player0.Matrix.value = avango.osg.make_scale_mat(3, 3, 3)
+		self.mini_player0.get_field(8).value = avango.osg.Vec4(1.0, 0, 0, 1.0)
+		
+		_mat = 	avango.osg.make_scale_mat(.00005,.00005,.00005) * \
+				avango.osg.make_trans_mat(1079.2, -39.3, -435.3)
+		self.minimap_1 = avango.osg.nodes.LoadFile(Filename = "data/Map/graben_new_reduced.obj", Matrix = _mat)
+		
+		self.Scene.root.Children.value.append(self.minimap_0)
+		
+		
 
 		_mat = avango.osg.make_scale_mat(10000,10000,10000) * \
         avango.osg.make_rot_mat(math.radians(180),1,0,0) * \
@@ -190,9 +204,9 @@ class Application:
 		self.time_sav = time.time()
 
 		self.Scene.Player0 = Player()
-		self.Scene.Player0.my_constructor(self.Scene, self.ImpactController, "./data/Submarine/My_YellowSubmarine.obj", self.collision_landscape, 0, self.time_sav)
+		self.Scene.Player0.my_constructor(self.Scene, self.ImpactController, "./data/Submarine/My_YellowSubmarine.obj", self.collision_landscape, 0, self.time_sav, self.minimap_0)
 		self.Scene.Player1 = Player()
-		self.Scene.Player1.my_constructor(self.Scene, self.Spacemouse, "./data/Submarine/My_RedSubmarine.obj", self.collision_landscape, 1, self.time_sav)
+		self.Scene.Player1.my_constructor(self.Scene, self.Spacemouse, "./data/Submarine/My_RedSubmarine.obj", self.collision_landscape, 1, self.time_sav, self.minimap_1)
 		
 		#print self.Scene.Player0
 		#print self.Scene.Player1
