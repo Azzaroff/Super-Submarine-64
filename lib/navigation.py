@@ -43,7 +43,8 @@ class SixDofInputDevice(avango.script.Script):
     button2_out = avango.SFBool()
     button3_out = avango.SFBool()
     button4_out = avango.SFBool()
-       
+    
+    
     # constructor
     def __init__(self):
         self.super(SixDofInputDevice).__init__()
@@ -55,6 +56,7 @@ class SixDofInputDevice(avango.script.Script):
         self.button1_out.connect_from(self.device_sensor.Button0)
         self.button2_out.connect_from(self.device_sensor.Button1)
 
+        
         # variables
         self.time_sav = time.time()
         
@@ -92,6 +94,7 @@ class ThreeDofInputDevice(avango.script.Script):
     button2_out = avango.SFBool()
     button3_out = avango.SFBool()
     button4_out = avango.SFBool()
+    
        
     # constructor
     def __init__(self):
@@ -105,6 +108,7 @@ class ThreeDofInputDevice(avango.script.Script):
         self.button2_out.connect_from(self.device_sensor.Button7)
         self.button3_out.connect_from(self.device_sensor.Button6)
         self.button4_out.connect_from(self.device_sensor.Button8)
+        
 
         # variables
         self.time_sav = time.time()
@@ -134,6 +138,9 @@ class ThreeDofInputDevice(avango.script.Script):
         return VALUE
     
 class SpacemouseDevice(SixDofInputDevice):
+    
+    buttons_out = avango.MFBool()
+    buttons_out.value = [0,0,0,0]
 
     # constructor
     def __init__(self):
@@ -166,8 +173,16 @@ class SpacemouseDevice(SixDofInputDevice):
         self.dof_out.value[3] = _rx * _fr_scale_factor
         self.dof_out.value[4] = _ry * _fr_scale_factor * -1.0
         self.dof_out.value[5] = _rz * _fr_scale_factor
+        
+        self.buttons_out.value[0] = self.device_sensor.Button0.value
+        self.buttons_out.value[1] = self.device_sensor.Button1.value
+        self.buttons_out.value[2] = False
+        self.buttons_out.value[3] = False
 
 class GameControllerDevice(ThreeDofInputDevice):
+    
+    buttons_out = avango.MFBool()
+    buttons_out.value = [0,0,0,0]
 
     # constructor
     def __init__(self):
@@ -196,81 +211,22 @@ class GameControllerDevice(ThreeDofInputDevice):
         self.dof_out.value[1] = _y * _fr_scale_factor * -1.0
         self.dof_out.value[2] = _z * _fr_scale_factor
         self.dof_out.value[4] = _ry * _fr_scale_factor * -1.0
+        
+        self.buttons_out.value[0] = self.device_sensor.Button5.value
+        self.buttons_out.value[1] = self.device_sensor.Button7.value
+        self.buttons_out.value[2] = self.device_sensor.Button6.value
+        self.buttons_out.value[3] = self.device_sensor.Button8.value
        
 class Player(avango.script.Script):
     # input fields
     dof_in = avango.MFFloat()
     transfer_treshold = 0.2
+    buttons_in = avango.MFBool()
+    buttons_in.value = [False, False, False, False]
     
     # output fields
     mat_out = avango.osg.SFMatrix()
-    
-
-    
-    #camera
-    camera = avango.osg.nodes.MatrixTransform()
-    camera_absolute = avango.osg.nodes.AbsoluteTransform()
-    
-    camerabutton = avango.SFBool()
-    cameratoggle = avango.SFBool()
-    camerabuttonlast = avango.SFBool()
-    camera2 = avango.osg.nodes.MatrixTransform()   
-    
-    camerabutton2 = avango.SFBool()
-    cameratoggle2 = avango.SFBool()
-    camerabuttonlast2 = avango.SFBool()
-    camera3 = avango.osg.nodes.MatrixTransform()
-    
-    camerabutton3 = avango.SFBool()
-    cameratoggle3 = avango.SFBool()
-    camerabuttonlast3 = avango.SFBool()
-    camera4 = avango.osg.nodes.MatrixTransform()
-    
-    camerabutton4 = avango.SFBool()
-    cameratoggle4 = avango.SFBool()
-    camerabuttonlast4 = avango.SFBool()
-    camera5 = avango.osg.nodes.MatrixTransform() 
-    
-    #navigation
-    #model_transform = avango.osg.nodes.MatrixTransform()
-    #pitchthreshold = 25 # rund 45 Grad
-    #rollthreshold = 15 # rund 35 Grad
-    
-    pitch = 0
-    roll = 0
-    
-    acceleration = 0.0
-    accelerationstep = .5
-    
-    #pickraylength
-    raylength = 20.
-    ray_transform_pos_y = avango.osg.nodes.MatrixTransform()
-    ray_absolute_pos_y = avango.osg.nodes.AbsoluteTransform()
-    selected_targets_pos_y = avango.tools.MFTargetHolder()
-    
-    ray_transform_neg_y = avango.osg.nodes.MatrixTransform()
-    ray_absolute_neg_y = avango.osg.nodes.AbsoluteTransform()
-    selected_targets_neg_y = avango.tools.MFTargetHolder()
-    
-    ray_transform_pos_z = avango.osg.nodes.MatrixTransform()
-    ray_absolute_pos_z = avango.osg.nodes.AbsoluteTransform()
-    selected_targets_pos_z = avango.tools.MFTargetHolder()
-    
-    ray_transform_neg_z = avango.osg.nodes.MatrixTransform()
-    ray_absolute_neg_z = avango.osg.nodes.AbsoluteTransform()
-    selected_targets_neg_z = avango.tools.MFTargetHolder()
-    
-    ray_transform_pos_x = avango.osg.nodes.MatrixTransform()
-    ray_absolute_pos_x = avango.osg.nodes.AbsoluteTransform()
-    selected_targets_pos_x = avango.tools.MFTargetHolder()
-    
-    ray_transform_neg_x = avango.osg.nodes.MatrixTransform()
-    ray_absolute_neg_x = avango.osg.nodes.AbsoluteTransform()
-    selected_targets_neg_x = avango.tools.MFTargetHolder()
-
-    
-
-    
+        
     # constructor
     def __init__(self):
         self.super(Player).__init__()
@@ -287,13 +243,44 @@ class Player(avango.script.Script):
         #object container
         self.group = avango.osg.nodes.MatrixTransform()
         
+        #camera
+        self.camera = avango.osg.nodes.MatrixTransform()
+        self.camera_absolute = avango.osg.nodes.AbsoluteTransform()
+        
+        #self.camerabutton = avango.SFBool()
+        self.cameratoggle = avango.SFBool()
+        self.camerabuttonlast = avango.SFBool()
+        self.camera2 = avango.osg.nodes.MatrixTransform()   
+        
+        #self.camerabutton2 = avango.SFBool()
+        self.cameratoggle2 = avango.SFBool()
+        self.camerabuttonlast2 = avango.SFBool()
+        self.camera3 = avango.osg.nodes.MatrixTransform()
+        
+        #self.camerabutton3 = avango.SFBool()
+        self.cameratoggle3 = avango.SFBool()
+        self.camerabuttonlast3 = avango.SFBool()
+        self.camera4 = avango.osg.nodes.MatrixTransform()
+        
+        #self.camerabutton4 = avango.SFBool()
+        self.cameratoggle4 = avango.SFBool()
+        self.camerabuttonlast4 = avango.SFBool()
+        self.camera5 = avango.osg.nodes.MatrixTransform() 
+        
         #navigation
         self.model_transform = avango.osg.nodes.MatrixTransform()
         self.pitchthreshold = 25 # rund 45 Grad
         self.rollthreshold = 15 # rund 35 Grad
         self.velocity = 0.0 # -1 ... volles abbremsen, 1...volle beschleunigung
-        self.friction = 0.02 #reibung
+        self.max_velocity = 8
+        self.velocity_factor = 3
+        self.friction = 0.2 #reibung
+
+        self.pitch = 0
+        self.roll = 0
         
+        self.acceleration = 0.0
+        self.accelerationstep = .5
             
         #distance for previous collision
         self.old_dist = 0
@@ -302,6 +289,33 @@ class Player(avango.script.Script):
         self.check_point = 0
         self.lap_count = 1
         self.last_lap_time = time.time() - time.time()
+        
+        #pickraylength
+        self.raylength = 20.
+        self.ray_transform_pos_y = avango.osg.nodes.MatrixTransform()
+        self.ray_absolute_pos_y = avango.osg.nodes.AbsoluteTransform()
+        #self.selected_targets_pos_y = avango.tools.MFTargetHolder()
+
+        self.ray_transform_neg_y = avango.osg.nodes.MatrixTransform()
+        self.ray_absolute_neg_y = avango.osg.nodes.AbsoluteTransform()
+        #self.selected_targets_neg_y = avango.tools.MFTargetHolder()
+        
+        self.ray_transform_pos_z = avango.osg.nodes.MatrixTransform()
+        self.ray_absolute_pos_z = avango.osg.nodes.AbsoluteTransform()
+        #self.selected_targets_pos_z = avango.tools.MFTargetHolder()
+        
+        self.ray_transform_neg_z = avango.osg.nodes.MatrixTransform()
+        self.ray_absolute_neg_z = avango.osg.nodes.AbsoluteTransform()
+        #self.selected_targets_neg_z = avango.tools.MFTargetHolder()
+        
+        self.ray_transform_pos_x = avango.osg.nodes.MatrixTransform()
+        self.ray_absolute_pos_x = avango.osg.nodes.AbsoluteTransform()
+        #self.selected_targets_pos_x = avango.tools.MFTargetHolder()
+        
+        self.ray_transform_neg_x = avango.osg.nodes.MatrixTransform()
+        self.ray_absolute_neg_x = avango.osg.nodes.AbsoluteTransform()
+        #self.selected_targets_neg_x = avango.tools.MFTargetHolder()
+        
         
         if(self.ID == 0):
             self.mat_out.value = avango.osg.make_rot_mat(math.radians(180),0,1,0) * avango.osg.make_trans_mat(1077.455688, -39.309696, -427.697662) # initial navigation values # initial navigation values
@@ -319,10 +333,11 @@ class Player(avango.script.Script):
 
         # init field connections    
         self.dof_in.connect_from(INPUT_DEVICE.dof_out)
-        self.camerabutton.connect_from(INPUT_DEVICE.button1_out)
-        self.camerabutton2.connect_from(INPUT_DEVICE.button2_out)
-        self.camerabutton3.connect_from(INPUT_DEVICE.button3_out)
-        self.camerabutton4.connect_from(INPUT_DEVICE.button4_out)
+        #self.camerabutton.connect_from(INPUT_DEVICE.button1_out)
+        #self.camerabutton2.connect_from(INPUT_DEVICE.button2_out)
+        #self.camerabutton3.connect_from(INPUT_DEVICE.button3_out)
+        #self.camerabutton4.connect_from(INPUT_DEVICE.button4_out)
+        self.buttons_in.connect_from(INPUT_DEVICE.buttons_out)
         
         
         if self.ID == 0:
@@ -367,8 +382,8 @@ class Player(avango.script.Script):
         # pick selector for definition of reference point
         self.pick_selector1 = avango.tools.nodes.PickSelector(FirstHitOnly = True, PickTrigger = True, TransitionOnly = False, EveryFrame = True, RootNode = self.reduced_collison_map, CreateIntersections = True, PickRayLength = self.raylength)
         self.pick_selector1.PickRayTransform.connect_from(self.ray_absolute_neg_y.AbsoluteMatrix)
-        self.selected_targets_neg_y.connect_from(self.pick_selector1.SelectedTargets)
-    
+        #self.selected_targets_neg_y.connect_from(self.pick_selector1.SelectedTargets)
+        
         #ground following
         # ray geometry for target-based navigation
         self.ray_geometry_pos_z = avango.osg.nodes.LoadFile(Filename = "data/cylinder.obj", Matrix = avango.osg.make_scale_mat(0.025, 0.025, self.raylength) * avango.osg.make_trans_mat(0.0, 0.0, self.raylength * -0.5))
@@ -379,7 +394,7 @@ class Player(avango.script.Script):
         # pick selector for definition of reference point
         self.pick_selector2 = avango.tools.nodes.PickSelector(FirstHitOnly = True, PickTrigger = True, TransitionOnly = False, EveryFrame = True, RootNode = self.reduced_collison_map, CreateIntersections = True, PickRayLength = self.raylength)
         self.pick_selector2.PickRayTransform.connect_from(self.ray_absolute_pos_z.AbsoluteMatrix)
-        self.selected_targets_pos_z.connect_from(self.pick_selector2.SelectedTargets)
+        #self.selected_targets_pos_z.connect_from(self.pick_selector2.SelectedTargets)
     
         # ray geometry for target-based navigation
         self.ray_geometry_neg_z = avango.osg.nodes.LoadFile(Filename = "data/cylinder.obj", Matrix = avango.osg.make_scale_mat(0.025, 0.025, self.raylength) * avango.osg.make_trans_mat(0.0, 0.0, self.raylength * -0.5))
@@ -390,7 +405,7 @@ class Player(avango.script.Script):
         # pick selector for definition of reference point
         self.pick_selector3 = avango.tools.nodes.PickSelector(FirstHitOnly = True, PickTrigger = True, TransitionOnly = False, EveryFrame = True, RootNode = self.reduced_collison_map, CreateIntersections = True, PickRayLength = self.raylength)
         self.pick_selector3.PickRayTransform.connect_from(self.ray_absolute_neg_z.AbsoluteMatrix)
-        self.selected_targets_neg_z.connect_from(self.pick_selector3.SelectedTargets)
+        #self.selected_targets_neg_z.connect_from(self.pick_selector3.SelectedTargets)
     
         #x direction collision trigger
         # ray geometry for target-based navigation
@@ -402,7 +417,7 @@ class Player(avango.script.Script):
         # pick selector for definition of reference point
         self.pick_selector4 = avango.tools.nodes.PickSelector(FirstHitOnly = True, PickTrigger = True, TransitionOnly = False, EveryFrame = True, RootNode = self.reduced_collison_map, CreateIntersections = True, PickRayLength = self.raylength)
         self.pick_selector4.PickRayTransform.connect_from(self.ray_absolute_pos_x.AbsoluteMatrix)
-        self.selected_targets_pos_x.connect_from(self.pick_selector4.SelectedTargets)
+        #self.selected_targets_pos_x.connect_from(self.pick_selector4.SelectedTargets)
         
         # ray geometry for target-based navigation
         self.ray_geometry_neg_x = avango.osg.nodes.LoadFile(Filename = "data/cylinder.obj", Matrix = avango.osg.make_scale_mat(0.025, 0.025, self.raylength) * avango.osg.make_trans_mat(0.0, 0.0, self.raylength * -0.5))
@@ -413,7 +428,7 @@ class Player(avango.script.Script):
         # pick selector for definition of reference point
         self.pick_selector5 = avango.tools.nodes.PickSelector(FirstHitOnly = True, PickTrigger = True, TransitionOnly = False, EveryFrame = True, RootNode = self.reduced_collison_map, CreateIntersections = True, PickRayLength = self.raylength)
         self.pick_selector5.PickRayTransform.connect_from(self.ray_absolute_neg_x.AbsoluteMatrix)
-        self.selected_targets_neg_x.connect_from(self.pick_selector5.SelectedTargets)
+        #self.selected_targets_neg_x.connect_from(self.pick_selector5.SelectedTargets)
         
         #ground following
         # ray geometry for target-based navigation
@@ -425,7 +440,7 @@ class Player(avango.script.Script):
         # pick selector for definition of reference point
         self.pick_selector6 = avango.tools.nodes.PickSelector(FirstHitOnly = True, PickTrigger = True, TransitionOnly = False, EveryFrame = True, RootNode = self.reduced_collison_map, CreateIntersections = True, PickRayLength = self.raylength)
         self.pick_selector6.PickRayTransform.connect_from(self.ray_absolute_pos_y.AbsoluteMatrix)
-        self.selected_targets_pos_y.connect_from(self.pick_selector6.SelectedTargets)
+        #self.selected_targets_pos_y.connect_from(self.pick_selector6.SelectedTargets)
     
     
         self.ray_transform_neg_y.Matrix.value = avango.osg.make_rot_mat(math.radians(90), -1, 0, 0)
@@ -433,7 +448,7 @@ class Player(avango.script.Script):
         self.ray_transform_neg_z.Matrix.value = avango.osg.make_rot_mat(math.radians(180), 0, 1, 0)
         self.ray_transform_pos_x.Matrix.value = avango.osg.make_rot_mat(math.radians(90), 0, 1, 0)
         self.ray_transform_neg_x.Matrix.value = avango.osg.make_rot_mat(math.radians(90), 0, -1, 0)
-                
+             
         self.group.Children.value.append(self.ray_transform_pos_y)
         self.group.Children.value.append(self.ray_transform_neg_y)
         self.group.Children.value.append(self.ray_transform_pos_z)
@@ -450,6 +465,7 @@ class Player(avango.script.Script):
         self.navigate()
         self.update_HUD()
         
+        print self.hud
         #print "player",self.ID,": mat_out: ",self.mat_out.value
         #print self.submarine
         #print self.model_transform
@@ -484,62 +500,61 @@ class Player(avango.script.Script):
  
         
         #beschleunigung
-        #print "z: ",_z
-        self.velocity += (-_z*0.01)
-        if self.velocity < 0.0:
-            self.velocity += self.friction
-        elif self.velocity > 0.0:
-            self.velocity -= self.friction
-        print self.velocity
-        if self.velocity > 1.0:
-            self.velocity = 1.0
-        if self.velocity < -1.0:
-            self.velocity = -1.0
-        if math.fabs(self.velocity) < 0.00001:
-            self.velocity = 0.0
-        print self.velocity
-            
-#        #acceleration
-#        _z *= self.acceleration
-#        self.acceleration += self.accelerationstep * self.accelerationstep
-#        if self.acceleration > 1.0:
-#            self.acceleration = 1.0
-#        if self.acceleration < -1.0:
-#            self.acceleration = -1.0
-#        if math.fabs(self.acceleration) < 0.1:
-#            self.acceleration = 0.0
         
+        self.acceleration = (_z / 7)
+        
+        if self.acceleration > 1.0:
+            self.acceleration = 1.0
+        if self.acceleration < -1.0:
+            self.acceleration = -1.0
+        
+            
+        self.velocity = (self.velocity_factor * self.acceleration) + self.velocity
+        
+        if self.velocity > self.max_velocity:
+            self.velocity = self.max_velocity
+        if self.velocity < -self.max_velocity:
+            self.velocity = -self.max_velocity
+        
+        if self.velocity > 0.0:
+            self.velocity -= self.friction
+            if self.velocity < 0.0:
+                self.velocity = 0.0
+        else:
+            self.velocity += self.friction
+            if self.velocity > 0.0:
+                self.velocity = 0.0
         #print "x: ", _x, " y: ", _y, " z: ", _z
         
         #print self.mat_out.value.get_translate()
         
         # z+ collision
-        if len(self.selected_targets_pos_z.value) > 0:
-            ip = self.selected_targets_pos_z.value[0].Intersection.value.Point.value
+        if len(self.pick_selector2.SelectedTargets.value) > 0:
+            ip = self.pick_selector2.SelectedTargets.value[0].Intersection.value.Point.value
             dist_vec = (ip - self.group.Matrix.value.get_translate())
             #print self.old_dist, dist_vec.length()
             
-            if (dist_vec.length() < 5 and self.old_dist > _z):
-                old_dist = _z
+            if (dist_vec.length() < 10 and self.old_dist > self.velocity):
+                old_dist = self.velocity
                 dist_vec.normalize()
-                self.mat_out.value *= avango.osg.make_trans_mat(dist_vec * _z)
+                self.mat_out.value *= avango.osg.make_trans_mat(dist_vec * self.velocity)
                 old_dist = dist_vec.length()
         
         # z- collision
-        if len(self.selected_targets_neg_z.value) > 0:
-            ip = self.selected_targets_neg_z.value[0].Intersection.value.Point.value
+        if len(self.pick_selector3.SelectedTargets.value) > 0:
+            ip = self.pick_selector3.SelectedTargets.value[0].Intersection.value.Point.value
             dist_vec = (ip - self.group.Matrix.value.get_translate())
             #print self.old_dist, dist_vec.length()
             
-            if (dist_vec.length() < 5 and self.old_dist > -_z):
-                old_dist = -_z
+            if (dist_vec.length() < 10 and self.old_dist > -self.velocity):
+                old_dist = -self.velocity
                 dist_vec.normalize()
-                self.mat_out.value *= avango.osg.make_trans_mat(dist_vec * -_z)
+                self.mat_out.value *= avango.osg.make_trans_mat(dist_vec * -self.velocity)
                 old_dist = dist_vec.length()
 
         # y+ collision
-        if len(self.selected_targets_pos_y.value) > 0:
-            ip = self.selected_targets_pos_y.value[0].Intersection.value.Point.value
+        if len(self.pick_selector6.SelectedTargets.value) > 0:
+            ip = self.pick_selector6.SelectedTargets.value[0].Intersection.value.Point.value
             dist_vec = (ip - self.group.Matrix.value.get_translate())
             #print self.old_dist, dist_vec.length()
             
@@ -550,8 +565,8 @@ class Player(avango.script.Script):
                 old_dist = dist_vec.length()
         
         # y- collision
-        if len(self.selected_targets_neg_y.value) > 0:
-            ip = self.selected_targets_neg_y.value[0].Intersection.value.Point.value
+        if len(self.pick_selector1.SelectedTargets.value) > 0:
+            ip = self.pick_selector1.SelectedTargets.value[0].Intersection.value.Point.value
             dist_vec = (ip - self.group.Matrix.value.get_translate())
             #print self.old_dist, dist_vec.length()
             
@@ -565,8 +580,8 @@ class Player(avango.script.Script):
                 old_dist = dist_vec.length()
              
         # x+ collision
-        if len(self.selected_targets_pos_x.value) > 0:
-            ip = self.selected_targets_pos_x.value[0].Intersection.value.Point.value
+        if len(self.pick_selector4.SelectedTargets.value) > 0:
+            ip = self.pick_selector4.SelectedTargets.value[0].Intersection.value.Point.value
             dist_vec = (ip - self.group.Matrix.value.get_translate())
             #print self.old_dist, dist_vec.length()
             
@@ -577,8 +592,8 @@ class Player(avango.script.Script):
                 old_dist = dist_vec.length()
         
         # x- collision
-        if len(self.selected_targets_neg_x.value) > 0:
-            ip = self.selected_targets_neg_x.value[0].Intersection.value.Point.value
+        if len(self.pick_selector5.SelectedTargets.value) > 0:
+            ip = self.pick_selector5.SelectedTargets.value[0].Intersection.value.Point.value
             dist_vec = (ip - self.group.Matrix.value.get_translate())
             #print self.old_dist, dist_vec.length()
             
@@ -607,9 +622,10 @@ class Player(avango.script.Script):
         _roll = self.dof_in.value[5] * rot_factor
 
         if math.fabs(_x) > translation_threshold_min or math.fabs(_y) > translation_threshold_min or math.fabs(_z) > translation_threshold_min:
-            self.nav_trans = avango.osg.make_trans_mat(_x * math.fabs(self.velocity),_y * math.fabs(self.velocity),_z * math.fabs(self.velocity))
+            #self.nav_trans = avango.osg.make_trans_mat(_x * math.fabs(self.velocity),_y * math.fabs(self.velocity),_z * math.fabs(self.velocity))
+            self.nav_trans = avango.osg.make_trans_mat(_x,_y,self.velocity)
         else:
-            self.nav_trans = avango.osg.make_trans_mat(0, 0, self.velocity * 6)
+            self.nav_trans = avango.osg.make_trans_mat(0, 0, self.velocity)
             
 
         
@@ -681,7 +697,7 @@ class Player(avango.script.Script):
                                             avango.osg.make_rot_mat(math.radians(self.roll), 0, 0, 1)
                                     
         #camera toggle
-        if self.camerabutton.value == True and self.camerabuttonlast.value != self.camerabutton.value and \
+        if self.buttons_in.value[0] == True and self.camerabuttonlast.value != self.buttons_in.value[0] and \
             not self.cameratoggle2.value == True and not self.cameratoggle3.value == True:
             self.cameratoggle.value = not self.cameratoggle.value
             if self.cameratoggle.value == True:
@@ -693,7 +709,7 @@ class Player(avango.script.Script):
                 self.camera2.Matrix.value = self.camera.Matrix.value
                 self.camera.Matrix.value = help
         
-        if self.camerabutton2.value == True and self.camerabuttonlast2.value != self.camerabutton2.value and \
+        if self.buttons_in.value[1] == True and self.camerabuttonlast2.value != self.buttons_in.value[1] and \
             not self.cameratoggle.value == True and not self.cameratoggle3.value == True:
             self.cameratoggle2.value = not self.cameratoggle2.value
             if self.cameratoggle2.value == True:
@@ -705,7 +721,7 @@ class Player(avango.script.Script):
                 self.camera3.Matrix.value = self.camera.Matrix.value
                 self.camera.Matrix.value = help
 
-        if self.camerabutton3.value == True and self.camerabuttonlast3.value != self.camerabutton3.value and \
+        if self.buttons_in.value[2] == True and self.camerabuttonlast3.value != self.buttons_in.value[2] and \
             not self.cameratoggle.value == True and not self.cameratoggle2.value == True:
             self.cameratoggle3.value = not self.cameratoggle3.value
             if self.cameratoggle3.value == True:
@@ -717,7 +733,7 @@ class Player(avango.script.Script):
                 self.camera4.Matrix.value = self.camera.Matrix.value
                 self.camera.Matrix.value = help
                 
-        if self.camerabutton4.value == True and self.camerabuttonlast4.value != self.camerabutton4.value and \
+        if self.buttons_in.value[3] == True and self.camerabuttonlast4.value != self.buttons_in.value[3] and \
             not self.cameratoggle.value == True and not self.cameratoggle2.value == True:
             self.cameratoggle4.value = not self.cameratoggle4.value
             if self.cameratoggle4.value == True:
@@ -729,10 +745,10 @@ class Player(avango.script.Script):
                 self.camera4.Matrix.value = self.camera.Matrix.value
                 self.camera.Matrix.value = help
                 
-        self.camerabuttonlast.value = self.camerabutton.value
-        self.camerabuttonlast2.value = self.camerabutton2.value
-        self.camerabuttonlast3.value = self.camerabutton3.value
-        self.camerabuttonlast4.value = self.camerabutton4.value
+        self.camerabuttonlast.value = self.buttons_in.value[0]
+        self.camerabuttonlast2.value = self.buttons_in.value[1]
+        self.camerabuttonlast3.value = self.buttons_in.value[2]
+        self.camerabuttonlast4.value = self.buttons_in.value[3]
         
         
         
