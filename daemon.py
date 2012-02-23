@@ -74,7 +74,8 @@ def init_impact_controller():
 		_controller.buttons[4] = "EV_KEY::BTN_TOP" # button 4
 		_controller.buttons[5] = "EV_KEY::BTN_TOP2" # button 5
 		_controller.buttons[6] = "EV_KEY::BTN_PINKIE" # button 6
-		_controller.buttons[7] = "EV_KEY::BTN_BASE" # button LX  
+		_controller.buttons[7] = "EV_KEY::BTN_BASE" # button LX
+		_controller.buttons[8] = "EV_KEY::BTN_BASE5" # button S    
 		
 				# =========================================
 		# For codes, run 
@@ -228,7 +229,7 @@ if gl_viewing_setup == "desktop" or gl_viewing_setup == "anaglyph" or gl_viewing
 	init_pst_tracking()
 
 # init input devices
-#init_spacemouse()
+init_spacemouse()
 init_keyboard()
 init_mouse()
 init_impact_controller()

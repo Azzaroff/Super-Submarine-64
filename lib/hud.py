@@ -30,13 +30,13 @@ class HUD(avango.script.Script):
         #self.panel.EdgeSmooth.value = 1
         
         self.label0 = self.create_text(avango.osg.Vec3(self.id*gl_physical_screen_width*0.5 + (-(0.06 + 0.015)), gl_physical_screen_height * 0.44, 0.0), "Runde:");
-        self.text0 = self.create_text(avango.osg.Vec3(self.id*gl_physical_screen_width*0.5 + (-(0.02)), gl_physical_screen_height * 0.44, 0.0), "1/2");
+        self.text0 = self.create_text(avango.osg.Vec3(self.id*gl_physical_screen_width*0.5 + (-(0.02)), gl_physical_screen_height * 0.44, 0.0), "1/3");
         self.label1 = self.create_text(avango.osg.Vec3(self.id*gl_physical_screen_width*0.5 + (-(0.06 + 0.015)), gl_physical_screen_height * 0.41, 0.0), "Position:");
         self.text1 = self.create_text(avango.osg.Vec3(self.id*gl_physical_screen_width*0.5 + (-(0.02)), gl_physical_screen_height * 0.41, 0.0), "1/2");
         self.label2 = self.create_text(avango.osg.Vec3((self.id-1)*gl_physical_screen_width*0.5 + (0.005), gl_physical_screen_height * 0.44, 0.0), "Zeit:");
-        self.text2 = self.create_text(avango.osg.Vec3((self.id-1)*gl_physical_screen_width*0.5 + ((0.085)), gl_physical_screen_height * 0.44, 0.0), "00:00:00");
+        self.text2 = self.create_text(avango.osg.Vec3((self.id-1)*gl_physical_screen_width*0.5 + ((0.085)), gl_physical_screen_height * 0.44, 0.0), "00:00:000");
         self.label3 = self.create_text(avango.osg.Vec3((self.id-1)*gl_physical_screen_width*0.5 + (0.005), gl_physical_screen_height * 0.41, 0.0), "Rundenzeit:");
-        self.text3 = self.create_text(avango.osg.Vec3((self.id-1)*gl_physical_screen_width*0.5 + ((0.085)), gl_physical_screen_height * 0.41, 0.0), "00:00:00");
+        self.text3 = self.create_text(avango.osg.Vec3((self.id-1)*gl_physical_screen_width*0.5 + ((0.085)), gl_physical_screen_height * 0.41, 0.0), "--:--:---");
         self.geode = avango.osg.nodes.LayerGeode(Drawables = [self.label0, self.text0, self.label1, self.text1, self.label2, self.text2, self.label3, self.text3], StateSet = avango.osg.nodes.StateSet(LightingMode = 0), Name="HUD1")
         
         self.Scene.root.Children.value.append(self.hud_transform)
@@ -50,7 +50,7 @@ class HUD(avango.script.Script):
     
     def change_text(self, textid,new_content):
         if textid == 0:
-            self.text0.String.value = new_content
+            self.text0.String.value = new_content + "/3"
         elif textid == 1:
             self.text1.String.value = new_content
         elif textid == 2:

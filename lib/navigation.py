@@ -41,6 +41,8 @@ class SixDofInputDevice(avango.script.Script):
 
     button1_out = avango.SFBool()
     button2_out = avango.SFBool()
+    button3_out = avango.SFBool()
+    button4_out = avango.SFBool()
        
     # constructor
     def __init__(self):
@@ -88,6 +90,8 @@ class ThreeDofInputDevice(avango.script.Script):
 
     button1_out = avango.SFBool()
     button2_out = avango.SFBool()
+    button3_out = avango.SFBool()
+    button4_out = avango.SFBool()
        
     # constructor
     def __init__(self):
@@ -99,6 +103,8 @@ class ThreeDofInputDevice(avango.script.Script):
         # field connections
         self.button1_out.connect_from(self.device_sensor.Button5)
         self.button2_out.connect_from(self.device_sensor.Button7)
+        self.button3_out.connect_from(self.device_sensor.Button6)
+        self.button4_out.connect_from(self.device_sensor.Button8)
 
         # variables
         self.time_sav = time.time()
@@ -195,9 +201,7 @@ class Player(avango.script.Script):
     # input fields
     dof_in = avango.MFFloat()
     transfer_treshold = 0.2
-    
-    # output fields
-    mat_out = avango.osg.SFMatrix()
+
     
     #object container
     group = avango.osg.nodes.MatrixTransform()
@@ -214,7 +218,17 @@ class Player(avango.script.Script):
     camerabutton2 = avango.SFBool()
     cameratoggle2 = avango.SFBool()
     camerabuttonlast2 = avango.SFBool()
-    camera3 = avango.osg.nodes.MatrixTransform()   
+    camera3 = avango.osg.nodes.MatrixTransform()
+    
+    camerabutton3 = avango.SFBool()
+    cameratoggle3 = avango.SFBool()
+    camerabuttonlast3 = avango.SFBool()
+    camera4 = avango.osg.nodes.MatrixTransform()
+    
+    camerabutton4 = avango.SFBool()
+    cameratoggle4 = avango.SFBool()
+    camerabuttonlast4 = avango.SFBool()
+    camera5 = avango.osg.nodes.MatrixTransform() 
     
     #navigation
     model_transform = avango.osg.nodes.MatrixTransform()
@@ -256,6 +270,11 @@ class Player(avango.script.Script):
     #distance for previous collision
     old_dist = 0
     
+    #checkpoint counter
+    check_point = 0
+    lap_count = 1
+    last_lap_time = time.time() - time.time()
+    
     # constructor
     def __init__(self):
         self.super(Player).__init__()
@@ -263,24 +282,36 @@ class Player(avango.script.Script):
        
     def my_constructor(self, SCENE, INPUT_DEVICE, MODELPATH, REDUCED_COLLISION_MAP, ID, STARTTIME):
 
+        print "constructor call of player: ",ID
+            
+        # output fields
+        self.mat_out = avango.osg.SFMatrix()
+
         # references
         self.SCENE = SCENE
         self.ID = ID
         
         if(self.ID == 0):
-            self.mat_out.value = SCENE.Player0.group.Matrix.value # initial navigation values
+            self.mat_out.value = SCENE.Player0.group.Matrix.value * avango.osg.make_rot_mat(math.radians(180),0,1,0) * avango.osg.make_trans_mat(1077.455688, -39.309696, -427.697662) # initial navigation values # initial navigation values
             self.nav_trans = SCENE.Player0.group.Matrix.value
         else:
-            self.mat_out.value = SCENE.Player1.group.Matrix.value # initial navigation values
+            self.mat_out.value = SCENE.Player1.group.Matrix.value * avango.osg.make_rot_mat(math.radians(180),0,1,0) * avango.osg.make_trans_mat(1077.455688, -39.309696, -427.697662) # initial navigation values
             self.nav_trans = SCENE.Player1.group.Matrix.value        
         self.reduced_collison_map = avango.osg.nodes.MatrixTransform()
         self.reduced_collison_map.Children.value.append(REDUCED_COLLISION_MAP)
         self.starttime = STARTTIME
+        
+        #move the players to the start
+        self.mat_out.value *= avango.osg.make_trans_mat((-self.ID * -3), 0.0, 0.0) 
+
 
         # init field connections    
         self.dof_in.connect_from(INPUT_DEVICE.dof_out)
         self.camerabutton.connect_from(INPUT_DEVICE.button1_out)
         self.camerabutton2.connect_from(INPUT_DEVICE.button2_out)
+        self.camerabutton3.connect_from(INPUT_DEVICE.button3_out)
+        self.camerabutton4.connect_from(INPUT_DEVICE.button4_out)
+        
         
         if self.ID == 0:
             SCENE.Player0.group.Matrix.connect_from(self.mat_out)
@@ -295,6 +326,8 @@ class Player(avango.script.Script):
         self.camera.Matrix.value = avango.osg.make_trans_mat(.0, 2.0, 15.0)
         self.camera2.Matrix.value = avango.osg.make_trans_mat(.0, -2.0, -2.0)
         self.camera3.Matrix.value = avango.osg.make_rot_mat(math.radians(90), 0, 1, 0) * avango.osg.make_trans_mat(10.0, -2.0, 0.0)
+        self.camera4.Matrix.value = avango.osg.make_trans_mat(0.0, 0.0, 10.0) * avango.osg.make_rot_mat(math.radians(90), -1, 0, 0)
+        self.camera5.Matrix.value = avango.osg.make_trans_mat(0.0, 2.0, 10.0) * avango.osg.make_rot_mat(math.radians(45), 0, 1, 0)
         
         #load modell        
         self._mat =     avango.osg.make_scale_mat(.3,.3,.3) * \
@@ -405,6 +438,8 @@ class Player(avango.script.Script):
         self.navigate()
         self.update_HUD()
         
+        #print self.mat_out
+        
     def transfer(self, val):
         if (math.fabs(val) <= self.transfer_treshold):
             # linear output        
@@ -442,6 +477,10 @@ class Player(avango.script.Script):
             self.acceleration = -1.0
         if math.fabs(self.acceleration) < 0.1:
             self.acceleration = 0.0
+        
+        #print "x: ", _x, " y: ", _y, " z: ", _z
+        
+        #print self.mat_out.value.get_translate()
         
         # z+ collision
         if len(self.selected_targets_pos_z.value) > 0:
@@ -519,84 +558,6 @@ class Player(avango.script.Script):
                 old_dist = dist_vec.length()
         
         
-#        # verhindert durchstossen in positiver z richtung
-#        pos_ztargets = self.selected_targets_pos_z.value
-#        if len(pos_ztargets) > 0:
-#            old_local_intersection_point = (avango.osg.make_trans_mat(pos_ztargets[0].Intersection.value.Point.value) * avango.osg.make_inverse_mat(self.ray_absolute_pos_z.get_absolute_transform(self.ray_absolute_pos_z))).get_translate()  
-#            new_local_intersection_point = (avango.osg.make_trans_mat(pos_ztargets[0].Intersection.value.Point.value - avango.osg.Vec3(_x, _y, _z)) * avango.osg.make_inverse_mat(self.ray_absolute_pos_z.get_absolute_transform(self.ray_absolute_pos_z))).get_translate()
-#            
-##            if old_local_intersection_point.z - new_local_intersection_point.z < 0:
-##                print "old intersection point: ", old_local_intersection_point
-##                print "new intersection point: ", new_local_intersection_point
-##                print "delta z: ", old_local_intersection_point.z - new_local_intersection_point.z
-#            
-#            if old_local_intersection_point.z  < -5. and \
-#                new_local_intersection_point.z > old_local_intersection_point.z:
-#                _x = -0.1 * _x
-#                _y = -0.1 * _y
-#                _z = -0.1 * _z
-#                
-#        # verhindert durchstossen in negativer z richtung
-#        neg_ztargets = self.selected_targets_neg_z.value
-#        if len(neg_ztargets) > 0:
-#            old_local_intersection_point = (avango.osg.make_trans_mat(neg_ztargets[0].Intersection.value.Point.value) * avango.osg.make_inverse_mat(self.ray_absolute_neg_z.get_absolute_transform(self.ray_absolute_neg_z))).get_translate()  
-#            new_local_intersection_point = (avango.osg.make_trans_mat(neg_ztargets[0].Intersection.value.Point.value + avango.osg.Vec3(_x, _y, _z)) * avango.osg.make_inverse_mat(self.ray_absolute_neg_z.get_absolute_transform(self.ray_absolute_neg_z))).get_translate()
-#            
-##            if old_local_intersection_point.z - new_local_intersection_point.z < 0:
-##                print "old intersection point: ", old_local_intersection_point.z
-##                print "new intersection point: ", new_local_intersection_point.z
-##                print "delta z: ", old_local_intersection_point.z - new_local_intersection_point.z
-#            
-#            if old_local_intersection_point.z  > -10. and new_local_intersection_point.z > old_local_intersection_point.z:
-#                _x = -0.1 * _x
-#                _y = -0.1 * _y
-#                _z = -0.1 * _z
-#        
-#        # verhindert durchstossen in positiver x richtung
-#        pos_xtargets = self.selected_targets_pos_x.value
-#        if len(pos_xtargets) > 0:
-#            old_local_intersection_point = (avango.osg.make_trans_mat(pos_xtargets[0].Intersection.value.Point.value) * avango.osg.make_inverse_mat(self.ray_absolute_pos_x.get_absolute_transform(self.ray_absolute_pos_x))).get_translate()  
-#            new_local_intersection_point = (avango.osg.make_trans_mat(pos_xtargets[0].Intersection.value.Point.value - avango.osg.Vec3(_x, _y, _z)) * avango.osg.make_inverse_mat(self.ray_absolute_pos_x.get_absolute_transform(self.ray_absolute_pos_x))).get_translate()
-#            
-##            if old_local_intersection_point.z - new_local_intersection_point.z < 0:
-##                print "old intersection point: ", old_local_intersection_point
-##                print "new intersection point: ", new_local_intersection_point
-##                print "delta z: ", old_local_intersection_point.z - new_local_intersection_point.z
-#            
-#            if old_local_intersection_point.z  < -5. and \
-#                new_local_intersection_point.z > old_local_intersection_point.z:
-#                _x = -0.1 * _x
-#                _y = -0.1 * _y
-#                _z = -0.1 * _z
-#                
-#        # verhindert durchstossen in negativer x richtung
-#        neg_xtargets = self.selected_targets_neg_x.value
-#        if len(neg_xtargets) > 0:
-#            old_local_intersection_point = (avango.osg.make_trans_mat(neg_xtargets[0].Intersection.value.Point.value) * avango.osg.make_inverse_mat(self.ray_absolute_neg_x.get_absolute_transform(self.ray_absolute_neg_x))).get_translate()  
-#            new_local_intersection_point = (avango.osg.make_trans_mat(neg_xtargets[0].Intersection.value.Point.value + avango.osg.Vec3(_x, _y, _z)) * avango.osg.make_inverse_mat(self.ray_absolute_neg_x.get_absolute_transform(self.ray_absolute_neg_x))).get_translate()
-#            
-#            if old_local_intersection_point.z - new_local_intersection_point.z < 0:
-#                print "old intersection point: ", old_local_intersection_point.z
-#                print "new intersection point: ", new_local_intersection_point.z
-#                print "delta z: ", old_local_intersection_point.z - new_local_intersection_point.z
-#            
-#            if old_local_intersection_point.z  > -10. and new_local_intersection_point.z > old_local_intersection_point.z:
-#                _x = -0.1 * _x
-#                _y = -0.1 * _y
-#                _z = -0.1 * _z
-#        
-#        # verhindert durchstossen des bodens
-#        ytargets = self.selected_targets_y.value
-#        if len(ytargets) > 0:
-#            old_intersection_point = (ytargets[0].Intersection.value.Point.value - self.mat_out.value.get_translate())
-#            new_intersection_point = (ytargets[0].Intersection.value.Point.value - (self.mat_out.value.get_translate() + avango.osg.Vec3(_x, _y, _z)))
-#            #print new_intersection_point.length()
-#            if old_intersection_point.length()  < 3.5 and new_intersection_point.length() < old_intersection_point.length():
-#                #print self.mat_out.value.get_translate()
-#                #print ytargets[0].Intersection.value.Point.value
-#                _x = 0.0
-#                _y = 0.0
-#                _z = 0.0
             
             
         #_x = self.transfer(self.dof_in.value[0])
@@ -687,7 +648,8 @@ class Player(avango.script.Script):
                                             avango.osg.make_rot_mat(math.radians(self.roll), 0, 0, 1)
                                     
         #camera toggle
-        if self.camerabutton.value == True and self.camerabuttonlast.value != self.camerabutton.value:
+        if self.camerabutton.value == True and self.camerabuttonlast.value != self.camerabutton.value and \
+            not self.cameratoggle2.value == True and not self.cameratoggle3.value == True:
             self.cameratoggle.value = not self.cameratoggle.value
             if self.cameratoggle.value == True:
                 help = self.camera.Matrix.value
@@ -698,7 +660,8 @@ class Player(avango.script.Script):
                 self.camera2.Matrix.value = self.camera.Matrix.value
                 self.camera.Matrix.value = help
         
-        if self.camerabutton2.value == True and self.camerabuttonlast2.value != self.camerabutton2.value:
+        if self.camerabutton2.value == True and self.camerabuttonlast2.value != self.camerabutton2.value and \
+            not self.cameratoggle.value == True and not self.cameratoggle3.value == True:
             self.cameratoggle2.value = not self.cameratoggle2.value
             if self.cameratoggle2.value == True:
                 help = self.camera.Matrix.value
@@ -708,9 +671,36 @@ class Player(avango.script.Script):
                 help = self.camera3.Matrix.value
                 self.camera3.Matrix.value = self.camera.Matrix.value
                 self.camera.Matrix.value = help
+
+        if self.camerabutton3.value == True and self.camerabuttonlast3.value != self.camerabutton3.value and \
+            not self.cameratoggle.value == True and not self.cameratoggle2.value == True:
+            self.cameratoggle3.value = not self.cameratoggle3.value
+            if self.cameratoggle3.value == True:
+                help = self.camera.Matrix.value
+                self.camera.Matrix.value = self.camera4.Matrix.value
+                self.camera4.Matrix.value = help            
+            else:
+                help = self.camera4.Matrix.value
+                self.camera4.Matrix.value = self.camera.Matrix.value
+                self.camera.Matrix.value = help
+                
+        if self.camerabutton4.value == True and self.camerabuttonlast4.value != self.camerabutton4.value and \
+            not self.cameratoggle.value == True and not self.cameratoggle2.value == True:
+            self.cameratoggle4.value = not self.cameratoggle4.value
+            if self.cameratoggle4.value == True:
+                help = self.camera.Matrix.value
+                self.camera.Matrix.value = self.camera4.Matrix.value
+                self.camera4.Matrix.value = help            
+            else:
+                help = self.camera4.Matrix.value
+                self.camera4.Matrix.value = self.camera.Matrix.value
+                self.camera.Matrix.value = help
                 
         self.camerabuttonlast.value = self.camerabutton.value
         self.camerabuttonlast2.value = self.camerabutton2.value
+        self.camerabuttonlast3.value = self.camerabutton3.value
+        self.camerabuttonlast4.value = self.camerabutton4.value
+        
         
         
         
@@ -720,18 +710,48 @@ class Player(avango.script.Script):
         if self.mat_out.value.get_translate().y > 60.0:
             self.mat_out.value *= avango.osg.make_trans_mat(0, -_y, 0)
             
-    def update_HUD(self):
-        self.update_time()
+        #Checkpoints & Laps
+        player_bs = self.group.get_bounding_sphere()
+        
+        if self.check_point == 2 and player_bs.intersects(self.SCENE.finish_group.get_bounding_sphere()):
+            self.check_point = 0
+            self.lap_count = self.lap_count + 1
+            print "Checkpoint: ", self.check_point
+            print "Lap: ", self.lap_count
+            self.update_time(True)
+        
+        if self.check_point == 0 and player_bs.intersects(self.SCENE.checkpoint1_group.get_bounding_sphere()):
+            self.check_point = 1
+            print "Checkpoint: ", self.check_point
             
-    def update_time(self):
+        if self.check_point == 1 and player_bs.intersects(self.SCENE.checkpoint2_group.get_bounding_sphere()):
+            self.check_point = 2
+            print "Checkpoint: ", self.check_point
+         
+        #print player_bs.intersects(self.SCENE.finish_group.get_bounding_sphere()), \
+        #player_bs.intersects(self.SCENE.checkpoint1_group.get_bounding_sphere()), \
+        #player_bs.intersects(self.SCENE.checkpoint2_group.get_bounding_sphere())
+            
+    def update_HUD(self):
+        self.update_time(False)
+            
+    def update_time(self, lap):
         currenttime = time.time() - self.starttime
         seconds = math.floor(currenttime)
         minutes = math.floor(seconds / 60)
-        milliseconds = math.floor((currenttime - seconds)*100)
+        milliseconds = math.floor((currenttime - seconds)*1000)
         seconds = seconds - (minutes * 60)
         text = "%02d%s%02d%s%02d" % (minutes, ":", seconds, ":", milliseconds)
         self.hud.change_text(2, text)
-            
+        if lap:
+            self.last_lap_time = currenttime - self.last_lap_time
+            seconds = math.floor(self.last_lap_time)
+            minutes = math.floor(seconds / 60)
+            milliseconds = math.floor((currenttime - seconds)*1000)
+            seconds = seconds - (minutes * 60)
+            text = "%02d%s%02d%s%02d" % (minutes, ":", seconds, ":", milliseconds)
+            self.hud.change_text(3, text)
+            self.hud.change_text(0, str(self.lap_count))
 
 #class Navigation(avango.script.Script):
 #
