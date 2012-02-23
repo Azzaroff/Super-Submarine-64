@@ -91,7 +91,7 @@ class Application:
 #		_mat = 	avango.osg.make_scale_mat(0.004,0.004,0.004) * \
 #				avango.osg.make_rot_mat(math.pi,-1,0,0)	* \
 #				avango.osg.make_trans_mat(2.15,0.97,-3.55)
-#		self.chess = avango.osg.nodes.LoadFile(Filename = "/opt/3d_models/exhibition/chess-game.obj", Matrix = _mat)
+#		self.chess = avango.osg.nodes.Loaself.SCENE.finish_group.get_bounding_spheredFile(Filename = "/opt/3d_models/exhibition/chess-game.obj", Matrix = _mat)
 #		self.Scene.object_root.Children.value.append(self.chess)
 #
 #		_mat = 	avango.osg.make_scale_mat(0.14,0.14,0.14) * \
@@ -134,7 +134,7 @@ class Application:
 				avango.osg.make_rot_mat(math.radians(-90),1,0,0) * \
 				avango.osg.make_trans_mat(120.0, -200.0,250.0)
 		self.landscape = avango.osg.nodes.LoadFile(Filename = "data/Map/graben_new.obj", Matrix = _mat)
-		#self.Scene.environment_root.Children.value.append(self.landscape)
+		self.Scene.environment_root.Children.value.append(self.landscape)
 		
 		#Ziel
 		_mat = avango.osg.make_rot_mat(math.radians(270),1,0,0) * avango.osg.make_trans_mat(1170.637451, -84.802658, -63.487019)
@@ -173,9 +173,7 @@ class Application:
 		#minimap
 		_mat = 	avango.osg.make_scale_mat(.00003,.00003,.00003)
 		self.minimap_0 = avango.osg.nodes.LoadFile(Filename = "data/Map/graben_new_reduced.obj", Matrix = _mat)
-		self.mini_player0 = avango.osg.nodes.Sphere()
-		self.mini_player0.Matrix.value = avango.osg.make_scale_mat(3, 3, 3)
-		self.mini_player0.get_field(8).value = avango.osg.Vec4(1.0, 0, 0, 1.0)
+		
 		
 		_mat = 	avango.osg.make_scale_mat(.00005,.00005,.00005) * \
 				avango.osg.make_trans_mat(1079.2, -39.3, -435.3)
