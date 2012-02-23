@@ -43,7 +43,7 @@ class HUD(avango.script.Script):
         self.hud_transform.Children.value.append(self.geode) # append gui to navigation node --> head up display
         
     def create_text(self, position, content):
-        text = avango.osg.nodes.Text(Size = 0.01, Alignment = 1, Fontname = "VeraBI.ttf", Color = avango.osg.Vec4(1.0,1.0,1.0,1.0))
+        text = avango.osg.nodes.Text(Size = 0.01, Alignment = 1, Fontname = "VeraBI.ttf", Color = avango.osg.Vec4(1.0,1.0,1.0,1.0), BackdropType = 8)
         text.String.value = content
         text.Position.value = position
         return text

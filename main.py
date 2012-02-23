@@ -192,7 +192,7 @@ class Application:
 		self.Scene.Player0 = Player()
 		self.Scene.Player0.my_constructor(self.Scene, self.ImpactController, "./data/Submarine/My_YellowSubmarine.obj", self.collision_landscape, 0, self.time_sav)
 		self.Scene.Player1 = Player()
-		self.Scene.Player1.my_constructor(self.Scene, self.Spacemouse, "./data/Submarine/My_YellowSubmarine.obj", self.collision_landscape, 1, self.time_sav)
+		self.Scene.Player1.my_constructor(self.Scene, self.Spacemouse, "./data/Submarine/My_RedSubmarine.obj", self.collision_landscape, 1, self.time_sav)
 		
 		#print self.Scene.Player0
 		#print self.Scene.Player1

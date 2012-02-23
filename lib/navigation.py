@@ -201,10 +201,11 @@ class Player(avango.script.Script):
     # input fields
     dof_in = avango.MFFloat()
     transfer_treshold = 0.2
-
     
-    #object container
-    group = avango.osg.nodes.MatrixTransform()
+    # output fields
+    mat_out = avango.osg.SFMatrix()
+    
+
     
     #camera
     camera = avango.osg.nodes.MatrixTransform()
@@ -231,9 +232,9 @@ class Player(avango.script.Script):
     camera5 = avango.osg.nodes.MatrixTransform() 
     
     #navigation
-    model_transform = avango.osg.nodes.MatrixTransform()
-    pitchthreshold = 25 # rund 45 Grad
-    rollthreshold = 15 # rund 35 Grad
+    #model_transform = avango.osg.nodes.MatrixTransform()
+    #pitchthreshold = 25 # rund 45 Grad
+    #rollthreshold = 15 # rund 35 Grad
     
     pitch = 0
     roll = 0
@@ -266,14 +267,9 @@ class Player(avango.script.Script):
     ray_transform_neg_x = avango.osg.nodes.MatrixTransform()
     ray_absolute_neg_x = avango.osg.nodes.AbsoluteTransform()
     selected_targets_neg_x = avango.tools.MFTargetHolder()
+
     
-    #distance for previous collision
-    old_dist = 0
-    
-    #checkpoint counter
-    check_point = 0
-    lap_count = 1
-    last_lap_time = time.time() - time.time()
+
     
     # constructor
     def __init__(self):
@@ -283,19 +279,35 @@ class Player(avango.script.Script):
     def my_constructor(self, SCENE, INPUT_DEVICE, MODELPATH, REDUCED_COLLISION_MAP, ID, STARTTIME):
 
         print "constructor call of player: ",ID
-            
-        # output fields
-        self.mat_out = avango.osg.SFMatrix()
 
         # references
         self.SCENE = SCENE
         self.ID = ID
         
+        #object container
+        self.group = avango.osg.nodes.MatrixTransform()
+        
+        #navigation
+        self.model_transform = avango.osg.nodes.MatrixTransform()
+        self.pitchthreshold = 25 # rund 45 Grad
+        self.rollthreshold = 15 # rund 35 Grad
+        self.velocity = 0.0 # -1 ... volles abbremsen, 1...volle beschleunigung
+        self.friction = 0.02 #reibung
+        
+            
+        #distance for previous collision
+        self.old_dist = 0
+        
+        #checkpoint counter
+        self.check_point = 0
+        self.lap_count = 1
+        self.last_lap_time = time.time() - time.time()
+        
         if(self.ID == 0):
-            self.mat_out.value = SCENE.Player0.group.Matrix.value * avango.osg.make_rot_mat(math.radians(180),0,1,0) * avango.osg.make_trans_mat(1077.455688, -39.309696, -427.697662) # initial navigation values # initial navigation values
+            self.mat_out.value = avango.osg.make_rot_mat(math.radians(180),0,1,0) * avango.osg.make_trans_mat(1077.455688, -39.309696, -427.697662) # initial navigation values # initial navigation values
             self.nav_trans = SCENE.Player0.group.Matrix.value
         else:
-            self.mat_out.value = SCENE.Player1.group.Matrix.value * avango.osg.make_rot_mat(math.radians(180),0,1,0) * avango.osg.make_trans_mat(1077.455688, -39.309696, -427.697662) # initial navigation values
+            self.mat_out.value = avango.osg.make_rot_mat(math.radians(180),0,1,0) * avango.osg.make_trans_mat(1077.455688, -39.309696, -427.697662) # initial navigation values
             self.nav_trans = SCENE.Player1.group.Matrix.value        
         self.reduced_collison_map = avango.osg.nodes.MatrixTransform()
         self.reduced_collison_map.Children.value.append(REDUCED_COLLISION_MAP)
@@ -334,10 +346,10 @@ class Player(avango.script.Script):
                 avango.osg.make_rot_mat(math.pi*0.5,-1,0,0) * \
                 avango.osg.make_rot_mat(math.radians(90),0,1,0) * \
                 avango.osg.make_trans_mat(0.0,0.0,0.0)
-        self.yellow_submarine = avango.osg.nodes.LoadFile(Filename = MODELPATH, Matrix = self._mat)
+        self.submarine = avango.osg.nodes.LoadFile(Filename = MODELPATH, Matrix = self._mat)
         
         #append objects to group
-        self.model_transform.Children.value.append(self.yellow_submarine)
+        self.model_transform.Children.value.append(self.submarine)
         self.group.Children.value.append(self.model_transform)
         self.group.Children.value.append(self.camera)
         self.camera.Children.value.append(self.camera_absolute)
@@ -438,8 +450,10 @@ class Player(avango.script.Script):
         self.navigate()
         self.update_HUD()
         
-        #print self.mat_out
-        
+        #print "player",self.ID,": mat_out: ",self.mat_out.value
+        #print self.submarine
+        #print self.model_transform
+        #print self.camera
     def transfer(self, val):
         if (math.fabs(val) <= self.transfer_treshold):
             # linear output        
@@ -467,16 +481,33 @@ class Player(avango.script.Script):
             _y = -self.dof_in.value[1] * factor
         else:    
             _y = self.dof_in.value[1] * factor
+ 
+        
+        #beschleunigung
+        #print "z: ",_z
+        self.velocity += (-_z*0.01)
+        if self.velocity < 0.0:
+            self.velocity += self.friction
+        elif self.velocity > 0.0:
+            self.velocity -= self.friction
+        print self.velocity
+        if self.velocity > 1.0:
+            self.velocity = 1.0
+        if self.velocity < -1.0:
+            self.velocity = -1.0
+        if math.fabs(self.velocity) < 0.00001:
+            self.velocity = 0.0
+        print self.velocity
             
-        #acceleration
-        _z *= self.acceleration
-        self.acceleration += self.accelerationstep * self.accelerationstep
-        if self.acceleration > 1.0:
-            self.acceleration = 1.0
-        if self.acceleration < -1.0:
-            self.acceleration = -1.0
-        if math.fabs(self.acceleration) < 0.1:
-            self.acceleration = 0.0
+#        #acceleration
+#        _z *= self.acceleration
+#        self.acceleration += self.accelerationstep * self.accelerationstep
+#        if self.acceleration > 1.0:
+#            self.acceleration = 1.0
+#        if self.acceleration < -1.0:
+#            self.acceleration = -1.0
+#        if math.fabs(self.acceleration) < 0.1:
+#            self.acceleration = 0.0
         
         #print "x: ", _x, " y: ", _y, " z: ", _z
         
@@ -574,11 +605,13 @@ class Player(avango.script.Script):
             _yaw = -self.dof_in.value[4] * rot_factor
         _pitch = self.dof_in.value[3] * rot_factor
         _roll = self.dof_in.value[5] * rot_factor
-                    
+
         if math.fabs(_x) > translation_threshold_min or math.fabs(_y) > translation_threshold_min or math.fabs(_z) > translation_threshold_min:
-            self.nav_trans = avango.osg.make_trans_mat(_x,_y,_z)
+            self.nav_trans = avango.osg.make_trans_mat(_x * math.fabs(self.velocity),_y * math.fabs(self.velocity),_z * math.fabs(self.velocity))
         else:
-            self.nav_trans = avango.osg.make_ident_mat()
+            self.nav_trans = avango.osg.make_trans_mat(0, 0, self.velocity * 6)
+            
+
         
         
         self.nav_rot_roll = avango.osg.make_rot_mat(_roll, 0, 0, 1)
