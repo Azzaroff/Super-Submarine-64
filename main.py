@@ -53,10 +53,6 @@ class Application:
 		self.Scene.make_light(avango.osg.Vec4(0.0,0.0,0.0,1.0), avango.osg.Vec4(0.65,0.65,0.65,1.0), avango.osg.Vec4(0.2,0.2,0.2,1.0), avango.osg.Vec4(-80,300,40,1.0)) 
 		self.Scene.make_light(avango.osg.Vec4(0.0,0.0,0.0,1.0), avango.osg.Vec4(0.65,0.65,0.65,1.0), avango.osg.Vec4(0.2,0.2,0.2,1.0), avango.osg.Vec4(60,300,40,1.0)) 
 		
-		#snow stuff
-		self.precip, self.state = make_precipitation()
-		self.skyfog = avango.osg.nodes.StateSet(Fog = avango.osg.nodes.Fog(), FogMode = 1).Fog.value
-		self.skyfog.Color.connect_from(self.precip.Fog.value.Color)
 	
 		# init scene objects
 #		_mat =	avango.osg.make_scale_mat(12,12,12) * \
@@ -142,7 +138,7 @@ class Application:
 		self.landscape = avango.osg.nodes.LoadFile(Filename = "data/Map/graben_new.obj", Matrix = _mat)
 		self.Scene.environment_root.Children.value.append(self.landscape)
 		
-		#self.Scene.deko_root.Matrix.value = avango.osg.make_trans_mat(120.0, -200.0,250.0)
+		self.Scene.deko_root.Matrix.value = avango.osg.make_trans_mat(120.0, -200.0,250.0)
 		
 		#Ziel
 		_mat = avango.osg.make_rot_mat(math.radians(270),1,0,0) * avango.osg.make_trans_mat(1170.637451, -84.802658, -63.487019)
@@ -180,11 +176,22 @@ class Application:
 		self.collision_landscape = avango.osg.nodes.LoadFile(Filename = "data/Map/graben_new_reduced.obj", Matrix = _mat)
 		
 		
-		_mat = avango.osg.make_scale_mat(10000,10000,10000) * \
-        avango.osg.make_rot_mat(math.radians(180),1,0,0) * \
-        avango.osg.make_rot_mat(math.radians(90),1,0,0)
-		self.skybox = avango.osg.nodes.LoadFile(Filename = "data/Skybox/skybox.obj", Matrix = _mat)
-		self.Scene.skybox_root.Children.value.append(self.skybox)
+		#_mat = avango.osg.make_scale_mat(10000,10000,10000) * \
+        #avango.osg.make_rot_mat(math.radians(180),1,0,0) * \
+        #avango.osg.make_rot_mat(math.radians(90),1,0,0)
+		#self.skybox = avango.osg.nodes.LoadFile(Filename = "data/Skybox/skybox.obj", Matrix = _mat)
+		#self.Scene.skybox_root.Children.value.append(self.skybox)
+		
+		#snow stuff
+		self.precip, self.snowstate = make_precipitation()
+		self.sky, self.skyfog = make_sky()
+		
+		#self.skyfog.Color.connect_from(self.precip.Fog.value.Color)
+		self.skyfog.Color.value = avango.osg.Vec4(0.0,0.6,0.8, 3.0)
+		
+		self.Scene.environment_root.StateSet.value = self.snowstate
+		self.Scene.skybox_root.Children.value.append(self.sky)
+		self.Scene.environment_root.Children.value.append(self.precip)
 
 			#self.Scene.navigation_transform.Matrix.value = avango.osg.make_trans_mat(0.0,0.0,0.0)
 
@@ -227,20 +234,36 @@ class Application:
 		
 	def snow(self, value):
 		self.precip.Snow.value = value
-		self.precip.Fog.value.Density.value *= 1.5
-		self.skyfog.Density.value = self.precip.Fog.value.Density.value * 0.2
-		self.precip.Wind.value = avango.osg.Vec3(value * 0, 0, 1)
+		self.precip.ParticleSize.value = 0.1
+		self.precip.ParticleSpeed.value = 0.05
+		self.precip.MaximumParticleDensity.value = 0.05
+		self.precip.NearTransition.value = 0.00
+		self.precip.FarTransition.value = 0.00
+		self.precip.Fog.value.Density.value *= 0.8
+		self.precip.Fog.value.Color.value = avango.osg.Vec4(0.0,0.6,0.8, 0.6)
+		self.skyfog.Density.value = self.precip.Fog.value.Density.value * 0.0
+		self.precip.Wind.value = avango.osg.Vec3( 0, 0.25, 0)
 		
 	def rain(self, value):
 		self.precip.Rain = value
 		self.precip.Fog.value.Density.value *= 1.5
 		self.skyfog.Density.value = self.precip.Fog.value.Density.value * 0.2
-		self.precip.Wind.value = avango.osg.Vec3(value * 0, 1, 0)
+		self.precip.Wind.value = avango.osg.Vec3(0, 0, 0.5)
+	
+def make_sky():
+	_mat = avango.osg.make_scale_mat(10000,10000,10000) * \
+    avango.osg.make_rot_mat(math.radians(180),1,0,0) * \
+    avango.osg.make_rot_mat(math.radians(90),1,0,0)
+	sky = avango.osg.nodes.LoadFile(Filename = "data/Skybox/skybox.obj", Matrix = _mat)
+	skystate = avango.osg.nodes.StateSet(Fog = avango.osg.nodes.Fog(), FogMode = 1)
+	sky.StateSet.value = skystate
+	return sky, skystate.Fog.value
+
 		
 def make_precipitation():
 	# setup a precipitation effect with fog
 	precip = avango.osg.particle.nodes.PrecipitationEffect(Fog = avango.osg.nodes.Fog())
-	precip.CellSize.value = avango.osg.Vec3(10,10,10)
+	precip.CellSize.value = avango.osg.Vec3(1,1,1)
 
 	# setup stateset
 	state = avango.osg.nodes.StateSet(FogMode = 1, Fog = precip.Fog.value)

@@ -1,23 +1,9 @@
 
 import sys
 import avango
-import avango.osg
+
 import math
-import avango.script
-from avango.script import field_has_changed
-import avango.osg.simpleviewer
-import avango.osg.particle
-import avango.daemon
 
-def make_precipitation():
-	# setup a precipitation effect with fog
-	precip = avango.osg.particle.nodes.PrecipitationEffect(Fog = avango.osg.nodes.Fog())
-	precip.CellSize.value = avango.osg.Vec3(10,10,10)
-
-	# setup stateset
-	state = avango.osg.nodes.StateSet(FogMode = 1, Fog = precip.Fog.value)
-
-	return precip, state
 
 class Scene:
 
