@@ -834,7 +834,7 @@ class Player(avango.script.Script):
             self.sub1 = self.SCENE.Player1.group.get_bounding_sphere()
             
             player_dist = (self.sub0.get_center() - self.sub1.get_center()).length()
-            print player_dist
+            #print player_dist
             if player_dist < 400 and self.lap_count == self.SCENE.Player0.lap_count and self.check_point == self.SCENE.Player0.check_point:
                 if self.sub1.get_center().z > self.sub0.get_center().z:
                     #print "2: erster"

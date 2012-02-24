@@ -30,16 +30,17 @@ class HUD(avango.script.Script):
         _mat = avango.osg.make_scale_mat(150,150,150) * avango.osg.make_trans_mat(0, 500, 0)
         
         self.player0 = avango.osg.nodes.Sphere(Matrix = _mat)
-        self.player0.get_field(8).value = avango.osg.Vec4(1,0,0,1)
+        self.player0.get_field(8).value = avango.osg.Vec4(1,1,0,1)
         self.player0_transform = avango.osg.nodes.MatrixTransform()
         self.player0_transform.Matrix.connect_from(self.Scene.Player0.group.Matrix)
         self.player0_transform.Children.value.append(self.player0)
         
-        self.player1 = avango.osg.nodes.Sphere(Matrix = _mat)
-        self.player1.get_field(8).value = avango.osg.Vec4(1,1,0,1)
-        self.player1_transform = avango.osg.nodes.MatrixTransform()
-        self.player1_transform.Matrix.connect_from(self.Scene.Player1.group.Matrix)
-        self.player1_transform.Children.value.append(self.player1)
+        if gl_viewing_setup == "splitscreen":
+            self.player1 = avango.osg.nodes.Sphere(Matrix = _mat)
+            self.player1.get_field(8).value = avango.osg.Vec4(1,0,0,1)
+            self.player1_transform = avango.osg.nodes.MatrixTransform()
+            self.player1_transform.Matrix.connect_from(self.Scene.Player1.group.Matrix)
+            self.player1_transform.Children.value.append(self.player1)
         
         _mat =  avango.osg.make_scale_mat(.1,.1,.1) * \
                 avango.osg.make_rot_mat(math.radians(0),1,0,0) * \
@@ -49,7 +50,8 @@ class HUD(avango.script.Script):
         
         self.minimapgroup.Children.value.append(self.minimap)
         self.minimapgroup.Children.value.append(self.player0_transform)
-        self.minimapgroup.Children.value.append(self.player1_transform)
+        if gl_viewing_setup == "splitscreen":
+            self.minimapgroup.Children.value.append(self.player1_transform)
         
         
         
@@ -65,14 +67,16 @@ class HUD(avango.script.Script):
             lefttextoffset = 0.068
             rightlabeloffset = 0.15
             righttextoffset = 0.065
-            self.label0 = self.create_text(avango.osg.Vec3((-gl_physical_screen_width * 0.5 + leftlabeloffset), gl_physical_screen_height * 0.44, 0.0), "Runde:");
-            self.text0 = self.create_text(avango.osg.Vec3((-gl_physical_screen_width * 0.5 + lefttextoffset), gl_physical_screen_height * 0.44, 0.0), "1/3");
-            self.label1 = self.create_text(avango.osg.Vec3((-gl_physical_screen_width * 0.5 + leftlabeloffset), gl_physical_screen_height * 0.41, 0.0), "Position:");
-            self.text1 = self.create_text(avango.osg.Vec3((-gl_physical_screen_width * 0.5 + lefttextoffset), gl_physical_screen_height * 0.41, 0.0), "1/2");
-            self.label2 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - rightlabeloffset), gl_physical_screen_height * 0.44, 0.0), "Zeit:");
-            self.text2 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - righttextoffset), gl_physical_screen_height * 0.44, 0.0), "00:00:000");
-            self.label3 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - rightlabeloffset), gl_physical_screen_height * 0.41, 0.0), "Rundenzeit:");
-            self.text3 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - righttextoffset), gl_physical_screen_height * 0.41, 0.0), "--:--:---");
+            self.label0 = self.create_text(avango.osg.Vec3((-gl_physical_screen_width * 0.5 + leftlabeloffset), gl_physical_screen_height * 0.44, 0.0), "Runde:", 0.01, 1, 32);
+            self.text0 = self.create_text(avango.osg.Vec3((-gl_physical_screen_width * 0.5 + lefttextoffset), gl_physical_screen_height * 0.44, 0.0), "1/3", 0.01, 1, 32);
+            self.label1 = self.create_text(avango.osg.Vec3((-gl_physical_screen_width * 0.5 + leftlabeloffset), gl_physical_screen_height * 0.41, 0.0), "Position:", 0.01, 1, 32);
+            self.text1 = self.create_text(avango.osg.Vec3((-gl_physical_screen_width * 0.5 + lefttextoffset), gl_physical_screen_height * 0.41, 0.0), "1/2", 0.01, 1, 32);
+            self.label2 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - rightlabeloffset), gl_physical_screen_height * 0.44, 0.0), "Zeit:", 0.01, 1, 32);
+            self.text2 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - righttextoffset), gl_physical_screen_height * 0.44, 0.0), "--:--:---", 0.01, 1, 32);
+            self.label3 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - rightlabeloffset), gl_physical_screen_height * 0.41, 0.0), "Rundenzeit:", 0.01, 1, 32);
+            self.text3 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - righttextoffset), gl_physical_screen_height * 0.41, 0.0), "--:--:---", 0.01, 1, 32);
+            
+            self.text4 = self.create_text(avango.osg.Vec3(0, 0, 0.0), "3", 0.05, 3, 120);
             
         elif gl_viewing_setup == "splitscreen":
             #move minimap
@@ -85,23 +89,25 @@ class HUD(avango.script.Script):
             lefttextoffset = 0.068
             rightlabeloffset = 0.15
             righttextoffset = 0.065
-            self.label0 = self.create_text(avango.osg.Vec3((-gl_physical_screen_width * 0.5 + leftlabeloffset), -.01, 0.0), "Runde:");
-            self.text0 = self.create_text(avango.osg.Vec3((-gl_physical_screen_width * 0.5 + lefttextoffset), -.01, 0.0), "1/3");
-            self.label1 = self.create_text(avango.osg.Vec3((-gl_physical_screen_width * 0.5 + leftlabeloffset), -.022, 0.0), "Position:");
-            self.text1 = self.create_text(avango.osg.Vec3((-gl_physical_screen_width * 0.5 + lefttextoffset), -.022, 0.0), "1/2");
-            self.label2 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - rightlabeloffset), -.01, 0.0), "Zeit:");
-            self.text2 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - righttextoffset), -.01, 0.0), "00:00:000");
-            self.label3 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - rightlabeloffset), -.022, 0.0), "Rundenzeit:");
-            self.text3 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - righttextoffset), -.022, 0.0), "--:--:---");
+            self.label0 = self.create_text(avango.osg.Vec3((-gl_physical_screen_width * 0.5 + leftlabeloffset), -.01, 0.0), "Runde:", 0.01, 1, 32);
+            self.text0 = self.create_text(avango.osg.Vec3((-gl_physical_screen_width * 0.5 + lefttextoffset), -.01, 0.0), "1/3", 0.01, 1, 32);
+            self.label1 = self.create_text(avango.osg.Vec3((-gl_physical_screen_width * 0.5 + leftlabeloffset), -.022, 0.0), "Position:", 0.01, 1, 32);
+            self.text1 = self.create_text(avango.osg.Vec3((-gl_physical_screen_width * 0.5 + lefttextoffset), -.022, 0.0), "1/2", 0.01, 1, 32);
+            self.label2 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - rightlabeloffset), -.01, 0.0), "Zeit:", 0.01, 1, 32);
+            self.text2 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - righttextoffset), -.01, 0.0), "--:--:---", 0.01, 1, 32);
+            self.label3 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - rightlabeloffset), -.022, 0.0), "Rundenzeit:", 0.01, 1, 32);
+            self.text3 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - righttextoffset), -.022, 0.0), "--:--:---", 0.01, 1, 32);
             
-        self.geode = avango.osg.nodes.LayerGeode(Drawables = [self.label0, self.text0, self.label1, self.text1, self.label2, self.text2, self.label3, self.text3], StateSet = avango.osg.nodes.StateSet(LightingMode = 0), Name="HUD" + str(self.id))
+            self.text4 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - righttextoffset), gl_physical_screen_height * 0.41, 0.0), "3", 0.05, 2, 120);
+            
+        self.geode = avango.osg.nodes.LayerGeode(Drawables = [self.label0, self.text0, self.label1, self.text1, self.label2, self.text2, self.label3, self.text3, self.text4], StateSet = avango.osg.nodes.StateSet(LightingMode = 0), Name="HUD" + str(self.id))
         
         self.Scene.root.Children.value.append(self.hud_transform)
         self.hud_transform.Children.value.append(self.geode) # append gui to navigation node --> head up display
         self.hud_transform.Children.value.append(self.minimapgroup)
         
-    def create_text(self, position, content):
-        text = avango.osg.nodes.Text(Size = 0.01, Alignment = 1, Fontname = "VeraBI.ttf", Color = avango.osg.Vec4(1.0,1.0,1.0,1.0), BackdropType = 8)
+    def create_text(self, position, content, size = 0.01, align = 1, resolution = 32):
+        text = avango.osg.nodes.Text(Size = size, Alignment = align, Fontname = "VeraBI.ttf", Color = avango.osg.Vec4(1.0,1.0,1.0,1.0), BackdropType = 8, Resolution = resolution)
         text.String.value = content
         text.Position.value = position
         return text
@@ -115,3 +121,6 @@ class HUD(avango.script.Script):
             self.text2.String.value = new_content
         elif textid == 3:
             self.text3.String.value = new_content
+        elif textid == 4:
+            print "change to: ", new_content
+            self.text4.String.value = new_content
