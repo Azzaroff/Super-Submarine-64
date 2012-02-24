@@ -29,7 +29,7 @@ class HUD(avango.script.Script):
         
         _mat = avango.osg.make_scale_mat(150,150,150) * avango.osg.make_trans_mat(0, 500, 0)
         
-        self.player0 = avango.osg.nodes.Sphere(Matrix = _mat)
+        self.player0 = avango.osg.nodes.Sphere(StateSet = self.Scene.underwater_state, Matrix = _mat)
         self.player0.get_field(8).value = avango.osg.Vec4(1,1,0,1)
         self.player0_transform = avango.osg.nodes.MatrixTransform()
         self.player0_transform.Matrix.connect_from(self.Scene.Player0.group.Matrix)
