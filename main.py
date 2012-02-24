@@ -52,6 +52,11 @@ class Application:
 		self.Scene.make_light(avango.osg.Vec4(0.0,0.0,0.0,1.0), avango.osg.Vec4(0.65,0.65,0.65,1.0), avango.osg.Vec4(0.2,0.2,0.2,1.0), avango.osg.Vec4(60,300,-50,1.0))
 		self.Scene.make_light(avango.osg.Vec4(0.0,0.0,0.0,1.0), avango.osg.Vec4(0.65,0.65,0.65,1.0), avango.osg.Vec4(0.2,0.2,0.2,1.0), avango.osg.Vec4(-80,300,40,1.0)) 
 		self.Scene.make_light(avango.osg.Vec4(0.0,0.0,0.0,1.0), avango.osg.Vec4(0.65,0.65,0.65,1.0), avango.osg.Vec4(0.2,0.2,0.2,1.0), avango.osg.Vec4(60,300,40,1.0)) 
+		
+		#snow stuff
+		self.precip, self.state = make_precipitation()
+		self.skyfog = avango.osg.nodes.StateSet(Fog = avango.osg.nodes.Fog(), FogMode = 1).Fog.value
+		self.skyfog.Color.connect_from(self.precip.Fog.value.Color)
 	
 		# init scene objects
 #		_mat =	avango.osg.make_scale_mat(12,12,12) * \
@@ -190,7 +195,7 @@ class Application:
 
 		#self.Navigation = Navigation()
 		#self.Navigation.my_constructor(self.Scene, self.ViewingSetup, self.ImpactController)
-		
+		self.snow(0.3)
 		self.time_sav = time.time()
 		
 		if gl_viewing_setup == "desktop":
@@ -211,12 +216,36 @@ class Application:
 		
 		#print self.Scene.Player0
 		#print self.Scene.Player1
+		
 
 		self.Scene.GameController.start_countdown()
 
 		#####  run evaluation and render loop  #####		
 		self.ViewingSetup = ViewingSetup(self.Scene, self.Menu)
+		
 		self.ViewingSetup.start_render_loop()
+		
+	def snow(self, value):
+		self.precip.Snow.value = value
+		self.precip.Fog.value.Density.value *= 1.5
+		self.skyfog.Density.value = self.precip.Fog.value.Density.value * 0.2
+		self.precip.Wind.value = avango.osg.Vec3(value * 0, 0, 1)
+		
+	def rain(self, value):
+		self.precip.Rain = value
+		self.precip.Fog.value.Density.value *= 1.5
+		self.skyfog.Density.value = self.precip.Fog.value.Density.value * 0.2
+		self.precip.Wind.value = avango.osg.Vec3(value * 0, 1, 0)
+		
+def make_precipitation():
+	# setup a precipitation effect with fog
+	precip = avango.osg.particle.nodes.PrecipitationEffect(Fog = avango.osg.nodes.Fog())
+	precip.CellSize.value = avango.osg.Vec3(10,10,10)
+
+	# setup stateset
+	state = avango.osg.nodes.StateSet(FogMode = 1, Fog = precip.Fog.value)
+
+	return precip, state
 
 
 Application = Application()

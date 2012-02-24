@@ -149,16 +149,6 @@ def make_ball(root):
     return ball
 
 
-def make_precipitation():
-    # setup a precipitation effect with fog
-    precip = avango.osg.particle.nodes.PrecipitationEffect(Fog = avango.osg.nodes.Fog())
-    precip.CellSize.value = avango.osg.Vec3(10,10,10)
-
-    # setup stateset
-    state = avango.osg.nodes.StateSet(FogMode = 1, Fog = precip.Fog.value)
-
-    return precip, state
-
 
 def make_land():
     land = avango.osg.nodes.LoadFile(Filename = 'Models/lzsnow.osg')
