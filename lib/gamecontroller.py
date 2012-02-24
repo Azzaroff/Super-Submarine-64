@@ -28,7 +28,6 @@ class GAMECONTROLLER(avango.script.Script):
         self.count_countdown()
         
     def count_countdown(self):
-        print "countdown"
         if self.num_of_players == 1:
             current_counter = self.counter - math.floor(time.time() - self.starttime)
             self.Scene.Player0.hud.change_text(4, str(current_counter))
@@ -37,7 +36,6 @@ class GAMECONTROLLER(avango.script.Script):
                 #self.always_evaluate(False) # deactivate evaluate callback
         elif self.num_of_players == 2:
             current_counter = self.counter - math.floor(time.time() - self.starttime)
-            print current_counter
             self.Scene.Player0.hud.change_text(4, str(current_counter))
             self.Scene.Player1.hud.change_text(4, str(current_counter))
             if current_counter <= 0:

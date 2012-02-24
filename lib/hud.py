@@ -46,7 +46,7 @@ class HUD(avango.script.Script):
                 avango.osg.make_rot_mat(math.radians(0),1,0,0) * \
                 avango.osg.make_rot_mat(math.radians(-90),1,0,0) * \
                 avango.osg.make_trans_mat(120.0, -200.0,250.0)
-        self.minimap = avango.osg.nodes.LoadFile(Filename = "data/Map/graben_new_reduced.obj", Matrix = _mat)
+        self.minimap = avango.osg.nodes.LoadFile(StateSet = self.Scene.environment_state ,Filename = "data/Map/graben_new.obj", Matrix = _mat)
         
         self.minimapgroup.Children.value.append(self.minimap)
         self.minimapgroup.Children.value.append(self.player0_transform)
@@ -102,7 +102,7 @@ class HUD(avango.script.Script):
             
         self.geode = avango.osg.nodes.LayerGeode(Drawables = [self.label0, self.text0, self.label1, self.text1, self.label2, self.text2, self.label3, self.text3, self.text4], StateSet = avango.osg.nodes.StateSet(LightingMode = 0), Name="HUD" + str(self.id))
         
-        self.Scene.root.Children.value.append(self.hud_transform)
+        self.Scene.minimap_root.Children.value.append(self.hud_transform)
         self.hud_transform.Children.value.append(self.geode) # append gui to navigation node --> head up display
         self.hud_transform.Children.value.append(self.minimapgroup)
         
@@ -122,5 +122,5 @@ class HUD(avango.script.Script):
         elif textid == 3:
             self.text3.String.value = new_content
         elif textid == 4:
-            print "change to: ", new_content
+            #print "change to: ", new_content
             self.text4.String.value = new_content
