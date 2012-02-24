@@ -199,26 +199,26 @@ class Application:
 		self.Spacemouse = SpacemouseDevice()
 
 		self.ImpactController = GameControllerDevice()
+		self.SaitekController = GameControllerDevice2()
 
 		#self.Navigation = Navigation()
 		#self.Navigation.my_constructor(self.Scene, self.ViewingSetup, self.ImpactController)
 		self.snow(0.3)
 		self.time_sav = time.time()
+		self.Scene.GameController = GAMECONTROLLER()
 		
 		if gl_viewing_setup == "desktop":
 			self.Scene.Player0 = Player()
 			self.Scene.Player0.my_constructor(self.Scene, self.ImpactController, "./data/Submarine/My_YellowSubmarine.obj", self.collision_landscape, 0, self.time_sav)
 			self.Scene.Player0.create_hud()
-			self.Scene.GameController = GAMECONTROLLER()
 			self.Scene.GameController.my_constructor(self.Scene, 1)
 		elif gl_viewing_setup == "splitscreen":
 			self.Scene.Player0 = Player()
 			self.Scene.Player1 = Player()
 			self.Scene.Player0.my_constructor(self.Scene, self.ImpactController, "./data/Submarine/My_YellowSubmarine.obj", self.collision_landscape, 0, self.time_sav)
-			self.Scene.Player1.my_constructor(self.Scene, self.Spacemouse, "./data/Submarine/My_RedSubmarine.obj", self.collision_landscape, 1, self.time_sav)
+			self.Scene.Player1.my_constructor(self.Scene, self.SaitekController, "./data/Submarine/My_RedSubmarine.obj", self.collision_landscape, 1, self.time_sav)
 			self.Scene.Player0.create_hud()
 			self.Scene.Player1.create_hud()
-			self.Scene.GameController = GAMECONTROLLER()
 			self.Scene.GameController.my_constructor(self.Scene, 2)
 		
 		#print self.Scene.Player0

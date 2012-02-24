@@ -123,6 +123,83 @@ def init_impact_controller():
 	else:
 		print "Impact Controller NOT found !"
 
+def init_saitek_controller():
+
+	_string = os.popen("/opt/avango/vr_application_lib/tools/list-ev -s | grep \"Saitek P880\" | sed -e \'s/\"//g\'  | cut -d\" \" -f4").read()
+
+	if len(_string) == 0:
+		_string = os.popen("/opt/avango/vr_application_lib/tools/list-ev -s | grep \"SAITEK P880\" | sed -e \'s/\"//g\'  | cut -d\" \" -f4").read()
+    
+	if len(_string) > 0:	
+		_string = _string.split()[0]
+	
+		_controller = avango.daemon.HIDInput()
+		_controller.station = avango.daemon.Station('device-saitekcontroller') # create a station to propagate the input events
+		_controller.device = _string
+
+		# map incoming spacemouse events to station values
+		_controller.values[0] = "EV_ABS::REL_X"   # trans X
+		_controller.values[1] = "EV_ABS::REL_Y"   # trans Y
+		_controller.values[2] = "EV_ABS::REL_Z"   # rotate X
+		_controller.values[3] = "EV_ABS::REL_RZ"  # rotate Y
+		
+		# buttons
+		_controller.buttons[0] = "EV_KEY::BTN_BASE6" # start button
+		_controller.buttons[1] = "EV_KEY::BTN_TRIGGER" # button 1
+		_controller.buttons[2] = "EV_KEY::BTN_THUMB" # button 2 
+		_controller.buttons[3] = "EV_KEY::BTN_THUMB2" # button 3
+		_controller.buttons[4] = "EV_KEY::BTN_TOP" # button 4
+		_controller.buttons[5] = "EV_KEY::BTN_TOP2" # button 5
+		_controller.buttons[6] = "EV_KEY::BTN_PINKIE" # button 6
+		_controller.buttons[7] = "EV_KEY::BTN_BASE" # button LX
+		_controller.buttons[8] = "EV_KEY::BTN_BASE5" # button S    
+		
+				# =========================================
+		# For codes, run 
+		# /opt/avango/vr_application_lib/tools/ev_read /dev/input/event5
+		# -----------------------------------------
+		# For button mappings, see 
+		# /opt/svn/avango/current/avango-daemon/src/avango/daemon
+		# =========================================
+		
+		# =========================================
+		# INPUT 			| TYPE CODE VALUE
+		# -----------------------------------------
+		# start-button		| 1 299 1 = 0x12b | BTN_BASE6
+		# -----------------------------------------
+		# button 1 press	| 1 288 1 = 0x120 | BTN_TRIGGER
+		# button 2 press	| 1 289 1 = 0x121 | BTN_THUMB
+		# button 3 press	| 1 290 1 = 0x122 | BTN_THUMB2
+		# button 4 press	| 1 291 1 = 0x123 | BTN_TOP
+		# button 5 press	| 1 292 1 = 0x124 | BTN_TOP2
+		# button 6 press	| 1 293 1 = 0x125 | BTN_PINKIE
+		# -----------------------------------------
+		# button LX			| 1 294 1 = 0x126 | BTN_BASE
+		# button RX			| 1 294 1 = 0x126 | BTN_BASE2
+		# button S			| 1 295 1 = 0x127 | BTN_BASE5
+		# -----------------------------------------
+		# d-pad up			| 3 17 -1	| ABS_HAT0Y
+		# d-pad down		| 3 17 1	| ABS_HAT0Y
+		# d-pad left		| 3 16 -1	| ABS_HAT0X
+		# d-pad right		| 3 16 1	| ABS_HAT0X
+		# -----------------------------------------
+		# joystick 1 up		| 3 1 -128		| REL_Y
+		# joystick 1 down	| 3 1 127	| REL_Y
+		# joystick 1 left	| 3 0 -128		| REL_X
+		# joystick 1 right	| 3 0 127	| REL_X
+		# -----------------------------------------
+		# joystick 2 up		| 3 2 -128		| REL_Z
+		# joystick 2 down	| 3 2 127	| REL_Z
+		# joystick 2 left	| 3 5 -128		| REL_RZ
+		# joystick 2 right	| 3 5 127	| REL_RZ
+		# =========================================
+
+		device_list.append(_controller)
+		print "Saitek Controller started at:", _string
+
+	else:
+		print "Saitek Controller NOT found !"
+
 
 def init_keyboard():
 
@@ -233,6 +310,7 @@ init_spacemouse()
 init_keyboard()
 init_mouse()
 init_impact_controller()
+init_saitek_controller()
 
 	
 #avango/trunk/avango-daemon/src/avango/daemon/LinuxEvent.cpp
