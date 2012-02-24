@@ -47,10 +47,10 @@ class Application:
 
 
 		# init lights (if no lights are defined --> default OpenGL headlight is applied)
-		self.Scene.make_light(avango.osg.Vec4(0.0,0.0,0.0,1.0), avango.osg.Vec4(0.65,0.65,0.65,1.0), avango.osg.Vec4(0.2,0.2,0.2,1.0), avango.osg.Vec4(-80,15,-50,1.0))
-		self.Scene.make_light(avango.osg.Vec4(0.0,0.0,0.0,1.0), avango.osg.Vec4(0.65,0.65,0.65,1.0), avango.osg.Vec4(0.2,0.2,0.2,1.0), avango.osg.Vec4(60,15,-50,1.0))
-		self.Scene.make_light(avango.osg.Vec4(0.0,0.0,0.0,1.0), avango.osg.Vec4(0.65,0.65,0.65,1.0), avango.osg.Vec4(0.2,0.2,0.2,1.0), avango.osg.Vec4(-80,15,40,1.0)) 
-		self.Scene.make_light(avango.osg.Vec4(0.0,0.0,0.0,1.0), avango.osg.Vec4(0.65,0.65,0.65,1.0), avango.osg.Vec4(0.2,0.2,0.2,1.0), avango.osg.Vec4(60,15,40,1.0)) 
+		self.Scene.make_light(avango.osg.Vec4(0.0,0.0,0.0,1.0), avango.osg.Vec4(0.65,0.65,0.65,1.0), avango.osg.Vec4(0.2,0.2,0.2,1.0), avango.osg.Vec4(-80,300,-50,1.0))
+		self.Scene.make_light(avango.osg.Vec4(0.0,0.0,0.0,1.0), avango.osg.Vec4(0.65,0.65,0.65,1.0), avango.osg.Vec4(0.2,0.2,0.2,1.0), avango.osg.Vec4(60,300,-50,1.0))
+		self.Scene.make_light(avango.osg.Vec4(0.0,0.0,0.0,1.0), avango.osg.Vec4(0.65,0.65,0.65,1.0), avango.osg.Vec4(0.2,0.2,0.2,1.0), avango.osg.Vec4(-80,300,40,1.0)) 
+		self.Scene.make_light(avango.osg.Vec4(0.0,0.0,0.0,1.0), avango.osg.Vec4(0.65,0.65,0.65,1.0), avango.osg.Vec4(0.2,0.2,0.2,1.0), avango.osg.Vec4(60,300,40,1.0)) 
 	
 		# init scene objects
 #		_mat =	avango.osg.make_scale_mat(12,12,12) * \
@@ -136,32 +136,36 @@ class Application:
 		self.landscape = avango.osg.nodes.LoadFile(Filename = "data/Map/graben_new.obj", Matrix = _mat)
 		self.Scene.environment_root.Children.value.append(self.landscape)
 		
+		#self.Scene.deko_root.Matrix.value = avango.osg.make_trans_mat(120.0, -200.0,250.0)
+		
 		#Ziel
 		_mat = avango.osg.make_rot_mat(math.radians(270),1,0,0) * avango.osg.make_trans_mat(1170.637451, -84.802658, -63.487019)
-		self.finish_1 = avango.osg.nodes.LoadFile(Filename = "data/weed2.3ds", Matrix = avango.osg.make_ident_mat())
-		self.finish_2 = avango.osg.nodes.LoadFile(Filename = "data/weed2.3ds", Matrix = avango.osg.make_rot_mat(math.radians(180),0,0,1) * avango.osg.make_trans_mat(-145, 0, 0))
+		self.finish_1 = avango.osg.nodes.LoadFile(Filename = "data/weed2.obj", Matrix = avango.osg.make_ident_mat())
+		self.finish_2 = avango.osg.nodes.LoadFile(Filename = "data/weed2.obj", Matrix = avango.osg.make_rot_mat(math.radians(180),0,0,1) * avango.osg.make_trans_mat(-145, 0, 0))
 		self.Scene.finish_group = avango.osg.nodes.MatrixTransform(Matrix = _mat)
 		self.Scene.finish_group.Children.value = [self.finish_1, self.finish_2]
-		self.Scene.environment_root.Children.value.append(self.Scene.finish_group)
+		self.Scene.deko_root.Children.value.append(self.Scene.finish_group)
 		
 		#Checkpoint1
 		#-287.149078 -63.845512 830.017517
 		_mat = avango.osg.make_rot_mat(math.radians(270),1,0,0) * avango.osg.make_trans_mat(-287.149078, -63.845512, 830.017517)
-		self.checkpoint1_1 = avango.osg.nodes.LoadFile(Filename = "data/weed2.3ds", Matrix = avango.osg.make_ident_mat())
-		self.checkpoint1_2 = avango.osg.nodes.LoadFile(Filename = "data/weed2.3ds", Matrix = avango.osg.make_rot_mat(math.radians(180),0,0,1) * avango.osg.make_trans_mat(-145, 0, 0))
+		self.checkpoint1_1 = avango.osg.nodes.LoadFile(Filename = "data/weed2.obj", Matrix = avango.osg.make_ident_mat())
+		self.checkpoint1_2 = avango.osg.nodes.LoadFile(Filename = "data/weed2.obj", Matrix = avango.osg.make_rot_mat(math.radians(180),0,0,1) * avango.osg.make_trans_mat(-145, 0, 0))
 		self.Scene.checkpoint1_group = avango.osg.nodes.MatrixTransform(Matrix = _mat)
 		self.Scene.checkpoint1_group.Children.value = [self.checkpoint1_1, self.checkpoint1_2]
-		self.Scene.environment_root.Children.value.append(self.Scene.checkpoint1_group)
+		self.Scene.deko_root.Children.value.append(self.Scene.checkpoint1_group)
+		
+		
 
 		#Checkpoint2
 		#-1070.442871 -79.164711 -329.316742
 		#-901.965027 -57.412403 -444.109253
 		_mat = avango.osg.make_rot_mat(math.radians(270),1,0,0) * avango.osg.make_trans_mat(-1060.442871, -70.164711, -329.316742)
-		self.checkpoint2_1 = avango.osg.nodes.LoadFile(Filename = "data/weed2.3ds", Matrix = avango.osg.make_rot_mat(math.radians(20),0,1,0))
-		self.checkpoint2_2 = avango.osg.nodes.LoadFile(Filename = "data/weed2.3ds", Matrix = avango.osg.make_rot_mat(math.radians(20),0,1,0) * avango.osg.make_rot_mat(math.radians(180),0,0,1) * avango.osg.make_trans_mat(130, 0, 0))
+		self.checkpoint2_1 = avango.osg.nodes.LoadFile(Filename = "data/weed2.obj", Matrix = avango.osg.make_rot_mat(math.radians(20),0,1,0))
+		self.checkpoint2_2 = avango.osg.nodes.LoadFile(Filename = "data/weed2.obj", Matrix = avango.osg.make_rot_mat(math.radians(20),0,1,0) * avango.osg.make_rot_mat(math.radians(180),0,0,1) * avango.osg.make_trans_mat(130, 0, 0))
 		self.Scene.checkpoint2_group = avango.osg.nodes.MatrixTransform(Matrix = _mat)
 		self.Scene.checkpoint2_group.Children.value = [self.checkpoint2_1, self.checkpoint2_2]
-		self.Scene.environment_root.Children.value.append(self.Scene.checkpoint2_group)
+		self.Scene.deko_root.Children.value.append(self.Scene.checkpoint2_group)
 		
 		_mat = 	avango.osg.make_scale_mat(.1,.1,.1) * \
 				avango.osg.make_rot_mat(math.radians(0),1,0,0) * \
@@ -170,19 +174,6 @@ class Application:
 		self.collision_landscape = avango.osg.nodes.LoadFile(Filename = "data/Map/graben_new_reduced.obj", Matrix = _mat)
 		
 		
-		#minimap
-		_mat = 	avango.osg.make_scale_mat(.00003,.00003,.00003)
-		self.minimap_0 = avango.osg.nodes.LoadFile(Filename = "data/Map/graben_new_reduced.obj", Matrix = _mat)
-		
-		
-		_mat = 	avango.osg.make_scale_mat(.00005,.00005,.00005) * \
-				avango.osg.make_trans_mat(1079.2, -39.3, -435.3)
-		self.minimap_1 = avango.osg.nodes.LoadFile(Filename = "data/Map/graben_new_reduced.obj", Matrix = _mat)
-		
-		self.Scene.root.Children.value.append(self.minimap_0)
-		
-		
-
 		_mat = avango.osg.make_scale_mat(10000,10000,10000) * \
         avango.osg.make_rot_mat(math.radians(180),1,0,0) * \
         avango.osg.make_rot_mat(math.radians(90),1,0,0)
@@ -202,9 +193,11 @@ class Application:
 		self.time_sav = time.time()
 
 		self.Scene.Player0 = Player()
-		self.Scene.Player0.my_constructor(self.Scene, self.ImpactController, "./data/Submarine/My_YellowSubmarine.obj", self.collision_landscape, 0, self.time_sav, self.minimap_0)
 		self.Scene.Player1 = Player()
-		self.Scene.Player1.my_constructor(self.Scene, self.Spacemouse, "./data/Submarine/My_RedSubmarine.obj", self.collision_landscape, 1, self.time_sav, self.minimap_1)
+		self.Scene.Player0.my_constructor(self.Scene, self.ImpactController, "./data/Submarine/My_YellowSubmarine.obj", self.collision_landscape, 0, self.time_sav)
+		self.Scene.Player1.my_constructor(self.Scene, self.Spacemouse, "./data/Submarine/My_RedSubmarine.obj", self.collision_landscape, 1, self.time_sav)
+		self.Scene.Player0.create_hud()
+		self.Scene.Player1.create_hud()
 		
 		#print self.Scene.Player0
 		#print self.Scene.Player1

@@ -164,7 +164,7 @@ class SplitScreenSetup:
 		self.camera2 = avango.osg.viewer.nodes.Camera(Window = self.window)
 		#self.camera2.EyeOffset.value = self.eye_offset1 * 0.5
 		self.camera2.Far.value = 40000000.0
-		self.camera2.ScreenTransform.value = gl_screen_transform
+		self.camera2.ScreenTransform.value = gl_screen_transform * avango.osg.make_trans_mat(0, -0.084, 0)
 		self.camera2.BackgroundColor.value = gl_background_color
 		
 		self.camera1.ViewerTransform.connect_from(SCENE.Player0.camera_absolute.AbsoluteMatrix)
@@ -183,9 +183,10 @@ class SplitScreenSetup:
 
 		# init viewer
 		self.viewer = avango.osg.viewer.nodes.Viewer(Scene = SCENE.root, MasterCamera = self.camera1, SlaveCameras = [self.camera2])
-		
-		self.camera1.Viewport.value = avango.osg.Vec4(0.5, 0.0, 0.5, 1.0)
-		self.camera2.Viewport.value = avango.osg.Vec4(0.0, 0.0, 0.5, 1.0)
+
+		self.camera1.Viewport.value = avango.osg.Vec4(0.0, 0.5, 1.0, 1.0)		
+		self.camera2.Viewport.value = avango.osg.Vec4(0.0, 0.0, 1.0, 0.5)
+
 		
 
 		# init simple mouse events
