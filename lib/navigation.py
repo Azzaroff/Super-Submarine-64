@@ -204,7 +204,7 @@ class GameControllerDevice(ThreeDofInputDevice):
 
         # rotation
         #_rx = self.filter_channel(self.device_sensor.Value3.value, 0, -0.75, 0.8, 25, 25) # pitch
-        _ry = self.filter_channel(self.device_sensor.Value0.value, 0, -0.65, 0.68, 25, 25) # head
+        _ry = self.filter_channel(self.device_sensor.Value0.value, 0, -0.15, 0.18, 3, 3) # head
         #_rz = self.filter_channel(self.device_sensor.Value4.value, 0, -0.72, 0.84, 25, 25) # roll
         
 
@@ -235,7 +235,7 @@ class Player(avango.script.Script):
         self.super(Player).__init__()
         self.reference_point = avango.osg.Vec3()
        
-    def my_constructor(self, SCENE, INPUT_DEVICE, MODELPATH, REDUCED_COLLISION_MAP, ID, STARTTIME, MINIMAP):
+    def my_constructor(self, SCENE, INPUT_DEVICE, MODELPATH, REDUCED_COLLISION_MAP, ID, STARTTIME):
 
         print "constructor call of player: ",ID
 
@@ -270,22 +270,13 @@ class Player(avango.script.Script):
         self.camerabuttonlast4 = avango.SFBool()
         self.camera5 = avango.osg.nodes.MatrixTransform()
         
-        #minimap
-        self.minimap = MINIMAP
-        self.minimap_initial_position = avango.osg.make_trans_mat(-1.8, 0, 7)
-        self.minimap_initial_scale = avango.osg.make_scale_mat(.00003,.00003,.00003)
-        self.mini_player0 = avango.osg.nodes.Sphere()
-        self.mini_player0.Matrix.value = avango.osg.make_scale_mat(100, 100, 100)
-        self.mini_player0.get_field(8).value = avango.osg.Vec4(1.0, 0, 0, 1.0) # red color
-        self.minimap.Children.value.append(self.mini_player0)
-        
         #navigation
         self.model_transform = avango.osg.nodes.MatrixTransform()
         self.pitchthreshold = 25 # rund 45 Grad
         self.rollthreshold = 15 # rund 35 Grad
         self.velocity = 0.0 # -1 ... volles abbremsen, 1...volle beschleunigung
-        self.max_velocity = 8
-        self.velocity_factor = 3
+        self.max_velocity = 4
+        self.velocity_factor = 1.2
         self.friction = 0.2 #reibung
 
         self.pitch = 0
@@ -300,7 +291,8 @@ class Player(avango.script.Script):
         #checkpoint counter
         self.check_point = 0
         self.lap_count = 1
-        self.last_lap_time = time.time() - time.time()
+        #self.last_lap_time = time.time() - time.time()
+        self.last_lap_time = 0
         
         # submarine bounding spheres
         # lol sub zero get it?
@@ -488,15 +480,16 @@ class Player(avango.script.Script):
         
         #append hud
         self.hud = HUD()
-        self.hud.my_constructor(self.SCENE, self.camera_absolute, self.ID)
+        #self.hud.my_constructor(self.SCENE, self.camera_absolute, self.ID)
         
         # callbacks
     def evaluate(self):
         self.navigate()
         self.update_HUD()
-        self.move_minimap()
         
         self.check_player_coll()
+        
+        #print self.camera_absolute.get_absolute_transform(self.camera_absolute)
         
         #print self.hud
         #print "player",self.ID,": mat_out: ",self.mat_out.value
@@ -835,11 +828,6 @@ class Player(avango.script.Script):
             self.hud.change_text(3, text)
             self.hud.change_text(0, str(self.lap_count))
             
-    def move_minimap(self):
-        self.minimap.Matrix.value = self.minimap_initial_scale * self.minimap_initial_position * self.mat_out.value
-        #self.mini_player0.Matrix.value = self.minimap_initial_scale * avango.osg.make_rot_mat(math.radians(90), 1,0,0)* self.mat_out.value
-        self.mini_player0.Matrix.value = avango.osg.make_trans_mat(0,0,100)
-    
     def check_player_coll(self):
         if self.ID == 1:
             self.sub0 = self.SCENE.Player0.group.get_bounding_sphere()
@@ -862,6 +850,9 @@ class Player(avango.script.Script):
             
         #print self.race_pos
         self.hud.change_text(1, str(self.race_pos) + "/2")
+        
+    def create_hud(self):
+        self.hud.my_constructor(self.SCENE, self.camera_absolute, self.ID)
 
         
 #class Navigation(avango.script.Script):

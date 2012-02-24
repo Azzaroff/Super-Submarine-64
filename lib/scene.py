@@ -16,8 +16,8 @@ class Scene:
 		self.light_number = 0
 
 		# setup shader (phong lighting + texturing + diffuse color override)
-		self.environment_vshader = avango.osg.nodes.Shader(Type = avango.osg.shadertype.VERTEX, FileName = "/opt/avango/vr_application_lib/shader/phong_material_override_walls.vert")
-		self.environment_fshader = avango.osg.nodes.Shader(Type = avango.osg.shadertype.FRAGMENT, FileName = "/opt/avango/vr_application_lib/shader/phong_material_override_walls.frag")
+		self.environment_vshader = avango.osg.nodes.Shader(Type = avango.osg.shadertype.VERTEX, FileName = "./shader_example/texture.vert")
+		self.environment_fshader = avango.osg.nodes.Shader(Type = avango.osg.shadertype.FRAGMENT, FileName = "./shader_example/texture.frag")
 
 		self.environment_prog = avango.osg.nodes.Program(ShaderList = [self.environment_vshader, self.environment_fshader])
 
@@ -82,10 +82,15 @@ class Scene:
 		self.object_state = avango.osg.nodes.StateSet(RescaleNormalMode = 1, NormalizeMode = 1, CullFaceMode = 0, Program = self.object_prog, Uniforms = [self.object_uniform1, self.object_uniform2])
 
 		# scene structure
-		self.root = avango.osg.nodes.Group(StateSet = self.underwater_state) # root node
 
-		self.environment_root = avango.osg.nodes.Group(StateSet = self.map_state, Name = "environment_root")
+		self.root = avango.osg.nodes.Group(StateSet = self.underwater_state, Name = "root") # root node
+
+
+		self.environment_root = avango.osg.nodes.Group(StateSet = self.environment_state, Name = "environment_root")
 		self.root.Children.value.append(self.environment_root)
+		
+		self.deko_root = avango.osg.nodes.MatrixTransform(StateSet = self.state, Name = "deko_root")
+		self.root.Children.value.append(self.deko_root)
 		
 		self.skybox_root = avango.osg.nodes.Group(StateSet = self.sky_state, Name = "skybox_root")
 		self.root.Children.value.append(self.skybox_root)
