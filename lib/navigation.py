@@ -25,7 +25,7 @@
 
 import avango
 import avango.osg
-
+import avango.osg.particle
 
 from avango.script import field_has_changed
 

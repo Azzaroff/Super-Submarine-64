@@ -24,6 +24,7 @@ class HUD(avango.script.Script):
         self.Scene = SCENE
         self.hud_transform.Matrix.connect_from(self.camera.AbsoluteMatrix)
         
+        
         #minimap
         self.minimapgroup = avango.osg.nodes.MatrixTransform()
         
