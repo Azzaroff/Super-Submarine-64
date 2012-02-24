@@ -85,8 +85,6 @@ class Scene:
 
 		self.root = avango.osg.nodes.Group(Name = "root") # root node
 
-		self.minimap_root = avango.osg.nodes.Group( Name = "minimap_root")
-		self.root.Children.value.append(self.minimap_root)
 
 		self.environment_root = avango.osg.nodes.Group(StateSet = self.environment_state, Name = "environment_root")
 		self.root.Children.value.append(self.environment_root)
