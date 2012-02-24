@@ -60,6 +60,14 @@ class Scene:
 		self.map_uniform2 = avango.osg.nodes.Uniform(Values = [1], Type = avango.osg.uniformtype.INT, UniformName = "NumLights")
 		
 		self.map_state = avango.osg.nodes.StateSet(RescaleNormalMode = 1, NormalizeMode = 1, Program = self.prog, Uniforms = [self.map_uniform1, self.map_uniform2])
+		
+		#underwater shader
+		self.underwater_vshader = avango.osg.nodes.Shader(Type = avango.osg.shadertype.VERTEX, FileName = "./shader_example/underwater.vert")
+		self.underwater_fshader = avango.osg.nodes.Shader(Type = avango.osg.shadertype.FRAGMENT, FileName = "./shader_example/underwater.frag")
+		
+		self.prog = avango.osg.nodes.Program(ShaderList = [self.underwater_vshader, self.underwater_fshader])
+		
+		self.underwater_state = avango.osg.nodes.StateSet(RescaleNormalMode = 1, NormalizeMode = 1, Program = self.prog)
 
 		# setup shader (phong lighting + texturing + diffuse color override)
 		self.object_vshader = avango.osg.nodes.Shader(Type = avango.osg.shadertype.VERTEX, FileName = "/opt/avango/vr_application_lib/shader/phong_material_override.vert")
@@ -74,7 +82,7 @@ class Scene:
 		self.object_state = avango.osg.nodes.StateSet(RescaleNormalMode = 1, NormalizeMode = 1, CullFaceMode = 0, Program = self.object_prog, Uniforms = [self.object_uniform1, self.object_uniform2])
 
 		# scene structure
-		self.root = avango.osg.nodes.Group() # root node
+		self.root = avango.osg.nodes.Group(StateSet = self.underwater_state) # root node
 
 		self.environment_root = avango.osg.nodes.Group(StateSet = self.map_state, Name = "environment_root")
 		self.root.Children.value.append(self.environment_root)
