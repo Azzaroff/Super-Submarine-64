@@ -25,7 +25,7 @@
 
 import avango
 import avango.osg
-
+import avango.osg.particle
 
 from avango.script import field_has_changed
 
@@ -221,6 +221,45 @@ class GameControllerDevice(ThreeDofInputDevice):
         self.buttons_out.value[3] = self.device_sensor.Button8.value
         self.buttons_out.value[4] = self.device_sensor.Button1.value   
        
+class GameControllerDevice2(ThreeDofInputDevice):
+    
+    buttons_out = avango.MFBool()
+    buttons_out.value = [0,0,0,0,0]
+
+    # constructor
+    def __init__(self):
+        self.super(GameControllerDevice2).__init__()
+
+        # sensor    
+        self.device_sensor.Station.value = "device-saitekcontroller"
+
+    # callbacks
+    def evaluate(self):
+
+        _fr_scale_factor = 60 / (1 / (time.time() - self.time_sav)) # frame rate scale factor
+        self.time_sav = time.time()
+
+        # translation
+        _y = self.filter_channel(self.device_sensor.Value2.value, 0, -0.58, 0.75, 30, 30)
+        _z = self.filter_channel(self.device_sensor.Value1.value, 0, -0.88, 0.82, 30, 30)
+
+        # rotation
+        #_rx = self.filter_channel(self.device_sensor.Value3.value, 0, -0.75, 0.8, 25, 25) # pitch
+        _ry = self.filter_channel(self.device_sensor.Value0.value, 0, -0.15, 0.18, 3, 3) # head
+        #_rz = self.filter_channel(self.device_sensor.Value4.value, 0, -0.72, 0.84, 25, 25) # roll
+        
+
+        # forward data --> multi field connection
+        self.dof_out.value[1] = _y * _fr_scale_factor * -1.0
+        self.dof_out.value[2] = _z * _fr_scale_factor
+        self.dof_out.value[4] = _ry * _fr_scale_factor * -1.0
+        
+        self.buttons_out.value[0] = self.device_sensor.Button5.value
+        self.buttons_out.value[1] = self.device_sensor.Button7.value
+        self.buttons_out.value[2] = self.device_sensor.Button6.value
+        self.buttons_out.value[3] = self.device_sensor.Button8.value
+        self.buttons_out.value[4] = self.device_sensor.Button1.value 
+    
 class Player(avango.script.Script):
     # input fields
     dof_in = avango.MFFloat()
@@ -495,7 +534,7 @@ class Player(avango.script.Script):
         
         if self.buttons_in.value[4] == True:    #reset
             self.race_start = False
-            self.SCENE.GameController.start_countdown()
+            self.SCENE.GameController.start_countdown(8)
             
         
         #print self.camera_absolute.get_absolute_transform(self.camera_absolute)

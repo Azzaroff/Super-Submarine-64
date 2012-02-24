@@ -15,6 +15,7 @@ class GAMECONTROLLER(avango.script.Script):
     oldcounter = 0
     number_of_laps = 1
     player0_data = []
+    player1_data = []
     number_of_finished_races = 0
     
      # constructor
@@ -46,11 +47,6 @@ class GAMECONTROLLER(avango.script.Script):
                 self.always_evaluate(False) # deactivate evaluate callback
         elif self.num_of_players == 2:
             current_counter = self.counter - math.floor(time.time() - self.starttime)
-            if not current_counter == self.oldcounter :
-                text = "%d" % (current_counter)
-                self.Scene.Player0.hud.change_text(4, text)
-                self.Scene.Player1.hud.change_text(4, text)
-                self.oldcounter = current_counter
             if current_counter <= 0:
                 self.Scene.Player0.hud.change_text(4, "")
                 self.Scene.Player1.hud.change_text(4, "")
@@ -63,8 +59,8 @@ class GAMECONTROLLER(avango.script.Script):
                 self.always_evaluate(False) # deactivate evaluate callback
 
 
-    def start_countdown(self):
-        self.counter = 10
+    def start_countdown(self, countdown = 15):
+        self.counter = countdown
         self.oldcounter = self.counter
         self.starttime = time.time()
         self.number_of_finished_races = 0
@@ -110,7 +106,7 @@ class GAMECONTROLLER(avango.script.Script):
                     self.Scene.Player1.hud.change_text(0, str(lap_count))
                     self.number_of_finished_races = self.number_of_finished_races + 1
                     self.Scene.Player1.race_start = False
-                if self.number_of_finished_races == self.number_of_laps:
+                if self.number_of_finished_races == self.num_of_players:
                     self.Scene.Player0.hud.show_results(self.player0_data, self.player1_data)
                     self.Scene.Player1.hud.show_results(self.player1_data, self.player0_data)
             else:

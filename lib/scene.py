@@ -1,7 +1,23 @@
 
 import sys
 import avango
+import avango.osg
 import math
+import avango.script
+from avango.script import field_has_changed
+import avango.osg.simpleviewer
+import avango.osg.particle
+import avango.daemon
+
+def make_precipitation():
+	# setup a precipitation effect with fog
+	precip = avango.osg.particle.nodes.PrecipitationEffect(Fog = avango.osg.nodes.Fog())
+	precip.CellSize.value = avango.osg.Vec3(10,10,10)
+
+	# setup stateset
+	state = avango.osg.nodes.StateSet(FogMode = 1, Fog = precip.Fog.value)
+
+	return precip, state
 
 class Scene:
 
@@ -26,7 +42,7 @@ class Scene:
 		self.environment_uniform2 = avango.osg.nodes.Uniform(Values = [1], Type = avango.osg.uniformtype.INT, UniformName = "color_map2")
 		self.environment_uniform3 = avango.osg.nodes.Uniform(Values = [1], Type = avango.osg.uniformtype.INT, UniformName = "NumLights")		
 		
-		self.environment_state = avango.osg.nodes.StateSet(RescaleNormalMode = 1, NormalizeMode = 1, CullFaceMode = 0, Program = self.environment_prog, Uniforms = [self.environment_uniform1, self.environment_uniform2, self.environment_uniform3])
+		self.environment_state = avango.osg.nodes.StateSet(RescaleNormalMode = 1, NormalizeMode = 1, CullFaceMode = 0, Program = self.environment_prog, Uniforms = [self.environment_uniform1, self.environment_uniform2])
 		#skybox
 		# setup shader (phong lighting + texturing + diffuse color override)
 		self.sky_vshader = avango.osg.nodes.Shader(Type = avango.osg.shadertype.VERTEX, FileName = "./shader_example/phong_texture_no_material.vert")
@@ -109,6 +125,8 @@ class Scene:
 		self.root.Children.value.append(self.menu_navigation_transform)
 
 		self.menu_navigation_transform.Children.value.append(MENU.menu_transform) # append menu root node to navigation node
+		
+		
 	
 
 	# functions
@@ -143,5 +161,4 @@ class Scene:
 																		]))
 		self.root.Children.value.append(_geometry)
 
-		
-		
+
