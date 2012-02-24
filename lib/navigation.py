@@ -94,6 +94,7 @@ class ThreeDofInputDevice(avango.script.Script):
     button2_out = avango.SFBool()
     button3_out = avango.SFBool()
     button4_out = avango.SFBool()
+    button5_out = avango.SFBool()
     
        
     # constructor
@@ -140,7 +141,7 @@ class ThreeDofInputDevice(avango.script.Script):
 class SpacemouseDevice(SixDofInputDevice):
     
     buttons_out = avango.MFBool()
-    buttons_out.value = [0,0,0,0]
+    buttons_out.value = [0,0,0,0,0]
     
 
     # constructor
@@ -179,11 +180,12 @@ class SpacemouseDevice(SixDofInputDevice):
         self.buttons_out.value[1] = self.device_sensor.Button1.value
         self.buttons_out.value[2] = False
         self.buttons_out.value[3] = False
+        self.buttons_out.value[4] = False
 
 class GameControllerDevice(ThreeDofInputDevice):
     
     buttons_out = avango.MFBool()
-    buttons_out.value = [0,0,0,0]
+    buttons_out.value = [0,0,0,0,0]
 
     # constructor
     def __init__(self):
@@ -217,6 +219,7 @@ class GameControllerDevice(ThreeDofInputDevice):
         self.buttons_out.value[1] = self.device_sensor.Button7.value
         self.buttons_out.value[2] = self.device_sensor.Button6.value
         self.buttons_out.value[3] = self.device_sensor.Button8.value
+        self.buttons_out.value[4] = self.device_sensor.Button1.value   
        
 class Player(avango.script.Script):
     # input fields
@@ -284,15 +287,14 @@ class Player(avango.script.Script):
         
         self.acceleration = 0.0
         self.accelerationstep = .5
-            
+        
         #distance for previous collision
         self.old_dist = 0
         
         #checkpoint counter
         self.check_point = 0
         self.lap_count = 1
-        #self.last_lap_time = time.time() - time.time()
-        self.last_lap_time = 0
+        self.lap_time = 0
         
         # submarine bounding spheres
         # lol sub zero get it?
@@ -301,9 +303,9 @@ class Player(avango.script.Script):
         
         #race position
         if self.ID==0: 
-            self.race_pos = 2
-        else: 
             self.race_pos = 1
+        else: 
+            self.race_pos = 2
         
         #pickraylength
         self.raylength = 20.
@@ -330,6 +332,8 @@ class Player(avango.script.Script):
         self.ray_transform_neg_x = avango.osg.nodes.MatrixTransform()
         self.ray_absolute_neg_x = avango.osg.nodes.AbsoluteTransform()
         #self.selected_targets_neg_x = avango.tools.MFTargetHolder()
+        
+        self.race_start = False
         
         
         if(self.ID == 0):
@@ -484,10 +488,15 @@ class Player(avango.script.Script):
         
         # callbacks
     def evaluate(self):
-        self.navigate()
-        self.update_HUD()
+        if self.race_start:
+            self.check_player_coll()
+            self.update_HUD()        
+            self.navigate()
         
-        self.check_player_coll()
+        if self.buttons_in.value[4] == True:    #reset
+            self.race_start = False
+            self.SCENE.GameController.start_countdown()
+            
         
         #print self.camera_absolute.get_absolute_transform(self.camera_absolute)
         
@@ -646,7 +655,7 @@ class Player(avango.script.Script):
             _yaw = -self.dof_in.value[4] * rot_factor
         _pitch = self.dof_in.value[3] * rot_factor
         _roll = self.dof_in.value[5] * rot_factor
-
+        
         if math.fabs(_x) > translation_threshold_min or math.fabs(_y) > translation_threshold_min or math.fabs(_z) > translation_threshold_min:
             #self.nav_trans = avango.osg.make_trans_mat(_x * math.fabs(self.velocity),_y * math.fabs(self.velocity),_z * math.fabs(self.velocity))
             self.nav_trans = avango.osg.make_trans_mat(_x,_y,self.velocity)
@@ -775,10 +784,6 @@ class Player(avango.script.Script):
         self.camerabuttonlast2.value = self.buttons_in.value[1]
         self.camerabuttonlast3.value = self.buttons_in.value[2]
         self.camerabuttonlast4.value = self.buttons_in.value[3]
-        
-        
-        
-        
 
         
         #maximale hoehe
@@ -793,7 +798,8 @@ class Player(avango.script.Script):
             self.lap_count = self.lap_count + 1
             print "Checkpoint: ", self.check_point
             print "Lap: ", self.lap_count
-            self.update_time(True)
+            self.SCENE.GameController.report_lap_data(self.ID, self.lap_count, (time.time() - self.lap_time))
+            self.lap_time = time.time()
         
         if self.check_point == 0 and player_bs.intersects(self.SCENE.checkpoint1_group.get_bounding_sphere()):
             self.check_point = 1
@@ -818,15 +824,14 @@ class Player(avango.script.Script):
         seconds = seconds - (minutes * 60)
         text = "%02d%s%02d%s%02d" % (minutes, ":", seconds, ":", milliseconds)
         self.hud.change_text(2, text)
-        if lap:
-            self.last_lap_time = currenttime - self.last_lap_time
-            seconds = math.floor(self.last_lap_time)
-            minutes = math.floor(seconds / 60)
-            milliseconds = math.floor((currenttime - seconds)*1000)
-            seconds = seconds - (minutes * 60)
-            text = "%02d%s%02d%s%02d" % (minutes, ":", seconds, ":", milliseconds)
-            self.hud.change_text(3, text)
-            self.hud.change_text(0, str(self.lap_count))
+
+        currenttime = time.time() - self.lap_time
+        seconds = math.floor(currenttime)
+        minutes = math.floor(seconds / 60)
+        milliseconds = math.floor((currenttime - seconds)*1000)
+        seconds = seconds - (minutes * 60)
+        text = "%02d%s%02d%s%02d" % (minutes, ":", seconds, ":", milliseconds)
+        self.hud.change_text(3, text)
             
     def check_player_coll(self):
         if self.ID == 1:
@@ -849,10 +854,28 @@ class Player(avango.script.Script):
                 print "hit it!"
             
         #print self.race_pos
-        self.hud.change_text(1, str(self.race_pos) + "/2")
+        #self.hud.change_text(1, str(self.race_pos) + "/2")
+        self.SCENE.GameController.change_race_position(self.ID, self.race_pos)
         
     def create_hud(self):
         self.hud.my_constructor(self.SCENE, self.camera_absolute, self.ID)
+        
+    def reset_player(self):
+        self.race_start = False
+        self.mat_out.value = avango.osg.make_rot_mat(math.radians(180),0,1,0) * avango.osg.make_trans_mat(1077.455688, -39.309696, -427.697662) # initial navigation values # initial navigation values
+        self.mat_out.value *= avango.osg.make_trans_mat((-self.ID * -3), 0.0, 0.0) 
+        self.hud.change_text(2, "--:--:---")
+        self.pitch = 0
+        self.velocity = 0
+        self.roll = 0
+        self.acceleration = 0
+        #reset camera
+        self.camera.Matrix.value = avango.osg.make_trans_mat(.0, 2.0, 15.0)
+        self.camera2.Matrix.value = avango.osg.make_trans_mat(.0, -2.0, -2.0)
+        self.camera3.Matrix.value = avango.osg.make_rot_mat(math.radians(90), 0, 1, 0) * avango.osg.make_trans_mat(10.0, -2.0, 0.0)
+        self.camera4.Matrix.value = avango.osg.make_trans_mat(0.0, 0.0, 10.0) * avango.osg.make_rot_mat(math.radians(90), -1, 0, 0)
+        self.camera5.Matrix.value = avango.osg.make_trans_mat(0.0, 2.0, 10.0) * avango.osg.make_rot_mat(math.radians(45), 0, 1, 0)
+        
 
         
 #class Navigation(avango.script.Script):
