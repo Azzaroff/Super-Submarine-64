@@ -83,13 +83,13 @@ class Scene:
 
 		# scene structure
 
-		self.root = avango.osg.nodes.Group(StateSet = self.underwater_state, Name = "root") # root node
+		self.root = avango.osg.nodes.Group(Name = "root") # root node
 
 
 		self.environment_root = avango.osg.nodes.Group(StateSet = self.environment_state, Name = "environment_root")
 		self.root.Children.value.append(self.environment_root)
 		
-		self.deko_root = avango.osg.nodes.MatrixTransform(StateSet = self.state, Name = "deko_root")
+		self.deko_root = avango.osg.nodes.MatrixTransform(StateSet = self.map_state, Name = "deko_root")
 		self.root.Children.value.append(self.deko_root)
 		
 		self.skybox_root = avango.osg.nodes.Group(StateSet = self.sky_state, Name = "skybox_root")

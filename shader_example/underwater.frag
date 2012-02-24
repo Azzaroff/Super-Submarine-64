@@ -1,13 +1,9 @@
-#uniform sampler2D sceneTex; // 0
-#uniform float gamma; // 0.6
-#uniform float numColors; // 8.0
 void main()
 {
-  #vec3 c = texture2D(sceneTex, gl_TexCoord[0].xy).rgb;
-  #c = pow(c, vec3(gamma, gamma, gamma));
-  #c = c * numColors;
-  #c = floor(c);
-  #c = c / numColors;
-  #c = pow(c, vec3(1.0/gamma));
-  gl_FragColor = vec4(0.0, 1.0, 1.0, 1.0);
+  //gl_FragColor = vec4(0.0, 1.0, 1.0, 1.0);
+  gl_FragColor.r = gl_Color.r * 0.9;
+  gl_FragColor.g = gl_Color.g * 0.7;
+  gl_FragColor.b = gl_Color.b;
+  
+
 }
