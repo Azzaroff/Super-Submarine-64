@@ -17,6 +17,7 @@ class GAMECONTROLLER(avango.script.Script):
     player0_data = []
     player1_data = []
     number_of_finished_races = 0
+    num_of_players = 0
     
      # constructor
     def __init__(self):

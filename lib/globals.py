@@ -32,8 +32,11 @@ import socket
 
 # viewing setup mode
 gl_viewing_setup = "desktop" # default setup
+anaglyph_flag = False
 if len(sys.argv) >= 2: # check for further command line options
 	gl_viewing_setup = str(sys.argv[1])
+	if (len(sys.argv) >= 3) and (str(sys.argv[2]) == str("anaglyph")):
+		anaglyph_flag = True
 
 _supported_viewing_setups = ["desktop", "anaglyph", "checkerboard", "splitscreen"]
 if _supported_viewing_setups.count(gl_viewing_setup) == 0: # check if viewing setup is supported
@@ -75,7 +78,7 @@ if gl_display_configuration == 0: # monitor: Dell
 	gl_wanted_position_y		= 	0
 	gl_screen_transform 		= 	avango.osg.make_ident_mat()
 	gl_eye_transform 			= 	avango.osg.make_trans_mat(0.0,0.0,0.5) # default head position 50cm in front of display
-	gl_transmitter_offset 		= 	avango.osg.make_trans_mat(-0.31,-0.27,0.55)
+	gl_transmitter_offset 		= 	avango.osg.make_trans_mat(-0.0,-0.0,0.0) #avango.osg.make_trans_mat(-0.31,-0.27,0.55)
 	
 	gl_ground_flag				= 	False
 	gl_ground_plane_transform	= 	avango.osg.make_scale_mat(gl_physical_screen_width * 1.4, gl_physical_screen_width * 1.4, 1.0) * \
