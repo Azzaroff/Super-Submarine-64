@@ -39,12 +39,12 @@ class ViewingSetup:
 		# init viewing setup
 		if gl_viewing_setup == "desktop":
 			self.setup = DesktopSetup(SCENE)
-	
-		elif gl_viewing_setup == "minicave":
-			self.setup = MiniCaveSetup(SCENE)
 			
 		elif gl_viewing_setup == "splitscreen":
 			self.setup = SplitScreenSetup(SCENE)
+			
+		elif gl_viewing_setup == "minicave":
+			self.setup = MiniCaveSetup(SCENE)
 	
 		else: # viewing setup not supported
 
@@ -79,7 +79,10 @@ class DesktopSetup:
 		self.window = avango.osg.viewer.nodes.GraphicsWindow()
 		self.window.ScreenIdentifier.value = ":0.0"
 		self.window.AutoHeight.value = False
-		self.window.StereoMode.value = avango.osg.viewer.stereo_mode.STEREO_MODE_NONE
+		if anaglyph_flag:
+			self.window.StereoMode.value = avango.osg.viewer.stereo_mode.STEREO_MODE_ANAGLYPHIC
+		else:
+			self.window.StereoMode.value = avango.osg.viewer.stereo_mode.STEREO_MODE_NONE
 		
 		# screen parameters
 		self.window.WantedWidth.value = gl_pixels_width
@@ -94,6 +97,10 @@ class DesktopSetup:
 		self.camera.ScreenTransform.value = gl_screen_transform
 		self.camera.BackgroundColor.value = avango.osg.Vec4(0,0.1,1,1)#gl_background_color
 		self.camera.Far.value = 40000000
+		
+		if anaglyph_flag:
+			self.eye_offset = 0.065
+			self.camera.EyeOffset.value = self.eye_offset * 0.01
 
 		# init field connections
 		#self.camera.ViewerTransform.connect_from(SCENE.navigation_transform.Matrix)
@@ -143,7 +150,11 @@ class SplitScreenSetup:
 		self.window.ShowCursor.value = False
 		self.window.AutoHeight.value = False
 		self.window.Decoration.value = False
-		self.window.StereoMode.value = avango.osg.viewer.stereo_mode.STEREO_MODE_NONE
+		#self.window.StereoMode.value = avango.osg.viewer.stereo_mode.STEREO_MODE_NONE
+		if anaglyph_flag:
+			self.window.StereoMode.value = avango.osg.viewer.stereo_mode.STEREO_MODE_ANAGLYPHIC
+		else:
+			self.window.StereoMode.value = avango.osg.viewer.stereo_mode.STEREO_MODE_NONE
 						
 		# screen parameters
 		self.window.WantedWidth.value = gl_pixels_width
@@ -155,14 +166,16 @@ class SplitScreenSetup:
 
 		# init camera 1
 		self.camera1 = avango.osg.viewer.nodes.Camera(Window = self.window)
-		#self.camera1.EyeOffset.value = self.eye_offset1 * 0.5
+		if anaglyph_flag:
+			self.camera1.EyeOffset.value = self.eye_offset1 * 0.01
 		self.camera1.Far.value = 40000000.0
 		self.camera1.ScreenTransform.value = gl_screen_transform
 		self.camera1.BackgroundColor.value = gl_background_color
 		
 		# init camera 2
 		self.camera2 = avango.osg.viewer.nodes.Camera(Window = self.window)
-		#self.camera2.EyeOffset.value = self.eye_offset1 * 0.5
+		if anaglyph_flag:
+			self.camera2.EyeOffset.value = self.eye_offset1 * 0.01
 		self.camera2.Far.value = 40000000.0
 		self.camera2.ScreenTransform.value = gl_screen_transform * avango.osg.make_trans_mat(0, -0.084, 0)
 		self.camera2.BackgroundColor.value = gl_background_color
@@ -256,7 +269,7 @@ class MiniCaveSetup:
 		# init camera
 		self.camera2 = avango.osg.viewer.nodes.Camera(Window = self.window2)
 		self.camera2.EyeOffset.value = self.eye_offset * 0.5
-		self.camera2.ScreenTransform.value = gl_screen_transform2
+		self.camera2.ScreenTransform.value = gl_screen_transform
 		self.camera2.BackgroundColor.value = gl_background_color
 
 		# init display 3

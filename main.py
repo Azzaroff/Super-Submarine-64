@@ -207,7 +207,7 @@ class Application:
 		self.time_sav = time.time()
 		self.Scene.GameController = GAMECONTROLLER()
 		
-		if gl_viewing_setup == "desktop":
+		if gl_viewing_setup == "desktop" or gl_viewing_setup == "anaglyph":
 			self.Scene.Player0 = Player()
 			self.Scene.Player0.my_constructor(self.Scene, self.ImpactController, "./data/Submarine/My_YellowSubmarine.obj", self.collision_landscape, 0, self.time_sav)
 			self.Scene.Player0.create_hud()
