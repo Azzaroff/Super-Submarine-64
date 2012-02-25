@@ -111,6 +111,7 @@ class HUD(avango.script.Script):
             self.text5 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - righttextoffset), -.034, 0.0), "--:--:---", 0.01, 1, 32);
             
         self.geode = avango.osg.nodes.LayerGeode(Drawables = [self.label0, self.text0, self.label1, self.text1, self.label2, self.text2, self.label3, self.text3, self.text4, self.label5, self.text5], StateSet = avango.osg.nodes.StateSet(LightingMode = 0), Name="HUD" + str(self.id))
+        self.geode2 = avango.osg.nodes.LayerGeode(Drawables = [], StateSet = avango.osg.nodes.StateSet(LightingMode = 0), Name="HUD" + str(self.id))
         
         self.Scene.root.Children.value.append(self.hud_transform)
         self.hud_transform.Children.value.append(self.geode) # append gui to navigation node --> head up display
@@ -148,6 +149,7 @@ class HUD(avango.script.Script):
         self.text2.String.value = ""
         self.text3.String.value = ""
         self.text5.String.value = ""
+        self.hud_transform.Children.value.remove(self.geode)
         
         if gl_viewing_setup == "desktop":
             self.score_label0 = self.create_text(avango.osg.Vec3(0, gl_physical_screen_height * 0.44, 0.0), "Gewonnen!", 0.01, 1, 32);        
@@ -206,3 +208,17 @@ class HUD(avango.script.Script):
             self.geode2 = avango.osg.nodes.LayerGeode(Drawables = help, StateSet = avango.osg.nodes.StateSet(LightingMode = 0), Name="HUD" + str(self.id))
             self.hud_transform.Children.value.append(self.geode2)
             
+    def reset_hud(self):
+        self.hud_transform.Children.value.remove(self.geode2)
+        self.hud_transform.Children.value.append(self.geode)
+        
+        self.label0.String.value = "Runde:"
+        self.label1.String.value = "Position:"
+        self.label2.String.value = "Zeit:"
+        self.label3.String.value = "Rundenzeit:"
+        self.label5.String.value = "Beste Runde:"
+        self.change_text(0, "1")
+        self.change_text(1, "1/2")
+        self.change_text(2, "--:--:---")
+        self.change_text(3, "--:--:---")
+        self.change_text(5, "--:--:---")            

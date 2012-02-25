@@ -146,5 +146,6 @@ class Scene:
 																								avango.osg.nodes.Shader(Name = "VertexShader", Type = avango.osg.shadertype.FRAGMENT,ShaderSource = "void main() { gl_FragColor = gl_FrontMaterial.diffuse; }")
 																		]))
 		self.root.Children.value.append(_geometry)
-
+		
+		return _light
 
