@@ -280,7 +280,9 @@ class Player(avango.script.Script):
     def my_constructor(self, SCENE, INPUT_DEVICE, MODELPATH, REDUCED_COLLISION_MAP, ID, STARTTIME):
 
         print "constructor call of player: ",ID
-
+        
+        self.head_tracking_sensor = avango.daemon.nodes.DeviceSensor(DeviceService = gl_device_service, Station = "tracking-head", TransmitterOffset = gl_transmitter_offset)
+        
         # references
         self.SCENE = SCENE
         self.ID = ID
@@ -547,6 +549,8 @@ class Player(avango.script.Script):
         if self.buttons_in.value[4] == True:    #reset
             self.race_start = False
             self.SCENE.GameController.start_countdown(8)
+            
+        print self.head_tracking_sensor.Matrix.value
             
         
         #print self.camera_absolute.get_absolute_transform(self.camera_absolute)
