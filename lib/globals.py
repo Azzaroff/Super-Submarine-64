@@ -69,7 +69,7 @@ elif _host_name == "eris": # stereo-tv: table
 	
 if gl_display_configuration == 0: # monitor: Dell
 
-	gl_headtracking_flag		= 	False
+	gl_headtracking_flag		= 	True
 	gl_physical_screen_width 	= 	0.59	
 	gl_physical_screen_height 	= 	0.335
 	gl_pixels_width 			= 	2560
@@ -78,7 +78,7 @@ if gl_display_configuration == 0: # monitor: Dell
 	gl_wanted_position_y		= 	0
 	gl_screen_transform 		= 	avango.osg.make_ident_mat()
 	gl_eye_transform 			= 	avango.osg.make_trans_mat(0.0,0.0,0.5) # default head position 50cm in front of display
-	gl_transmitter_offset 		= 	avango.osg.make_trans_mat(-0.0,-0.0,0.0) #avango.osg.make_trans_mat(-0.31,-0.27,0.55)
+	gl_transmitter_offset 		= 	avango.osg.make_trans_mat(-0.3225, 0.0,0.5) #avango.osg.make_trans_mat(-0.31,-0.27,0.55)
 	
 	gl_ground_flag				= 	False
 	gl_ground_plane_transform	= 	avango.osg.make_scale_mat(gl_physical_screen_width * 1.4, gl_physical_screen_width * 1.4, 1.0) * \

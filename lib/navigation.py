@@ -877,7 +877,8 @@ class Player(avango.script.Script):
             self.sub0 = self.SCENE.Player0.group.get_bounding_sphere()
             self.sub1 = self.SCENE.Player1.group.get_bounding_sphere()
             
-            player_dist = (self.sub0.get_center() - self.sub1.get_center()).length()
+            coll_dir = (self.sub0.get_center() - self.sub1.get_center())
+            player_dist = coll_dir.length()
             #print player_dist
             if player_dist < 400 and self.lap_count == self.SCENE.Player0.lap_count and self.check_point == self.SCENE.Player0.check_point:
                 if self.sub1.get_center().z > self.sub0.get_center().z:
@@ -890,7 +891,9 @@ class Player(avango.script.Script):
                     self.SCENE.Player1.race_pos = 2
                 
             if self.sub1.intersects(self.sub0):
-                print "hit it!"
+                #print coll_dir
+                #print "hit it!"
+                self.mat_out.value *= avango.osg.make_trans_mat(-coll_dir.x,-coll_dir.y,-coll_dir.z)
             
         #print self.race_pos
         #self.hud.change_text(1, str(self.race_pos) + "/2")
