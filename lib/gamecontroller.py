@@ -59,7 +59,7 @@ class GAMECONTROLLER(avango.script.Script):
                 self.always_evaluate(False) # deactivate evaluate callback
 
 
-    def start_countdown(self, countdown = 15):
+    def start_countdown(self, countdown = 10):
         self.counter = countdown
         self.oldcounter = self.counter
         self.starttime = time.time()
@@ -67,9 +67,15 @@ class GAMECONTROLLER(avango.script.Script):
         
         if self.num_of_players == 1:
             self.Scene.Player0.reset_player()
+            self.Scene.Player0.hud.reset_hud()
+            self.player0_data = []
         elif self.num_of_players == 2:
             self.Scene.Player0.reset_player()
-            self.Scene.Player1.reset_player()            
+            self.Scene.Player1.reset_player()
+            self.Scene.Player0.hud.reset_hud()
+            self.Scene.Player1.hud.reset_hud()
+            self.player0_data = []            
+            self.player1_data = []
         
         self.always_evaluate(True) # activate evaluate callback
         
