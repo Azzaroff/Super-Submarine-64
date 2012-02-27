@@ -89,26 +89,26 @@ class HUD(avango.script.Script):
             leftminimapoffset = 0.034
             self.minimapgroup.Matrix.value = avango.osg.make_scale_mat(.000015,.000015,.000015) * \
                                                 avango.osg.make_rot_mat(math.radians(90), 1, 0, 0) * \
-                                                avango.osg.make_trans_mat((-gl_physical_screen_width * 0.5 + leftminimapoffset),gl_physical_screen_height * -0.40,0)
+                                                avango.osg.make_trans_mat((-gl_physical_screen_width * 0.5 + leftminimapoffset),gl_physical_screen_height * -0.31,0)
             #move hud
             leftlabeloffset = 0.012
             lefttextoffset = 0.068
             rightlabeloffset = 0.15
             righttextoffset = 0.065
-            self.label0 = self.create_text(avango.osg.Vec3((-gl_physical_screen_width * 0.5 + leftlabeloffset), -.01, 0.0), "Runde:", 0.01, 1, 32);
+            self.label0 = self.create_text(avango.osg.Vec3((-gl_physical_screen_width * 0.5 + leftlabeloffset), .016, 0.0), "Runde:", 0.01, 1, 32);
             num_of_laps = "1/" + "%d" % (self.Scene.GameController.number_of_laps)
-            self.text0 = self.create_text(avango.osg.Vec3((-gl_physical_screen_width * 0.5 + lefttextoffset), -.01, 0.0), num_of_laps, 0.01, 1, 32);
-            self.label1 = self.create_text(avango.osg.Vec3((-gl_physical_screen_width * 0.5 + leftlabeloffset), -.022, 0.0), "Position:", 0.01, 1, 32);
-            self.text1 = self.create_text(avango.osg.Vec3((-gl_physical_screen_width * 0.5 + lefttextoffset), -.022, 0.0), "1/2", 0.01, 1, 32);
-            self.label2 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - rightlabeloffset), -.01, 0.0), "Zeit:", 0.01, 1, 32);
-            self.text2 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - righttextoffset), -.01, 0.0), "--:--:---", 0.01, 1, 32);
-            self.label3 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - rightlabeloffset), -.022, 0.0), "Rundenzeit:", 0.01, 1, 32);
-            self.text3 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - righttextoffset), -.022, 0.0), "--:--:---", 0.01, 1, 32);
+            self.text0 = self.create_text(avango.osg.Vec3((-gl_physical_screen_width * 0.5 + lefttextoffset), .016, 0.0), num_of_laps, 0.01, 1, 32);
+            self.label1 = self.create_text(avango.osg.Vec3((-gl_physical_screen_width * 0.5 + leftlabeloffset), .004, 0.0), "Position:", 0.01, 1, 32);
+            self.text1 = self.create_text(avango.osg.Vec3((-gl_physical_screen_width * 0.5 + lefttextoffset), .004, 0.0), "1/2", 0.01, 1, 32);
+            self.label2 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - rightlabeloffset), .016, 0.0), "Zeit:", 0.01, 1, 32);
+            self.text2 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - righttextoffset), .016, 0.0), "--:--:---", 0.01, 1, 32);
+            self.label3 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - rightlabeloffset), .004, 0.0), "Rundenzeit:", 0.01, 1, 32);
+            self.text3 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - righttextoffset), .004, 0.0), "--:--:---", 0.01, 1, 32);
             
             self.text4 = self.create_text(avango.osg.Vec3(-.014, -.1, 0.0), "3", 0.05, 2, 120);
             
-            self.label5 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - rightlabeloffset), -.034, 0.0), "Beste Runde:", 0.01, 1, 32);
-            self.text5 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - righttextoffset), -.034, 0.0), "--:--:---", 0.01, 1, 32);
+            self.label5 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - rightlabeloffset), -.008, 0.0), "Beste Runde:", 0.01, 1, 32);
+            self.text5 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - righttextoffset), -.008, 0.0), "--:--:---", 0.01, 1, 32);
             
         self.geode = avango.osg.nodes.LayerGeode(Drawables = [self.label0, self.text0, self.label1, self.text1, self.label2, self.text2, self.label3, self.text3, self.text4, self.label5, self.text5], StateSet = avango.osg.nodes.StateSet(LightingMode = 0), Name="HUD" + str(self.id))
         self.geode2 = avango.osg.nodes.LayerGeode(Drawables = [], StateSet = avango.osg.nodes.StateSet(LightingMode = 0), Name="Results" + str(self.id))
@@ -177,9 +177,9 @@ class HUD(avango.script.Script):
             #print "laenge: ",len(help)
             
         elif gl_viewing_setup == "splitscreen":
-            self.score_label0 = self.create_text(avango.osg.Vec3(0, -.01, 0.0), "Gewonnen!", 0.01, 1, 32);        
-            self.score_label1 = self.create_text(avango.osg.Vec3(-0.065, -.022, 0.0), "Rundenzeit", 0.01, 1, 32);
-            self.score_label2 = self.create_text(avango.osg.Vec3(0.065, -.022, 0.0), "Position", 0.01, 1, 32);
+            self.score_label0 = self.create_text(avango.osg.Vec3(0, .16, 0.0), "Gewonnen!", 0.01, 1, 32);        
+            self.score_label1 = self.create_text(avango.osg.Vec3(-0.065, .004, 0.0), "Rundenzeit", 0.01, 1, 32);
+            self.score_label2 = self.create_text(avango.osg.Vec3(0.065, .004, 0.0), "Position", 0.01, 1, 32);
             help = []
             help.append(self.score_label0)
             help.append(self.score_label1)
@@ -197,8 +197,8 @@ class HUD(avango.script.Script):
                 milliseconds = math.floor((time0 - seconds)*1000)
                 seconds = seconds - (minutes * 60)
                 text = "%02d%s%02d%s%02d" % (minutes, ":", seconds, ":", milliseconds)
-                timeentry = self.create_text(avango.osg.Vec3(-0.065, (-0.034-0.012*x), 0.0), text, 0.01, 1, 32);
-                positionentry = self.create_text(avango.osg.Vec3(0.065, (-0.034-0.012*x), 0.0), "1/2", 0.01, 1, 32);
+                timeentry = self.create_text(avango.osg.Vec3(-0.065, (-0.008-0.012*x), 0.0), text, 0.01, 1, 32);
+                positionentry = self.create_text(avango.osg.Vec3(0.065, (-0.008-0.012*x), 0.0), "1/2", 0.01, 1, 32);
                 if sum0 > sum1:
                     positionentry.String.value = "2/2"
                 help.append(timeentry)

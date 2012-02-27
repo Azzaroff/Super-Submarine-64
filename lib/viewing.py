@@ -107,7 +107,7 @@ class DesktopSetup:
 		self.camera.ViewerTransform.connect_from(SCENE.Player0.camera_absolute.AbsoluteMatrix)
 
 		if gl_headtracking_flag == True:
-			self.tracking_sensor = avango.daemon.nodes.DeviceSensor(DeviceService = avango.daemon.DeviceService(), Station = "tracking-head", TransmitterOffset = gl_transmitter_offset) # init tracking sensor
+			self.tracking_sensor = avango.daemon.nodes.DeviceSensor(DeviceService = avango.daemon.DeviceService(), Station = "tracking-head0", TransmitterOffset = gl_transmitter_offset) # init tracking sensor
 			self.camera.EyeTransform.connect_from(self.tracking_sensor.Matrix)
 
 		else:
@@ -169,7 +169,7 @@ class SplitScreenSetup:
 		if anaglyph_flag:
 			self.camera1.EyeOffset.value = self.eye_offset1 * 0.01
 		self.camera1.Far.value = 40000000.0
-		self.camera1.ScreenTransform.value = gl_screen_transform
+		self.camera1.ScreenTransform.value = gl_screen_transform * avango.osg.make_trans_mat(0, 0.03, 0)
 		self.camera1.BackgroundColor.value = gl_background_color
 		
 		# init camera 2
@@ -177,7 +177,7 @@ class SplitScreenSetup:
 		if anaglyph_flag:
 			self.camera2.EyeOffset.value = self.eye_offset1 * 0.01
 		self.camera2.Far.value = 40000000.0
-		self.camera2.ScreenTransform.value = gl_screen_transform * avango.osg.make_trans_mat(0, -0.084, 0)
+		self.camera2.ScreenTransform.value = gl_screen_transform * avango.osg.make_trans_mat(0, -0.054, 0)
 		self.camera2.BackgroundColor.value = gl_background_color
 		
 		self.camera1.ViewerTransform.connect_from(SCENE.Player0.camera_absolute.AbsoluteMatrix)
@@ -187,7 +187,7 @@ class SplitScreenSetup:
 		self.camera2.Viewport.value = avango.osg.Vec4(0.0, 0.0, 1.0, 0.5)
 
 		if gl_headtracking_flag == True:
-			self.tracking_sensor1 = avango.daemon.nodes.DeviceSensor(DeviceService = avango.daemon.DeviceService(), Station = "tracking-head", TransmitterOffset = gl_transmitter_offset) # init tracking sensor
+			self.tracking_sensor1 = avango.daemon.nodes.DeviceSensor(DeviceService = avango.daemon.DeviceService(), Station = "tracking-head0", TransmitterOffset = gl_transmitter_offset) # init tracking sensor
 			self.tracking_sensor2 = avango.daemon.nodes.DeviceSensor(DeviceService = avango.daemon.DeviceService(), Station = "tracking-head1", TransmitterOffset = gl_transmitter_offset) # init tracking sensor
 
 			# connect headtracking sensor data with camera EyeTransform here

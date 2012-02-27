@@ -40,7 +40,7 @@ def init_pst_tracking():
 	_pst.port = "5002" # PST port
 	
 	# head tracking
-	_pst.stations[6] = avango.daemon.Station('tracking-head')
+	_pst.stations[6] = avango.daemon.Station('tracking-head0')
 	_pst.stations[6] = avango.daemon.Station('tracking-head1')
 	
 	device_list.append(_pst)
