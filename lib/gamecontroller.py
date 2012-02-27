@@ -34,33 +34,34 @@ class GAMECONTROLLER(avango.script.Script):
         self.count_countdown()
         
     def count_countdown(self):
+        now = time.time()
         if self.num_of_players == 1:
-            current_counter = self.counter - math.floor(time.time() - self.starttime)
-            if not current_counter == self.oldcounter :
+            current_counter = self.counter - math.floor(now - self.starttime)
+            if current_counter != self.oldcounter :
                 text = "%d" % (current_counter)
                 self.Scene.Player0.hud.change_text(4, text)
                 self.oldcounter = current_counter
             if current_counter <= 0:
                 self.Scene.Player0.hud.change_text(4, "")
                 self.Scene.Player0.race_start = True
-                self.Scene.Player0.starttime = time.time()
-                self.Scene.Player0.lap_time = time.time()
+                self.Scene.Player0.starttime = now
+                self.Scene.Player0.lap_time = now
                 self.always_evaluate(False) # deactivate evaluate callback
         elif self.num_of_players == 2:
-            current_counter = self.counter - math.floor(time.time() - self.starttime)
+            current_counter = self.counter - math.floor(now - self.starttime)
             if current_counter <= 0:
                 self.Scene.Player0.hud.change_text(4, "")
                 self.Scene.Player1.hud.change_text(4, "")
                 self.Scene.Player0.race_start = True
                 self.Scene.Player1.race_start = True
-                self.Scene.Player0.starttime = time.time()
-                self.Scene.Player1.starttime = time.time()
-                self.Scene.Player0.lap_time = time.time()
-                self.Scene.Player1.lap_time = time.time()
+                self.Scene.Player0.starttime = now
+                self.Scene.Player1.starttime = now
+                self.Scene.Player0.lap_time = now
+                self.Scene.Player1.lap_time = now
                 self.always_evaluate(False) # deactivate evaluate callback
 
 
-    def start_countdown(self, countdown = 10):
+    def start_countdown(self, countdown):
         self.counter = countdown
         self.oldcounter = self.counter
         self.starttime = time.time()

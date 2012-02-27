@@ -183,11 +183,16 @@ class SplitScreenSetup:
 		self.camera1.ViewerTransform.connect_from(SCENE.Player0.camera_absolute.AbsoluteMatrix)
 		self.camera2.ViewerTransform.connect_from(SCENE.Player1.camera_absolute.AbsoluteMatrix)
 
-		if gl_headtracking_flag == True:
-			self.tracking_sensor1 = avango.daemon.nodes.DeviceSensor(DeviceService = avango.daemon.DeviceService(), Station = "tracking-head1", TransmitterOffset = gl_transmitter_offset) # init tracking sensor
-			self.tracking_sensor2 = avango.daemon.nodes.DeviceSensor(DeviceService = avango.daemon.DeviceService(), Station = "tracking-head2", TransmitterOffset = gl_transmitter_offset) # init tracking sensor
+		self.camera1.Viewport.value = avango.osg.Vec4(0.0, 0.5, 1.0, 1.0)		
+		self.camera2.Viewport.value = avango.osg.Vec4(0.0, 0.0, 1.0, 0.5)
 
-			# connect headtracking sensor data with camera EyeTransform here			
+		if gl_headtracking_flag == True:
+			self.tracking_sensor1 = avango.daemon.nodes.DeviceSensor(DeviceService = avango.daemon.DeviceService(), Station = "tracking-head", TransmitterOffset = gl_transmitter_offset) # init tracking sensor
+			self.tracking_sensor2 = avango.daemon.nodes.DeviceSensor(DeviceService = avango.daemon.DeviceService(), Station = "tracking-head1", TransmitterOffset = gl_transmitter_offset) # init tracking sensor
+
+			# connect headtracking sensor data with camera EyeTransform here
+			self.camera1.EyeTransform.connect_from(self.tracking_sensor1.Matrix)
+			self.camera2.EyeTransform.connect_from(self.tracking_sensor2.Matrix)			
 
 		else:
 			self.camera1.EyeTransform.value = gl_eye_transform # fixed head position
@@ -196,11 +201,6 @@ class SplitScreenSetup:
 
 		# init viewer
 		self.viewer = avango.osg.viewer.nodes.Viewer(Scene = SCENE.root, MasterCamera = self.camera1, SlaveCameras = [self.camera2])
-
-		self.camera1.Viewport.value = avango.osg.Vec4(0.0, 0.5, 1.0, 1.0)		
-		self.camera2.Viewport.value = avango.osg.Vec4(0.0, 0.0, 1.0, 0.5)
-
-		
 
 		# init simple mouse events
 		self.events = avango.osg.viewer.nodes.EventFields(View = self.viewer)

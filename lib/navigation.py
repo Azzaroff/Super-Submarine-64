@@ -31,6 +31,7 @@ from avango.script import field_has_changed
 
 # import modules from local library
 from lib.globals import *
+from mako.runtime import UNDEFINED
 from lib.hud import *
 
 class SixDofInputDevice(avango.script.Script):
@@ -271,6 +272,7 @@ class Player(avango.script.Script):
     
     # output fields
     mat_out = avango.osg.SFMatrix()
+    mat_in = avango.osg.SFMatrix()
         
     # constructor
     def __init__(self):
@@ -282,6 +284,8 @@ class Player(avango.script.Script):
         print "constructor call of player: ",ID
         
         self.head_tracking_sensor = avango.daemon.nodes.DeviceSensor(DeviceService = gl_device_service, Station = "tracking-head", TransmitterOffset = gl_transmitter_offset)
+
+        self.mat_in.connect_from(self.head_tracking_sensor.Matrix) # connect tracking sensor matrix with input matrix
         
         # references
         self.SCENE = SCENE
@@ -321,7 +325,7 @@ class Player(avango.script.Script):
         self.velocity = 0.0 # -1 ... volles abbremsen, 1...volle beschleunigung
         self.max_velocity = 4
         self.velocity_factor = 1.2
-        self.friction = 0.2 #reibung
+        self.friction = 0.05 #reibung
 
         self.pitch = 0
         self.roll = 0
@@ -376,6 +380,7 @@ class Player(avango.script.Script):
         
         self.race_start = False
         
+        self.light_transform = avango.osg.nodes.MatrixTransform()
         
         if(self.ID == 0):
             self.mat_out.value = avango.osg.make_rot_mat(math.radians(180),0,1,0) * avango.osg.make_trans_mat(1077.455688, -39.309696, -427.697662) # initial navigation values # initial navigation values
@@ -410,14 +415,14 @@ class Player(avango.script.Script):
         self.mouse_sensor = avango.daemon.nodes.DeviceSensor(Station = "device-mouse", DeviceService = gl_device_service)
         
         #move camera
-        self.camera.Matrix.value = avango.osg.make_trans_mat(.0, 2.0, 15.0)
-        self.camera2.Matrix.value = avango.osg.make_trans_mat(.0, -2.0, -2.0)
-        self.camera3.Matrix.value = avango.osg.make_rot_mat(math.radians(90), 0, 1, 0) * avango.osg.make_trans_mat(10.0, -2.0, 0.0)
-        self.camera4.Matrix.value = avango.osg.make_trans_mat(0.0, 0.0, 10.0) * avango.osg.make_rot_mat(math.radians(90), -1, 0, 0)
-        self.camera5.Matrix.value = avango.osg.make_trans_mat(0.0, 2.0, 10.0) * avango.osg.make_rot_mat(math.radians(45), 0, 1, 0)
+        #self.camera.Matrix.value = avango.osg.make_trans_mat(.0, 2.0, 20.0)
+        #self.camera2.Matrix.value = avango.osg.make_trans_mat(.0, -2.0, -2.0)
+        #self.camera3.Matrix.value = avango.osg.make_rot_mat(math.radians(90), 0, 1, 0) * avango.osg.make_trans_mat(10.0, -2.0, 0.0)
+        #self.camera4.Matrix.value = avango.osg.make_trans_mat(0.0, 0.0, 10.0) * avango.osg.make_rot_mat(math.radians(90), -1, 0, 0)
+        #self.camera5.Matrix.value = avango.osg.make_trans_mat(0.0, 2.0, 10.0) * avango.osg.make_rot_mat(math.radians(45), 0, 1, 0)
         
         #load modell        
-        self._mat =     avango.osg.make_scale_mat(.3,.3,.3) * \
+        self._mat =     avango.osg.make_scale_mat(1.,1.,1.) * \
                 avango.osg.make_rot_mat(math.pi*0.5,-1,0,0) * \
                 avango.osg.make_rot_mat(math.radians(90),0,1,0) * \
                 avango.osg.make_trans_mat(0.0,0.0,0.0)
@@ -530,30 +535,35 @@ class Player(avango.script.Script):
         #append front light
         lightoffset = avango.osg.make_rot_mat(self.mat_out.value.get_rotate()) * avango.osg.make_trans_mat(0, 0, -5) * self.mat_out.value
         lightposition = avango.osg.Vec4(lightoffset.get_translate().x, lightoffset.get_translate().y, lightoffset.get_translate().z, 1.0)
-        lightdirection = avango.osg.make_rot_mat(self.mat_out.value.get_rotate()) * avango.osg.make_trans_mat(0,0,-1)
-        self.light = self.SCENE.make_light(avango.osg.Vec4(0.1,0.1,0.1,1.0), avango.osg.Vec4(0.35,0.35,0.35,1.0), avango.osg.Vec4(.8,.8,.8,1.0), lightposition)
-        self.light.get_field(6).value = lightdirection.get_translate()
-        self.light.get_field(7).value = 0.3
-        self.light.get_field(10).value = 0
-        #self.light.get_field(11).value = 500
+        lightdirection = lightoffset.get_translate() - self.mat_out.value.get_translate()
+        self.light = self.SCENE.make_light(avango.osg.Vec4(0.1,0.1,0.1,1.0), avango.osg.Vec4(0.95,0.95,0.95,1.0), avango.osg.Vec4(.8,.8,.8,1.0), lightposition)
+        self.light.get_field(6).value = lightdirection                  # direction
+        self.light.get_field(7).value = 0.0                             # ConstantAttenuation
+        self.light.get_field(10).value = 0.0                            # SpotExponent
+        self.light.get_field(11).value = 15                             # SpotCuttoff (angle: 0<= angle <= 90)
+        
+        #self.light_geometry = avango.osg.nodes.LoadFile(Filename = "data/cylinder.obj", Matrix = avango.osg.make_scale_mat(0.025, 0.025, self.raylength) * avango.osg.make_trans_mat(0.0, 0.0, self.raylength * -0.5))
+        #self.light_transform.Matrix.value = avango.osg.make_rot_mat(self.mat_out.value.get_rotate()) * lightoffset
+        #self.light_transform.Children.value.append(self.light_geometry)
+        #self.SCENE.object_root.Children.value.append(self.light_transform)
         
         
         # callbacks
     def evaluate(self):
         if self.race_start:
             self.check_player_coll()
-            self.update_HUD()        
+            self.update_HUD()
             self.navigate()
             self.update_light()
         
         if self.buttons_in.value[4] == True:    #reset
             self.race_start = False
-            self.SCENE.GameController.start_countdown(8)
+            self.SCENE.GameController.start_countdown(4)
             
-        print self.head_tracking_sensor.Matrix.value
-            
+        #print "object: ", self.mat_out.value
+        #print "camera: ", self.camera_absolute.get_absolute_transform(self.camera_absolute)
+        #print self.mat_out.value
         
-        #print self.camera_absolute.get_absolute_transform(self.camera_absolute)
         
         #print self.hud
         #print "player",self.ID,": mat_out: ",self.mat_out.value
@@ -648,7 +658,7 @@ class Player(avango.script.Script):
             dist_vec = (ip - self.group.Matrix.value.get_translate())
             #print self.old_dist, dist_vec.length()
             
-            if (dist_vec.length() < 5 and self.old_dist > -_y):
+            if (dist_vec.length() < 8 and self.old_dist > -_y):
                 old_dist = -_y
                 dist_vec.normalize()
                 self.mat_out.value *= avango.osg.make_trans_mat(dist_vec * -_y)
@@ -660,10 +670,10 @@ class Player(avango.script.Script):
             dist_vec = (ip - self.group.Matrix.value.get_translate())
             #print self.old_dist, dist_vec.length()
             
-            if(dist_vec.length() < 5 and math.fabs(_y) < 0.002):
+            if(dist_vec.length() < 8 and math.fabs(_y) < 0.002):
                 self.mat_out.value *= avango.osg.make_trans_mat(.0, 5-dist_vec.length(), .0)
             
-            if (dist_vec.length() < 5 and self.old_dist > _y):
+            if (dist_vec.length() < 8 and self.old_dist > _y):
                 old_dist = _y
                 dist_vec.normalize()
                 self.mat_out.value *= avango.osg.make_trans_mat(dist_vec * _y)
@@ -675,7 +685,7 @@ class Player(avango.script.Script):
             dist_vec = (ip - self.group.Matrix.value.get_translate())
             #print self.old_dist, dist_vec.length()
             
-            if (dist_vec.length() < 5 and self.old_dist > _x):
+            if (dist_vec.length() < 8 and self.old_dist > _x):
                 old_dist = _x
                 dist_vec.normalize()
                 self.mat_out.value *= avango.osg.make_trans_mat(dist_vec * _x)
@@ -687,7 +697,7 @@ class Player(avango.script.Script):
             dist_vec = (ip - self.group.Matrix.value.get_translate())
             #print self.old_dist, dist_vec.length()
             
-            if (dist_vec.length() < 5 and self.old_dist > -_x):
+            if (dist_vec.length() < 8 and self.old_dist > -_x):
                 old_dist = -_x
                 dist_vec.normalize()
                 self.mat_out.value *= avango.osg.make_trans_mat(dist_vec * -_x)
@@ -853,8 +863,9 @@ class Player(avango.script.Script):
             self.lap_count = self.lap_count + 1
             print "Checkpoint: ", self.check_point
             print "Lap: ", self.lap_count
-            self.SCENE.GameController.report_lap_data(self.ID, self.lap_count, (time.time() - self.lap_time))
-            self.lap_time = time.time()
+            now = time.time()
+            self.SCENE.GameController.report_lap_data(self.ID, self.lap_count, (now - self.lap_time))
+            self.lap_time = now
         
         if self.check_point == 0 and player_bs.intersects(self.SCENE.checkpoint1_group.get_bounding_sphere()):
             self.check_point = 1
@@ -872,21 +883,24 @@ class Player(avango.script.Script):
         self.update_time(False)
             
     def update_time(self, lap):
-        currenttime = time.time() - self.starttime
+        #print "start update"
+        now = time.time()
+        currenttime = now - self.starttime
         seconds = math.floor(currenttime)
         minutes = math.floor(seconds / 60)
         milliseconds = math.floor((currenttime - seconds)*1000)
         seconds = seconds - (minutes * 60)
         text = "%02d%s%02d%s%02d" % (minutes, ":", seconds, ":", milliseconds)
         self.hud.change_text(2, text)
-
-        currenttime = time.time() - self.lap_time
+        #print "finish update"
+        currenttime = now - self.lap_time
         seconds = math.floor(currenttime)
         minutes = math.floor(seconds / 60)
         milliseconds = math.floor((currenttime - seconds)*1000)
         seconds = seconds - (minutes * 60)
         text = "%02d%s%02d%s%02d" % (minutes, ":", seconds, ":", milliseconds)
         self.hud.change_text(3, text)
+
             
     def check_player_coll(self):
         if self.ID == 1:
@@ -929,29 +943,24 @@ class Player(avango.script.Script):
         self.acceleration = 0
         self.lap_count = 1
         #reset camera
-        self.camera.Matrix.value = avango.osg.make_trans_mat(.0, 2.0, 15.0)
-        self.camera2.Matrix.value = avango.osg.make_trans_mat(.0, -2.0, -2.0)
-        self.camera3.Matrix.value = avango.osg.make_rot_mat(math.radians(90), 0, 1, 0) * avango.osg.make_trans_mat(10.0, -2.0, 0.0)
-        self.camera4.Matrix.value = avango.osg.make_trans_mat(0.0, 0.0, 10.0) * avango.osg.make_rot_mat(math.radians(90), -1, 0, 0)
+        self.camera.Matrix.value = avango.osg.make_trans_mat(.0, 2.0, 25.0)
+        self.camera2.Matrix.value = avango.osg.make_trans_mat(.0, -6.0, -6.0)
+        self.camera3.Matrix.value = avango.osg.make_rot_mat(math.radians(90), 0, 1, 0) * avango.osg.make_trans_mat(20.0, -2.0, 0.0)
+        self.camera4.Matrix.value = avango.osg.make_trans_mat(0.0, 0.0, 20.0) * avango.osg.make_rot_mat(math.radians(90), -1, 0, 0)
         self.camera5.Matrix.value = avango.osg.make_trans_mat(0.0, 2.0, 10.0) * avango.osg.make_rot_mat(math.radians(45), 0, 1, 0)
+        #reset model transform
+        self.model_transform.Matrix.value = avango.osg.make_ident_mat()
         
     def update_light(self):
-        lightoffset = avango.osg.make_rot_mat(self.mat_out.value.get_rotate()) * avango.osg.make_trans_mat(0, -5, -1.2) * self.mat_out.value
+        lightoffset = avango.osg.make_trans_mat(0, 0, -5) * self.mat_out.value
         lightposition = avango.osg.Vec4(lightoffset.get_translate().x, lightoffset.get_translate().y, lightoffset.get_translate().z, 1.0)
-        lightdirection = avango.osg.make_rot_mat(self.mat_out.value.get_rotate()) * avango.osg.make_trans_mat(0,0,1)
+        lightdirection = lightoffset.get_translate() - self.mat_out.value.get_translate()
         self.light.get_field(5).value = lightposition
-        self.light.get_field(6).value = lightdirection.get_translate()
+        self.light.get_field(6).value = lightdirection
         
-        #print "light:", self.light.get_field(5).value
-        #print "position:", self.mat_out.value
-        #self.light.get_field(4).value = avango.osg.Vec4(0.0, 0.0, 0.0, 1.0)
+        #self.light_transform.Matrix.value = lightoffset
+        #self.light_transform.Children.value.append(self.light_geometry)
         
-        #sp = avango.osg.nodes.Sphere()
-        #sphereposition = avango.osg.make_trans_mat(lightoffset.get_translate().x, lightoffset.get_translate().y, lightoffset.get_translate().z)
-        #sp.Matrix.value = sphereposition
-        #self.SCENE.root.Children.value.append(sp)
-        
-
         
 #class Navigation(avango.script.Script):
 #

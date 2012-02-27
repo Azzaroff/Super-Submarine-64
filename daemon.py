@@ -41,6 +41,7 @@ def init_pst_tracking():
 	
 	# head tracking
 	_pst.stations[6] = avango.daemon.Station('tracking-head')
+	_pst.stations[6] = avango.daemon.Station('tracking-head1')
 	
 	device_list.append(_pst)
 	print "PST Tracking started!"
@@ -301,7 +302,7 @@ def init_mouse():
 device_list = []
 
 # init respective tracking system
-if gl_viewing_setup == "desktop" or gl_viewing_setup == "anaglyph" or gl_viewing_setup == "checkerboard":
+if gl_viewing_setup == "desktop" or gl_viewing_setup == "anaglyph" or gl_viewing_setup == "checkerboard" or gl_viewing_setup == "splitscreen":
 		
 	init_pst_tracking()
 

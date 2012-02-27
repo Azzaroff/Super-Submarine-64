@@ -69,7 +69,7 @@ elif _host_name == "eris": # stereo-tv: table
 	
 if gl_display_configuration == 0: # monitor: Dell
 
-	gl_headtracking_flag		= 	True
+	gl_headtracking_flag		= 	False
 	gl_physical_screen_width 	= 	0.59	
 	gl_physical_screen_height 	= 	0.335
 	gl_pixels_width 			= 	2560

@@ -138,7 +138,7 @@ class Application:
 		self.landscape = avango.osg.nodes.LoadFile(Filename = "data/Map/graben_new.obj", Matrix = _mat)
 		self.Scene.environment_root.Children.value.append(self.landscape)
 		
-		self.Scene.deko_root.Matrix.value = avango.osg.make_trans_mat(120.0, -200.0,250.0)
+		#self.Scene.deko_root.Matrix.value = avango.osg.make_trans_mat(120.0, -200.0,250.0)
 		
 		#Ziel
 		_mat = avango.osg.make_rot_mat(math.radians(270),1,0,0) * avango.osg.make_trans_mat(1170.637451, -84.802658, -63.487019)
@@ -169,11 +169,51 @@ class Application:
 		self.Scene.checkpoint2_group.Children.value = [self.checkpoint2_1, self.checkpoint2_2]
 		self.Scene.deko_root.Children.value.append(self.Scene.checkpoint2_group)
 		
+		_mat = 	avango.osg.make_scale_mat(0.013,0.013,0.013) * \
+				avango.osg.make_rot_mat(math.pi*0.5,-1,0,0) * \
+				avango.osg.make_rot_mat(math.radians(90.0),0,0,0) * \
+				avango.osg.make_trans_mat(-855, -64, 1191)
+		self.boat = avango.osg.nodes.LoadFile(Filename = "/opt/3d_models/exhibition/Diesel_Tug.3ds", Matrix = _mat)
+		self.Scene.deko_root.Children.value.append(self.boat)
+		
+		_mat = 	avango.osg.make_scale_mat(0.013,.013,.013) * \
+				avango.osg.make_rot_mat(math.pi*0.5,-1,0,0) * \
+				avango.osg.make_rot_mat(math.radians(90.0),0,0,0) * \
+				avango.osg.make_trans_mat(1100, -37, -180)
+		self.fish = avango.osg.nodes.LoadFile(Filename = "data/Deko/Fische/Rudd Fish.obj", Matrix = _mat)
+		self.Scene.deko_root.Children.value.append(self.fish)
+		
+		_mat = 	avango.osg.make_scale_mat(0.013,.013,.013) * \
+				avango.osg.make_rot_mat(math.pi*0.5,-1,0,0) * \
+				avango.osg.make_rot_mat(math.radians(90.0),0,0,0) * \
+				avango.osg.make_trans_mat(1100, -37, -175)
+		self.fish = avango.osg.nodes.LoadFile(Filename = "data/Deko/Fische/smallmouth_seabass/smallmouth_seabass.obj", Matrix = _mat)
+		self.Scene.deko_root.Children.value.append(self.fish)
+
+		_mat = 	avango.osg.make_scale_mat(0.013,.013,.013) * \
+				avango.osg.make_rot_mat(math.pi*0.5,-1,0,0) * \
+				avango.osg.make_rot_mat(math.radians(90.0),0,0,0) * \
+				avango.osg.make_trans_mat(-851, -38.5, -714)
+		self.anchor = avango.osg.nodes.LoadFile(Filename = "data/Deko/anchor1.obj", Matrix = _mat)
+		self.Scene.deko_root.Children.value.append(self.anchor)
+		self.anchorsphere = avango.osg.nodes.Sphere()
+		self.anchorsphere.get_field(6).value = self.anchor.get_bounding_sphere().radius()
+		self.anchorsphere.get_field(5).value = avango.osg.make_trans_mat(self.anchor.get_bounding_sphere().get_center())
+		
+		#Collision Map
+		
+		self.collision_root = avango.osg.nodes.Group()
+		
 		_mat = 	avango.osg.make_scale_mat(.1,.1,.1) * \
 				avango.osg.make_rot_mat(math.radians(0),1,0,0) * \
 				avango.osg.make_rot_mat(math.radians(-90),1,0,0) * \
 				avango.osg.make_trans_mat(120.0, -200.0,250.0)
 		self.collision_landscape = avango.osg.nodes.LoadFile(Filename = "data/Map/graben_new_reduced.obj", Matrix = _mat)
+		
+		self.collision_root.Children.value.append(self.collision_landscape)
+		self.collision_root.Children.value.append(self.boat)
+		self.collision_root.Children.value.append(self.anchorsphere)
+		
 		
 		
 		#_mat = avango.osg.make_scale_mat(10000,10000,10000) * \
@@ -209,14 +249,14 @@ class Application:
 		
 		if gl_viewing_setup == "desktop" or gl_viewing_setup == "anaglyph":
 			self.Scene.Player0 = Player()
-			self.Scene.Player0.my_constructor(self.Scene, self.ImpactController, "./data/Submarine/My_YellowSubmarine.obj", self.collision_landscape, 0, self.time_sav)
+			self.Scene.Player0.my_constructor(self.Scene, self.ImpactController, "./data/Submarine/My_YellowSubmarine.obj", self.collision_root, 0, self.time_sav)
 			self.Scene.Player0.create_hud()
 			self.Scene.GameController.my_constructor(self.Scene, 1)
 		elif gl_viewing_setup == "splitscreen":
 			self.Scene.Player0 = Player()
 			self.Scene.Player1 = Player()
-			self.Scene.Player0.my_constructor(self.Scene, self.ImpactController, "./data/Submarine/My_YellowSubmarine.obj", self.collision_landscape, 0, self.time_sav)
-			self.Scene.Player1.my_constructor(self.Scene, self.SaitekController, "./data/Submarine/My_RedSubmarine.obj", self.collision_landscape, 1, self.time_sav)
+			self.Scene.Player0.my_constructor(self.Scene, self.ImpactController, "./data/Submarine/My_YellowSubmarine.obj", self.collision_root, 0, self.time_sav)
+			self.Scene.Player1.my_constructor(self.Scene, self.SaitekController, "./data/Submarine/My_RedSubmarine.obj", self.collision_root, 1, self.time_sav)
 			self.Scene.Player0.create_hud()
 			self.Scene.Player1.create_hud()
 			self.Scene.GameController.my_constructor(self.Scene, 2)
@@ -225,7 +265,7 @@ class Application:
 		#print self.Scene.Player1
 		
 
-		self.Scene.GameController.start_countdown()
+		self.Scene.GameController.start_countdown(10)
 
 		#####  run evaluation and render loop  #####		
 		self.ViewingSetup = ViewingSetup(self.Scene, self.Menu)

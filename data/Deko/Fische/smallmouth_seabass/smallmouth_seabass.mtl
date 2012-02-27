@@ -1,0 +1,18 @@
+# 3ds Max Wavefront OBJ Exporter v0.94b - (c)2007 guruware
+# File Created: 02.03.2011 20:17:44
+
+newmtl smallmouth_seabass
+	Ns 9.999999046326
+	Ni 1.500000000000
+	d 1.000000000000
+	Tr 1.000000000000
+	Tf 1.000000000000 1.000000000000 1.000000000000 
+	illum 2
+	Ka 0.588235318661 0.588235318661 0.588235318661
+	Kd 0.588235318661 0.588235318661 0.588235318661
+	Ks 0.000000000000 0.000000000000 0.000000000000
+	Ke 0.000000000000 0.000000000000 0.000000000000
+	map_Ka E:\ESS Studio\Projects\Turbosquid.com\ModelPacks\Sea Fishes\Small Mouth Bass\smallmouth_seabass_diffuse.tga
+	map_Kd E:\ESS Studio\Projects\Turbosquid.com\ModelPacks\Sea Fishes\Small Mouth Bass\smallmouth_seabass_diffuse.tga
+	map_d E:\ESS Studio\Projects\Turbosquid.com\ModelPacks\Sea Fishes\Small Mouth Bass\smallmouth_seabass_alpha.tga
+	map_bump Map__1_Normal Bump.tga

@@ -1,0 +1,13 @@
+# Blender MTL File: 'Rudd Fish.blend'
+# Material Count: 1
+newmtl Rudd_Fish_Rudd-Fish_Colourmap
+Ns 137.254902
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.087000 0.087000 0.087000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:\Users\Paul\Dropbox\Virtual Reality\Models\Desktop\Rudd-Fish_Colourmap.png
+
+
