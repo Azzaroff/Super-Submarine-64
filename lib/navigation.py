@@ -872,19 +872,19 @@ class Player(avango.script.Script):
         if self.check_point == 2 and player_bs.intersects(self.SCENE.finish_group.get_bounding_sphere()):
             self.check_point = 0
             self.lap_count = self.lap_count + 1
-            print "Checkpoint: ", self.check_point
-            print "Lap: ", self.lap_count
+            print "ID ",self.ID, " Checkpoint: ", self.check_point
+            print "ID ",self.ID, " Lap: ", self.lap_count
             now = time.time()
             self.SCENE.GameController.report_lap_data(self.ID, self.lap_count, (now - self.lap_time))
             self.lap_time = now
         
         if self.check_point == 0 and player_bs.intersects(self.SCENE.checkpoint1_group.get_bounding_sphere()):
             self.check_point = 1
-            print "Checkpoint: ", self.check_point
+            print "ID ",self.ID, " Checkpoint: ", self.check_point
             
         if self.check_point == 1 and player_bs.intersects(self.SCENE.checkpoint2_group.get_bounding_sphere()):
             self.check_point = 2
-            print "Checkpoint: ", self.check_point
+            print "ID ",self.ID, " Checkpoint: ", self.check_point
          
         #print player_bs.intersects(self.SCENE.finish_group.get_bounding_sphere()), \
         #player_bs.intersects(self.SCENE.checkpoint1_group.get_bounding_sphere()), \
@@ -921,7 +921,7 @@ class Player(avango.script.Script):
             coll_dir = (self.sub0.get_center() - self.sub1.get_center())
             player_dist = coll_dir.length()
             #print player_dist
-            if player_dist < 400 and self.lap_count == self.SCENE.Player0.lap_count and self.check_point == self.SCENE.Player0.check_point:
+            if player_dist < 500 and self.lap_count == self.SCENE.Player0.lap_count and self.check_point == self.SCENE.Player0.check_point:
                 if self.sub1.get_center().z > self.sub0.get_center().z:
                     #print "2: erster"
                     self.SCENE.Player0.race_pos = 2
