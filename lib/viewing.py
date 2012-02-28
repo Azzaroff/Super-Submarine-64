@@ -42,9 +42,12 @@ class ViewingSetup:
 			
 		elif gl_viewing_setup == "splitscreen":
 			self.setup = SplitScreenSetup(SCENE)
-			
-		elif gl_viewing_setup == "minicave":
-			self.setup = MiniCaveSetup(SCENE)
+
+		elif gl_viewing_setup == "lcd":
+			self.setup = LcdWallStereoSetup(SCENE)
+
+		elif gl_viewing_setup == "lcd_splitscreen":
+			self.setup = LcdWallSplitScreenStereoSetup(SCENE)			
 	
 		else: # viewing setup not supported
 
@@ -226,7 +229,7 @@ class SplitScreenSetup:
 			SCENE.root.Children.value.append(self.ground_transform)
 
 
-class MiniCaveSetup:
+class LcdWallStereoSetup:
 
 	# contructor
 	def __init__(self, SCENE):
@@ -234,100 +237,110 @@ class MiniCaveSetup:
 		# parameters
 		self.eye_offset = 0.065
 
-		# init display 1 
-		self.window1 = avango.osg.viewer.nodes.GraphicsWindow()
-		self.window1.ScreenIdentifier.value = ":0.0"
-		self.window1.Decoration.value = False
-		self.window1.AutoHeight.value = False
-		self.window1.StereoMode.value = avango.osg.viewer.stereo_mode.STEREO_MODE_ANAGLYPHIC
+		self.near = 0.2
+		self.far = 40000000.0
+
+		_config_path = "/opt/avango/LCD-calibration/screen_config.txt"
+
+		# get the screen parameters from external description
+		try:
+			_file = open(_config_path, "r")
+			_lines = _file.readlines()
+			
+			_line = _lines[0].split() # read 1st line --> screen dimensions
+
+			self.physical_screen_width = float(_line[0]) # physical screen width in meter
+			self.physical_screen_height = float(_line[1]) # physical screen height in meter
+			self.screen_width = int(_line[2]) # screen width in pixel
+			self.screen_height = int(_line[3]) # screen height in pixel
+									
+			# right eye parameters									
+			_line = _lines[3].split()
+
+			self.screen_id = _line[0]						
+			self.right_screen_transform = avango.osg.make_trans_mat(float(_line[5]), float(_line[6]), float(_line[7]))
+			self.right_width_offset		= int(_line[1]) # screen width offset in pixel
+			self.right_height_offset 	= int(_line[2]) # screen width offset in pixel
+			self.right_width_dim	 	= int(_line[3]) # screen width dimension in pixel
+			self.right_height_dim 		= int(_line[4]) # screen width dimension in pixel
+
+			# left eye parameters
+			_line = _lines[4].split()
+
+			self.left_screen_transform = avango.osg.make_trans_mat(float(_line[5]), float(_line[6]), float(_line[7]))
+			self.left_width_offset	= int(_line[1]) # screen width offset in pixel
+			self.left_height_offset = int(_line[2]) # screen width offset in pixel
+			self.left_width_dim	= int(_line[3]) # screen width dimension in pixel
+			self.left_height_dim 	= int(_line[4]) # screen width dimension in pixel
+			
+			_file.close()
+
+		except IOError:
+			print "error while loading screen config file"
+			sys.exit(1)
 		
-		# screen parameters
-		self.window1.WantedWidth.value = gl_pixels_width
-		self.window1.WantedHeight.value = gl_pixels_height
-		self.window1.WantedPositionX.value = gl_wanted_position_x
-		self.window1.WantedPositionY.value = gl_wanted_position_y
-		self.window1.RealScreenWidth.value = gl_physical_screen_width
-		self.window1.RealScreenHeight.value = gl_physical_screen_height
-
-		# init camera
-		self.camera1 = avango.osg.viewer.nodes.Camera(Window = self.window1)
-		self.camera1.EyeOffset.value = self.eye_offset * 0.5
-		self.camera1.ScreenTransform.value = gl_screen_transform
-		self.camera1.BackgroundColor.value = gl_background_color
-
-		# init display 2
-		self.window2 = avango.osg.viewer.nodes.GraphicsWindow()
-		self.window2.ScreenIdentifier.value = ":0.1"
-		self.window2.Decoration.value = False
-		self.window2.AutoHeight.value = False
-		self.window2.StereoMode.value = avango.osg.viewer.stereo_mode.STEREO_MODE_ANAGLYPHIC
-	
-		# screen parameters
-		self.window2.WantedWidth.value = gl_pixels_width
-		self.window2.WantedHeight.value = gl_pixels_height
-		self.window2.WantedPositionX.value = 0
-		self.window2.WantedPositionY.value = 0
-		self.window2.RealScreenWidth.value = gl_physical_screen_width
-		self.window2.RealScreenHeight.value = gl_physical_screen_height
-
-		# init camera
-		self.camera2 = avango.osg.viewer.nodes.Camera(Window = self.window2)
-		self.camera2.EyeOffset.value = self.eye_offset * 0.5
-		self.camera2.ScreenTransform.value = gl_screen_transform
-		self.camera2.BackgroundColor.value = gl_background_color
-
-		# init display 3
-		self.window3 = avango.osg.viewer.nodes.GraphicsWindow()
-		self.window3.ScreenIdentifier.value = ":0.2"
-		self.window3.Decoration.value = False
-		self.window3.AutoHeight.value = False
-		self.window3.StereoMode.value = avango.osg.viewer.stereo_mode.STEREO_MODE_ANAGLYPHIC
-	
-		# screen parameters
-		self.window3.WantedWidth.value = gl_pixels_width
-		self.window3.WantedHeight.value = gl_pixels_height
-		self.window3.WantedPositionX.value = 0
-		self.window3.WantedPositionY.value = 0
-		self.window3.RealScreenWidth.value = gl_physical_screen_width
-		self.window3.RealScreenHeight.value = gl_physical_screen_height
-
-		# init camera
-		self.camera3 = avango.osg.viewer.nodes.Camera(Window = self.window3)
-		self.camera3.EyeOffset.value = self.eye_offset * 0.5
-		self.camera3.ScreenTransform.value = avango.osg.make_rot_mat(math.radians(45),0,1,0) * \
-									avango.osg.make_trans_mat(-0.51,0.0,0.28)
-		self.camera3.BackgroundColor.value = gl_background_color
-
-
-		# init field connections
-		self.camera1.ViewerTransform.connect_from(SCENE.navigation_transform.Matrix)
-		self.camera2.ViewerTransform.connect_from(SCENE.navigation_transform.Matrix)
-		self.camera3.ViewerTransform.connect_from(SCENE.navigation_transform.Matrix)
-
-		if gl_headtracking_flag == True:
-			self.tracking_sensor = avango.daemon.nodes.DeviceSensor(DeviceService = avango.daemon.DeviceService(), Station = "tracking-head", TransmitterOffset = gl_transmitter_offset) # init tracking sensor
-			self.camera1.EyeTransform.connect_from(self.tracking_sensor.Matrix)
-			self.camera2.EyeTransform.connect_from(self.tracking_sensor.Matrix)
-			self.camera3.EyeTransform.connect_from(self.tracking_sensor.Matrix)
-
 		else:
-			self.camera1.EyeTransform.value = gl_eye_transform # fixed head position
-			self.camera2.EyeTransform.value = gl_eye_transform # fixed head position
-			self.camera3.EyeTransform.value = gl_eye_transform # fixed head position
+
+			# right eye camera setup
+			self.right_window = avango.osg.viewer.nodes.GraphicsWindow()
+			self.right_window.ScreenIdentifier.value = self.screen_id
+			self.right_window.ShowCursor.value = False
+			self.right_window.Decoration.value = False
+			self.right_window.AutoHeight.value = False
+			self.right_window.RealScreenWidth.value = self.physical_screen_width
+			self.right_window.RealScreenHeight.value = self.physical_screen_height		
+			self.right_window.WantedPositionX.value = self.right_width_offset
+			self.right_window.WantedPositionY.value = self.right_height_offset
+			self.right_window.WantedWidth.value = self.right_width_dim # in pixel
+			self.right_window.WantedHeight.value = self.right_height_dim
+
+			self.right_camera = avango.osg.viewer.nodes.Camera(Window = self.right_window)
+			self.right_camera.EyeOffset.value = self.eye_offset * 0.5
+			self.right_camera.Far.value = self.far
+			self.right_camera.ScreenTransform.value = self.right_screen_transform
+			self.right_camera.BackgroundColor.value = gl_background_color
+		
+			# left eye camera setup
+			self.left_window = avango.osg.viewer.nodes.GraphicsWindow()
+			self.left_window.ScreenIdentifier.value = self.screen_id
+			self.left_window.ShowCursor.value = False
+			self.left_window.Decoration.value = False
+			self.left_window.AutoHeight.value = False
+			self.left_window.RealScreenWidth.value = self.physical_screen_width
+			self.left_window.RealScreenHeight.value = self.physical_screen_height		
+			self.left_window.WantedPositionX.value = self.left_width_offset
+			self.left_window.WantedPositionY.value = self.left_height_offset
+			self.left_window.WantedWidth.value = self.left_width_dim # in pixel
+			self.left_window.WantedHeight.value = self.left_height_dim
+
+			self.left_camera = avango.osg.viewer.nodes.Camera(Window = self.left_window)
+			self.left_camera.EyeOffset.value = self.eye_offset * -0.5
+			self.left_camera.Far.value = self.far
+			self.left_camera.ScreenTransform.value = self.left_screen_transform
+			self.left_camera.BackgroundColor.value = gl_background_color
 
 
-		# init viewer
-		self.viewer = avango.osg.viewer.nodes.Viewer(Scene = SCENE.root, MasterCamera = self.camera1, SlaveCameras = [self.camera2, self.camera3])
+			if gl_headtracking_flag == True:
+				self.tracking_sensor = avango.daemon.nodes.DeviceSensor(DeviceService = avango.daemon.DeviceService(), Station = "tracking-head1", TransmitterOffset = avango.osg.make_trans_mat(0.0,-1.42,2.0)) # init tracking sensor
+				self.right_camera.EyeTransform.connect_from(self.tracking_sensor.Matrix)
+				self.left_camera.EyeTransform.connect_from(self.tracking_sensor.Matrix)
+			
+			else:
+				self.right_camera.EyeTransform.value = avango.osg.make_trans_mat(0.0,0.0,2.0) # fixed head position
+				self.left_camera.EyeTransform.value = avango.osg.make_trans_mat(0.0,0.0,2.0) # fixed head position
 
-		# init simple mouse events
-		self.events = avango.osg.viewer.nodes.EventFields(View = self.viewer)
 
-		self.window1.DragEvent.connect_from(self.events.DragEvent)
-		self.window1.MoveEvent.connect_from(self.events.MoveEvent)
-		self.window1.ToggleFullScreen.connect_from(self.events.KeyAltReturn)
+			# init viewer
+			self.viewer = avango.osg.viewer.nodes.Viewer(Scene = SCENE.root, MasterCamera = self.right_camera, SlaveCameras = [self.left_camera])
+
+			# init simple mouse events
+			self.events = avango.osg.viewer.nodes.EventFields(View = self.viewer)
+
+			self.right_window.DragEvent.connect_from(self.events.DragEvent)
+			self.right_window.MoveEvent.connect_from(self.events.MoveEvent)
 
 
-		self.init_ground_plane(SCENE)
+			#self.init_ground_plane(SCENE)
 
 	# functions
 	def init_ground_plane(self, SCENE):
@@ -338,3 +351,154 @@ class MiniCaveSetup:
 			self.ground_transform.Matrix.value = gl_ground_plane_transform
 			SCENE.root.Children.value.append(self.ground_transform)
 
+
+class LcdWallSplitScreenStereoSetup:
+
+	# contructor
+	def __init__(self, SCENE):
+
+		# parameters
+		self.eye_offset1 = 0.065
+		self.eye_offset2 = 0.065
+
+		self.near = 0.2
+		self.far = 40000000.0
+
+		_config_path = "/opt/avango/LCD-calibration/screen_config.txt"
+
+		# get the screen parameters from external description
+		try:
+			_file = open(_config_path, "r")
+			_lines = _file.readlines()
+			
+			_line = _lines[0].split() # read 1st line --> screen dimensions
+
+			self.physical_screen_width = float(_line[0]) # physical screen width in meter
+			self.physical_screen_height = float(_line[1]) # physical screen height in meter
+			self.screen_width = int(_line[2]) # screen width in pixel
+			self.screen_height = int(_line[3]) # screen height in pixel
+									
+			# right eye parameters									
+			_line = _lines[3].split()
+
+			self.screen_id = _line[0]						
+			self.right_screen_transform = avango.osg.make_trans_mat(float(_line[5]), float(_line[6]), float(_line[7]))
+			self.right_width_offset		= int(_line[1]) # screen width offset in pixel
+			self.right_height_offset 	= int(_line[2]) # screen width offset in pixel
+			self.right_width_dim	 	= int(_line[3]) # screen width dimension in pixel
+			self.right_height_dim 		= int(_line[4]) # screen width dimension in pixel
+
+			# left eye parameters
+			_line = _lines[4].split()
+
+			self.left_screen_transform = avango.osg.make_trans_mat(float(_line[5]), float(_line[6]), float(_line[7]))
+			self.left_width_offset	= int(_line[1]) # screen width offset in pixel
+			self.left_height_offset = int(_line[2]) # screen width offset in pixel
+			self.left_width_dim	= int(_line[3]) # screen width dimension in pixel
+			self.left_height_dim 	= int(_line[4]) # screen width dimension in pixel
+			
+			_file.close()
+
+		except IOError:
+			print "error while loading screen config file"
+			sys.exit(1)
+		
+		else:
+
+			# right eye camera setup
+			self.right_window = avango.osg.viewer.nodes.GraphicsWindow()
+			self.right_window.ScreenIdentifier.value = self.screen_id
+			self.right_window.ShowCursor.value = False
+			self.right_window.Decoration.value = False
+			self.right_window.AutoHeight.value = False
+			self.right_window.RealScreenWidth.value = self.physical_screen_width
+			self.right_window.RealScreenHeight.value = self.physical_screen_height		
+			self.right_window.WantedPositionX.value = self.right_width_offset
+			self.right_window.WantedPositionY.value = self.right_height_offset
+			self.right_window.WantedWidth.value = self.right_width_dim # in pixel
+			self.right_window.WantedHeight.value = self.right_height_dim
+
+			self.right_camera1 = avango.osg.viewer.nodes.Camera(Window = self.right_window)
+			self.right_camera1.EyeOffset.value = self.eye_offset1 * 0.5
+			self.right_camera1.Far.value = self.far
+			self.right_camera1.ScreenTransform.value = self.right_screen_transform
+			self.right_camera1.BackgroundColor.value = gl_background_color
+			self.right_camera1.Viewport.value = avango.osg.Vec4(0.0,0.0,0.5,1.0)
+			self.right_camera1.ViewerTransform.connect_from(SCENE.Player0.camera_absolute.AbsoluteMatrix) # init field connection
+
+
+			self.right_camera2 = avango.osg.viewer.nodes.Camera(Window = self.right_window)
+			self.right_camera2.EyeOffset.value = self.eye_offset2 * 0.5
+			self.right_camera2.Far.value = self.far
+			self.right_camera2.ScreenTransform.value = self.right_screen_transform
+			self.right_camera2.BackgroundColor.value = gl_background_color	
+			self.right_camera2.Viewport.value = avango.osg.Vec4(0.5,0.0,0.5,1.0)
+			self.right_camera2.ViewerTransform.connect_from(SCENE.Player1.camera_absolute.AbsoluteMatrix) # init field connection
+		
+			# left eye camera setup
+			self.left_window = avango.osg.viewer.nodes.GraphicsWindow()
+			self.left_window.ScreenIdentifier.value = self.screen_id
+			self.left_window.ShowCursor.value = False
+			self.left_window.Decoration.value = False
+			self.left_window.AutoHeight.value = False
+			self.left_window.RealScreenWidth.value = self.physical_screen_width
+			self.left_window.RealScreenHeight.value = self.physical_screen_height		
+			self.left_window.WantedPositionX.value = self.left_width_offset
+			self.left_window.WantedPositionY.value = self.left_height_offset
+			self.left_window.WantedWidth.value = self.left_width_dim # in pixel
+			self.left_window.WantedHeight.value = self.left_height_dim
+
+			self.left_camera1 = avango.osg.viewer.nodes.Camera(Window = self.left_window)
+			self.left_camera1.EyeOffset.value = self.eye_offset1 * -0.5
+			self.left_camera1.Far.value = self.far
+			self.left_camera1.ScreenTransform.value = self.left_screen_transform
+			self.left_camera1.BackgroundColor.value = gl_background_color
+			self.left_camera1.ViewerTransform.connect_from(SCENE.Player0.camera_absolute.AbsoluteMatrix) # init field connection
+			self.left_camera1.Viewport.value = avango.osg.Vec4(0.0,0.0,0.5,1.0)
+
+			self.left_camera2 = avango.osg.viewer.nodes.Camera(Window = self.left_window)
+			self.left_camera2.EyeOffset.value = self.eye_offset2 * -0.5
+			self.left_camera2.Far.value = self.far
+			self.left_camera2.ScreenTransform.value = self.left_screen_transform
+			self.left_camera2.BackgroundColor.value = gl_background_color
+			self.left_camera2.ViewerTransform.connect_from(SCENE.Player1.camera_absolute.AbsoluteMatrix) # init field connection
+			self.left_camera2.Viewport.value = avango.osg.Vec4(0.5,0.0,0.5,1.0)
+
+		
+		
+
+			if gl_headtracking_flag == True:
+				self.tracking_sensor1 = avango.daemon.nodes.DeviceSensor(DeviceService = avango.daemon.DeviceService(), Station = "tracking-head1", TransmitterOffset = avango.osg.make_trans_mat(0.75,-1.42,2.0)) # init tracking sensor
+				self.right_camera1.EyeTransform.connect_from(self.tracking_sensor1.Matrix)
+				self.left_camera1.EyeTransform.connect_from(self.tracking_sensor1.Matrix)
+			
+				self.tracking_sensor2 = avango.daemon.nodes.DeviceSensor(DeviceService = avango.daemon.DeviceService(), Station = "tracking-head2", TransmitterOffset = avango.osg.make_trans_mat(-0.75,-1.42,2.0)) # init tracking sensor
+				self.right_camera2.EyeTransform.connect_from(self.tracking_sensor2.Matrix)
+				self.left_camera2.EyeTransform.connect_from(self.tracking_sensor2.Matrix)
+
+			else:
+				self.right_camera1.EyeTransform.value = gl_eye_transform # fixed head position
+				self.left_camera1.EyeTransform.value = gl_eye_transform # fixed head position
+				self.right_camera2.EyeTransform.value = gl_eye_transform # fixed head position
+				self.left_camera2.EyeTransform.value = gl_eye_transform # fixed head position
+
+			# init viewer
+			self.viewer = avango.osg.viewer.nodes.Viewer(Scene = SCENE.root, MasterCamera = self.right_camera1, SlaveCameras = [self.left_camera1, self.right_camera2, self.left_camera2])
+
+			# init simple mouse events
+			self.events = avango.osg.viewer.nodes.EventFields(View = self.viewer)
+
+			self.right_window.DragEvent.connect_from(self.events.DragEvent)
+			self.right_window.MoveEvent.connect_from(self.events.MoveEvent)
+
+
+			#self.init_ground_plane(SCENE)
+
+	# functions
+	def init_ground_plane(self, SCENE):
+		if gl_ground_flag == True:
+			self.ground_panel = avango.osg.nodes.Panel(PanelColor = avango.osg.Vec4(0.5,0.5,0.3,0.75), Width = 1.0, Height = 1.0)
+			self.ground_geode = avango.osg.nodes.LayerGeode(Drawables = [self.ground_panel], StateSet = avango.osg.nodes.StateSet(BlendMode = 1, LightingMode = 0, RenderingHint = 2))
+			self.ground_transform = avango.osg.nodes.MatrixTransform(Children = [self.ground_geode])
+			self.ground_transform.Matrix.value = gl_ground_plane_transform
+			SCENE.root.Children.value.append(self.ground_transform)

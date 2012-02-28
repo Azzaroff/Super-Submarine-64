@@ -45,6 +45,21 @@ def init_pst_tracking():
 	
 	device_list.append(_pst)
 	print "PST Tracking started!"
+	
+def init_art_tracking():
+
+	# create instance of DTrack
+	_dtrack = avango.daemon.DTrack()
+	_dtrack.port = "5000" # ART port at LCD wall
+	
+	# head tracking
+	_dtrack.stations[20] = avango.daemon.Station('tracking-head1') # passive glasses
+	_dtrack.stations[19] = avango.daemon.Station('tracking-head2') # passive glasses
+	
+	device_list.append(_dtrack)
+	print "ART Tracking started at LCD WALL"
+
+
 
 
 def init_impact_controller():
@@ -303,9 +318,9 @@ device_list = []
 
 # init respective tracking system
 if gl_viewing_setup == "desktop" or gl_viewing_setup == "anaglyph" or gl_viewing_setup == "checkerboard" or gl_viewing_setup == "splitscreen":
-		
 	init_pst_tracking()
-
+elif gl_viewing_setup == "lcd" or gl_viewing_setup == "lcd_splitscreen":
+	init_art_tracking()
 # init input devices
 init_spacemouse()
 init_keyboard()
