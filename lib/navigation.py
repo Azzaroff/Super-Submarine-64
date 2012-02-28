@@ -339,6 +339,7 @@ class Player(avango.script.Script):
         self.accelerationstep = .5
         
         self.streamstep = (random.random() * math.pi*2 + ID) % math.pi*2
+        self.streamstep2 = (random.random() * math.pi*2 + ID) % math.pi*2
         
         #distance for previous collision
         self.old_dist = 0
@@ -800,10 +801,11 @@ class Player(avango.script.Script):
                     self.roll = 0
         
                     
-        self.model_transform.Matrix.value = avango.osg.make_rot_mat(math.radians(self.pitch), 1, 0, 0) *\
+        self.model_transform.Matrix.value = avango.osg.make_rot_mat(math.radians(self.pitch) + math.sin(self.streamstep2)/32 + (random.random() % 0.0003), 1, 0, 0) *\
                                             avango.osg.make_rot_mat(math.radians(self.roll), 0, 0, 1) *\
                                             avango.osg.make_trans_mat(0.0,math.sin(self.streamstep)/4 + (random.random() % 0.003),0.0)
         self.streamstep = (self.streamstep + math.pi/500) % (2*math.pi)
+        self.streamstep2 = (self.streamstep + math.pi/1000) % (2*math.pi)
                                     
         #camera toggle
         if self.buttons_in.value[0] == True and self.camerabuttonlast.value != self.buttons_in.value[0] and \
