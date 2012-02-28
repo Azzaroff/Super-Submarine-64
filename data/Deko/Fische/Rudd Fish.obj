@@ -1,7 +1,8 @@
 # Blender v2.57 (sub 0) OBJ File: 'Rudd Fish.blend'
 # www.blender.org
 mtllib Rudd Fish.mtl
-o Rudd-Fish_Cube.001
+usemtl Rudd_Fish_Rudd-Fish_Colourmap
+g Rudd-Fish_Cube.001
 v -18.843546 -10.348886 1.242211
 v -18.843546 -10.348886 -1.248594
 v -16.517879 12.590579 1.242211
@@ -2580,8 +2581,7 @@ vt 0.674222 0.827052
 vt 0.668243 0.872283
 vt 0.650897 0.840428
 vt 0.647889 0.871939
-usemtl Rudd_Fish_Rudd-Fish_Colourmap
-s 1
+#s 1
 f 1/1 307/2 879/3 299/4
 f 879/3 307/2 2/5 300/6
 f 1/1 299/4 871/7 295/8

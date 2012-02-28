@@ -143,7 +143,7 @@ class Application:
 		#Ziel
 		_mat = avango.osg.make_rot_mat(math.radians(270),1,0,0) * avango.osg.make_trans_mat(1170.637451, -84.802658, -63.487019)
 		self.finish_1 = avango.osg.nodes.LoadFile(Filename = "data/weed2.obj", Matrix = avango.osg.make_ident_mat())
-		self.finish_2 = avango.osg.nodes.LoadFile(Filename = "data/weed2.obj", Matrix = avango.osg.make_rot_mat(math.radians(180),0,0,1) * avango.osg.make_trans_mat(-145, 0, 0))
+		self.finish_2 = avango.osg.nodes.LoadFile(Filename = "data/weed2.obj", Matrix = avango.osg.make_rot_mat(math.radians(90),0,1,0) * avango.osg.make_trans_mat(-145, 0, 0))
 		self.Scene.finish_group = avango.osg.nodes.MatrixTransform(Matrix = _mat)
 		self.Scene.finish_group.Children.value = [self.finish_1, self.finish_2]
 		self.Scene.deko_root.Children.value.append(self.Scene.finish_group)
@@ -152,7 +152,7 @@ class Application:
 		#-287.149078 -63.845512 830.017517
 		_mat = avango.osg.make_rot_mat(math.radians(270),1,0,0) * avango.osg.make_trans_mat(-287.149078, -63.845512, 830.017517)
 		self.checkpoint1_1 = avango.osg.nodes.LoadFile(Filename = "data/weed2.obj", Matrix = avango.osg.make_ident_mat())
-		self.checkpoint1_2 = avango.osg.nodes.LoadFile(Filename = "data/weed2.obj", Matrix = avango.osg.make_rot_mat(math.radians(180),0,0,1) * avango.osg.make_trans_mat(-145, 0, 0))
+		self.checkpoint1_2 = avango.osg.nodes.LoadFile(Filename = "data/weed2.obj", Matrix = avango.osg.make_rot_mat(math.radians(90),0,0,1) * avango.osg.make_trans_mat(-145, 0, 0))
 		self.Scene.checkpoint1_group = avango.osg.nodes.MatrixTransform(Matrix = _mat)
 		self.Scene.checkpoint1_group.Children.value = [self.checkpoint1_1, self.checkpoint1_2]
 		self.Scene.deko_root.Children.value.append(self.Scene.checkpoint1_group)
@@ -163,7 +163,7 @@ class Application:
 		#-1070.442871 -79.164711 -329.316742
 		#-901.965027 -57.412403 -444.109253
 		_mat = avango.osg.make_rot_mat(math.radians(270),1,0,0) * avango.osg.make_trans_mat(-1060.442871, -70.164711, -329.316742)
-		self.checkpoint2_1 = avango.osg.nodes.LoadFile(Filename = "data/weed2.obj", Matrix = avango.osg.make_rot_mat(math.radians(20),0,1,0))
+		self.checkpoint2_1 = avango.osg.nodes.LoadFile(Filename = "data/weed2.obj", Matrix = avango.osg.make_rot_mat(math.radians(20),0,1,0) * avango.osg.make_rot_mat(math.radians(180),0,0,1))
 		self.checkpoint2_2 = avango.osg.nodes.LoadFile(Filename = "data/weed2.obj", Matrix = avango.osg.make_rot_mat(math.radians(20),0,1,0) * avango.osg.make_rot_mat(math.radians(180),0,0,1) * avango.osg.make_trans_mat(130, 0, 0))
 		self.Scene.checkpoint2_group = avango.osg.nodes.MatrixTransform(Matrix = _mat)
 		self.Scene.checkpoint2_group.Children.value = [self.checkpoint2_1, self.checkpoint2_2]
@@ -176,18 +176,20 @@ class Application:
 		self.boat = avango.osg.nodes.LoadFile(Filename = "/opt/3d_models/exhibition/Diesel_Tug.3ds", Matrix = _mat)
 		self.Scene.deko_root.Children.value.append(self.boat)
 		
-		_mat = 	avango.osg.make_scale_mat(0.013,.013,.013) * \
+		_mat = 	avango.osg.make_scale_mat(0.13,.13,.13) * \
 				avango.osg.make_rot_mat(math.pi*0.5,-1,0,0) * \
 				avango.osg.make_rot_mat(math.radians(90.0),0,0,0) * \
 				avango.osg.make_trans_mat(1100, -37, -180)
 		self.fish = avango.osg.nodes.LoadFile(Filename = "data/Deko/Fische/Rudd Fish.obj", Matrix = _mat)
 		self.Scene.deko_root.Children.value.append(self.fish)
 		
-		_mat = 	avango.osg.make_scale_mat(0.013,.013,.013) * \
+		
+		# 634.717487   26.079331  942.262169
+		_mat = 	avango.osg.make_scale_mat(0.01,0.01,0.01) * \
 				avango.osg.make_rot_mat(math.pi*0.5,-1,0,0) * \
-				avango.osg.make_rot_mat(math.radians(90.0),0,0,0) * \
-				avango.osg.make_trans_mat(1100, -37, -175)
-		self.fish = avango.osg.nodes.LoadFile(Filename = "data/Deko/Fische/smallmouth_seabass/smallmouth_seabass.obj", Matrix = _mat)
+				avango.osg.make_rot_mat(math.radians(90.0),0,1,0) * \
+				avango.osg.make_trans_mat(634.717487, 50.079331, 935.262169)
+		self.fish = avango.osg.nodes.LoadFile(Filename = "data/Deko/TURTLE/TURTLE/TURTLE_L.3DS", Matrix = _mat)
 		self.Scene.deko_root.Children.value.append(self.fish)
 
 		_mat = 	avango.osg.make_scale_mat(0.013,.013,.013) * \
