@@ -26,6 +26,8 @@
 import avango
 import avango.osg
 import avango.osg.particle
+import math
+import random
 
 from avango.script import field_has_changed
 
@@ -333,6 +335,8 @@ class Player(avango.script.Script):
         self.acceleration = 0.0
         self.accelerationstep = .5
         
+        self.streamstep = 0.0
+        
         #distance for previous collision
         self.old_dist = 0
         
@@ -547,6 +551,8 @@ class Player(avango.script.Script):
         #self.light_transform.Children.value.append(self.light_geometry)
         #self.SCENE.object_root.Children.value.append(self.light_transform)
         
+        #initialize random number generator
+        random.seed()
         
         # callbacks
     def evaluate(self):
@@ -562,7 +568,7 @@ class Player(avango.script.Script):
             
         #print "object: ", self.mat_out.value
         #print "camera: ", self.camera_absolute.get_absolute_transform(self.camera_absolute)
-        print self.mat_out.value
+        #print self.mat_out.value
         
         
         #print self.hud
@@ -794,7 +800,9 @@ class Player(avango.script.Script):
         
                     
         self.model_transform.Matrix.value = avango.osg.make_rot_mat(math.radians(self.pitch), 1, 0, 0) *\
-                                            avango.osg.make_rot_mat(math.radians(self.roll), 0, 0, 1)
+                                            avango.osg.make_rot_mat(math.radians(self.roll), 0, 0, 1) *\
+                                            avango.osg.make_trans_mat(0.0,math.sin(self.streamstep)/4 + (random.random() % 0.003),0.0)
+        self.streamstep = (self.streamstep + math.pi/500) % (2*math.pi)
                                     
         #camera toggle
         if self.buttons_in.value[0] == True and self.camerabuttonlast.value != self.buttons_in.value[0] and \
