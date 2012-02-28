@@ -57,7 +57,7 @@ class HUD(avango.script.Script):
         
         
         # mode visualization nodes
-        if gl_viewing_setup == "" or gl_viewing_setup == "lcd":
+        if gl_viewing_setup == "desktop" or gl_viewing_setup == "lcd":
             #move minimap
             leftminimapoffset = 0.034
             self.minimapgroup.Matrix.value = avango.osg.make_scale_mat(.000015,.000015,.000015) * \

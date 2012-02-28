@@ -203,7 +203,7 @@ class Application:
 		_mat = 	avango.osg.make_scale_mat(2,2,2) * \
 				avango.osg.make_rot_mat(math.pi*0.5,-1,0,0) * \
 				avango.osg.make_rot_mat(math.radians(-90.0),0,1,0) * \
-				avango.osg.make_trans_mat(1019.791777, -24.348597, -628.051344)
+				avango.osg.make_trans_mat(1027.791777, -24.348597, -517.051344)
 		self.whale = avango.osg.nodes.LoadFile(Filename = "data/Deko/Fische/whale/whale.3ds", Matrix = _mat)
 		self.Scene.deko_root.Children.value.append(self.whale)
 		
