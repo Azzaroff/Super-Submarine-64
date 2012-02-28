@@ -185,25 +185,25 @@ class Application:
 		self.Scene.deko_root.Children.value.append(self.shark)
 		
 
-		_mat = 	avango.osg.make_scale_mat(10,10,10) * \
-				avango.osg.make_rot_mat(math.pi*0.5,-1,0,0) * \
-				avango.osg.make_rot_mat(math.radians(180.0),0,1,0) * \
-				avango.osg.make_trans_mat(1300.791777, 40.348597, 90.051344)
-		self.fish1 = avango.osg.nodes.LoadFile(Filename = "data/Deko/Fische/TropicalFish_obj/TropicalFish03.obj", Matrix = _mat)
-		self.Scene.deko_root.Children.value.append(self.fish1)
-		
-		_mat = 	avango.osg.make_scale_mat(10,10,10) * \
-				avango.osg.make_rot_mat(math.pi*0.5,-1,0,0) * \
-				avango.osg.make_rot_mat(math.radians(180.0),0,1,0) * \
-				avango.osg.make_trans_mat(1200.791777, 30.348597, 90.051344)
-		self.fish2 = avango.osg.nodes.LoadFile(Filename = "data/Deko/Fische/TropicalFish_obj/TropicalFish02.obj", Matrix = _mat)
-		self.Scene.deko_root.Children.value.append(self.fish2)
+#		_mat = 	avango.osg.make_scale_mat(10,10,10) * \
+#				avango.osg.make_rot_mat(math.pi*0.5,-1,0,0) * \
+#				avango.osg.make_rot_mat(math.radians(180.0),0,1,0) * \
+#				avango.osg.make_trans_mat(1300.791777, 40.348597, 90.051344)
+#		self.fish1 = avango.osg.nodes.LoadFile(Filename = "data/Deko/Fische/TropicalFish_obj/TropicalFish03.obj", Matrix = _mat)
+#		self.Scene.deko_root.Children.value.append(self.fish1)
+#		
+#		_mat = 	avango.osg.make_scale_mat(10,10,10) * \
+#				avango.osg.make_rot_mat(math.pi*0.5,-1,0,0) * \
+#				avango.osg.make_rot_mat(math.radians(180.0),0,1,0) * \
+#				avango.osg.make_trans_mat(1200.791777, 30.348597, 90.051344)
+#		self.fish2 = avango.osg.nodes.LoadFile(Filename = "data/Deko/Fische/TropicalFish_obj/TropicalFish02.obj", Matrix = _mat)
+#		self.Scene.deko_root.Children.value.append(self.fish2)
 		
 		#1219.455259  -24.842079 -628.119584
 		_mat = 	avango.osg.make_scale_mat(2,2,2) * \
 				avango.osg.make_rot_mat(math.pi*0.5,-1,0,0) * \
-				avango.osg.make_rot_mat(math.radians(180.0),0,1,0) * \
-				avango.osg.make_trans_mat(1219.791777, -24.348597, -628.051344)
+				avango.osg.make_rot_mat(math.radians(-90.0),0,1,0) * \
+				avango.osg.make_trans_mat(1019.791777, -24.348597, -628.051344)
 		self.whale = avango.osg.nodes.LoadFile(Filename = "data/Deko/Fische/whale/whale.3ds", Matrix = _mat)
 		self.Scene.deko_root.Children.value.append(self.whale)
 		
@@ -222,9 +222,10 @@ class Application:
 				avango.osg.make_trans_mat(-858, -38.5, -722)
 		self.anchor = avango.osg.nodes.LoadFile(Filename = "data/Deko/anchor1.obj", Matrix = _mat)
 		self.Scene.deko_root.Children.value.append(self.anchor)
-		self.anchorsphere = avango.osg.nodes.Sphere()
-		self.anchorsphere.get_field(6).value = self.anchor.get_bounding_sphere().radius()
-		self.anchorsphere.get_field(5).value = avango.osg.make_trans_mat(self.anchor.get_bounding_sphere().get_center())
+		
+		#bounding sphere buggy deswegen dieser hack
+		self.anchorsphere = avango.osg.nodes.Sphere(Radius = 23, Matrix = avango.osg.make_trans_mat(-858, -24.5, -722))
+		#self.Scene.deko_root.Children.value.append(self.anchorsphere)
 		
 		#Collision Map
 		
