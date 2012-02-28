@@ -49,6 +49,11 @@ class GAMECONTROLLER(avango.script.Script):
                 self.always_evaluate(False) # deactivate evaluate callback
         elif self.num_of_players == 2:
             current_counter = self.counter - math.floor(now - self.starttime)
+            if not current_counter == self.oldcounter :
+                text = "%d" % (current_counter)
+                self.Scene.Player0.hud.change_text(4, text)
+                self.Scene.Player1.hud.change_text(4, text)
+                self.oldcounter = current_counter
             if current_counter <= 0:
                 self.Scene.Player0.hud.change_text(4, "")
                 self.Scene.Player1.hud.change_text(4, "")
