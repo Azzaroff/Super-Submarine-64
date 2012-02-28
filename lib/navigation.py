@@ -426,11 +426,11 @@ class Player(avango.script.Script):
         self.camera_id = 0
         self.cameralist = []
         self.cameralist.append(avango.osg.make_trans_mat(.0, 2.0, 20.0))
-        self.cameralist.append(avango.osg.make_trans_mat(.0, -2.0, -2.0))
+        self.cameralist.append(avango.osg.make_trans_mat(.0, -4.0, -5.0))
         self.cameralist.append(avango.osg.make_rot_mat(math.radians(90), 0, 1, 0) * avango.osg.make_trans_mat(10.0, -2.0, 0.0))
         self.cameralist.append(avango.osg.make_trans_mat(0.0, 0.0, 10.0) * avango.osg.make_rot_mat(math.radians(90), -1, 0, 0))
         self.cameralist.append(avango.osg.make_trans_mat(0.0, 2.0, 10.0) * avango.osg.make_rot_mat(math.radians(45), 0, 1, 0))
-        self.camera.Matrix.value = cameralist[camera_id]
+        self.camera.Matrix.value = self.cameralist[self.camera_id]
         
         
         #load modell        
@@ -813,8 +813,7 @@ class Player(avango.script.Script):
                                     
         #camera toggle
         if self.buttons_in.value[0] == True and self.camerabuttonlast.value != self.buttons_in.value[0]:
-            self.camera_id = (self.camera_id + 1)%len(self.cameralist)
-            self.camera.Matrix.value = self.cameralist[self.camera_id]
+            self.toggle_camera()
             
         self.camerabuttonlast.value = self.buttons_in.value[0]
 
@@ -911,7 +910,7 @@ class Player(avango.script.Script):
         self.acceleration = 0
         self.lap_count = 1
         #reset camera
-        self.camera.Matrix.value = self.cameralist(self.camera_id)
+        self.camera.Matrix.value = self.cameralist[self.camera_id]
         #reset model transform
         self.model_transform.Matrix.value = avango.osg.make_ident_mat()
         
@@ -926,6 +925,8 @@ class Player(avango.script.Script):
         #self.light_transform.Children.value.append(self.light_geometry)
         
     def toggle_camera(self):
+        self.camera_id = (self.camera_id + 1)%len(self.cameralist)
+        self.camera.Matrix.value = self.cameralist[self.camera_id]
         
         
         
