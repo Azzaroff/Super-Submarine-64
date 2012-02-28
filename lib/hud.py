@@ -153,7 +153,7 @@ class HUD(avango.script.Script):
     def change_text(self, textid,new_content):
         if textid == 0:
             num_of_laps = "/" + "%d" % (self.Scene.GameController.number_of_laps)
-            self.text0.String.value = new_content + num_of_laps
+            self.text0.String.value = str(new_content) + num_of_laps
         elif textid == 1:
             self.text1.String.value = new_content
         elif textid == 2:

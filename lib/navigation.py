@@ -401,7 +401,7 @@ class Player(avango.script.Script):
         self.starttime = STARTTIME
         
         #move the players to the start
-        self.mat_out.value *= avango.osg.make_trans_mat((-self.ID * -3), 0.0, 0.0) 
+        self.mat_out.value *= avango.osg.make_trans_mat((-self.ID * -6), 0.0, 0.0) 
 
 
         # init field connections    
@@ -423,11 +423,15 @@ class Player(avango.script.Script):
         self.mouse_sensor = avango.daemon.nodes.DeviceSensor(Station = "device-mouse", DeviceService = gl_device_service)
         
         #move camera
-        #self.camera.Matrix.value = avango.osg.make_trans_mat(.0, 2.0, 20.0)
-        #self.camera2.Matrix.value = avango.osg.make_trans_mat(.0, -2.0, -2.0)
-        #self.camera3.Matrix.value = avango.osg.make_rot_mat(math.radians(90), 0, 1, 0) * avango.osg.make_trans_mat(10.0, -2.0, 0.0)
-        #self.camera4.Matrix.value = avango.osg.make_trans_mat(0.0, 0.0, 10.0) * avango.osg.make_rot_mat(math.radians(90), -1, 0, 0)
-        #self.camera5.Matrix.value = avango.osg.make_trans_mat(0.0, 2.0, 10.0) * avango.osg.make_rot_mat(math.radians(45), 0, 1, 0)
+        self.camera_id = 0
+        self.cameralist = []
+        self.cameralist.append(avango.osg.make_trans_mat(.0, 2.0, 20.0))
+        self.cameralist.append(avango.osg.make_trans_mat(.0, -2.0, -2.0))
+        self.cameralist.append(avango.osg.make_rot_mat(math.radians(90), 0, 1, 0) * avango.osg.make_trans_mat(10.0, -2.0, 0.0))
+        self.cameralist.append(avango.osg.make_trans_mat(0.0, 0.0, 10.0) * avango.osg.make_rot_mat(math.radians(90), -1, 0, 0))
+        self.cameralist.append(avango.osg.make_trans_mat(0.0, 2.0, 10.0) * avango.osg.make_rot_mat(math.radians(45), 0, 1, 0))
+        self.camera.Matrix.value = cameralist[camera_id]
+        
         
         #load modell        
         self._mat =     avango.osg.make_scale_mat(1.,1.,1.) * \
@@ -808,58 +812,11 @@ class Player(avango.script.Script):
         self.streamstep2 = (self.streamstep + math.pi/1000) % (2*math.pi)
                                     
         #camera toggle
-        if self.buttons_in.value[0] == True and self.camerabuttonlast.value != self.buttons_in.value[0] and \
-            not self.cameratoggle2.value == True and not self.cameratoggle3.value == True:
-            self.cameratoggle.value = not self.cameratoggle.value
-            if self.cameratoggle.value == True:
-                help = self.camera.Matrix.value
-                self.camera.Matrix.value = self.camera2.Matrix.value
-                self.camera2.Matrix.value = help            
-            else:
-                help = self.camera2.Matrix.value
-                self.camera2.Matrix.value = self.camera.Matrix.value
-                self.camera.Matrix.value = help
-        
-        if self.buttons_in.value[1] == True and self.camerabuttonlast2.value != self.buttons_in.value[1] and \
-            not self.cameratoggle.value == True and not self.cameratoggle3.value == True:
-            self.cameratoggle2.value = not self.cameratoggle2.value
-            if self.cameratoggle2.value == True:
-                help = self.camera.Matrix.value
-                self.camera.Matrix.value = self.camera3.Matrix.value
-                self.camera3.Matrix.value = help            
-            else:
-                help = self.camera3.Matrix.value
-                self.camera3.Matrix.value = self.camera.Matrix.value
-                self.camera.Matrix.value = help
-
-        if self.buttons_in.value[2] == True and self.camerabuttonlast3.value != self.buttons_in.value[2] and \
-            not self.cameratoggle.value == True and not self.cameratoggle2.value == True:
-            self.cameratoggle3.value = not self.cameratoggle3.value
-            if self.cameratoggle3.value == True:
-                help = self.camera.Matrix.value
-                self.camera.Matrix.value = self.camera4.Matrix.value
-                self.camera4.Matrix.value = help            
-            else:
-                help = self.camera4.Matrix.value
-                self.camera4.Matrix.value = self.camera.Matrix.value
-                self.camera.Matrix.value = help
-                
-        if self.buttons_in.value[3] == True and self.camerabuttonlast4.value != self.buttons_in.value[3] and \
-            not self.cameratoggle.value == True and not self.cameratoggle2.value == True:
-            self.cameratoggle4.value = not self.cameratoggle4.value
-            if self.cameratoggle4.value == True:
-                help = self.camera.Matrix.value
-                self.camera.Matrix.value = self.camera4.Matrix.value
-                self.camera4.Matrix.value = help            
-            else:
-                help = self.camera4.Matrix.value
-                self.camera4.Matrix.value = self.camera.Matrix.value
-                self.camera.Matrix.value = help
-                
+        if self.buttons_in.value[0] == True and self.camerabuttonlast.value != self.buttons_in.value[0]:
+            self.camera_id = (self.camera_id + 1)%len(self.cameralist)
+            self.camera.Matrix.value = self.cameralist[self.camera_id]
+            
         self.camerabuttonlast.value = self.buttons_in.value[0]
-        self.camerabuttonlast2.value = self.buttons_in.value[1]
-        self.camerabuttonlast3.value = self.buttons_in.value[2]
-        self.camerabuttonlast4.value = self.buttons_in.value[3]
 
         
         #maximale hoehe
@@ -946,7 +903,7 @@ class Player(avango.script.Script):
     def reset_player(self):
         self.race_start = False
         self.mat_out.value = avango.osg.make_rot_mat(math.radians(180),0,1,0) * avango.osg.make_trans_mat(1077.455688, -39.309696, -427.697662) # initial navigation values # initial navigation values
-        self.mat_out.value *= avango.osg.make_trans_mat((-self.ID * -3), 0.0, 0.0) 
+        self.mat_out.value *= avango.osg.make_trans_mat((-self.ID * -6), 0.0, 0.0) 
         self.hud.change_text(2, "--:--:---")
         self.pitch = 0
         self.velocity = 0
@@ -954,11 +911,7 @@ class Player(avango.script.Script):
         self.acceleration = 0
         self.lap_count = 1
         #reset camera
-        self.camera.Matrix.value = avango.osg.make_trans_mat(.0, 2.0, 25.0)
-        self.camera2.Matrix.value = avango.osg.make_trans_mat(.0, -6.0, -6.0)
-        self.camera3.Matrix.value = avango.osg.make_rot_mat(math.radians(90), 0, 1, 0) * avango.osg.make_trans_mat(20.0, -2.0, 0.0)
-        self.camera4.Matrix.value = avango.osg.make_trans_mat(0.0, 0.0, 20.0) * avango.osg.make_rot_mat(math.radians(90), -1, 0, 0)
-        self.camera5.Matrix.value = avango.osg.make_trans_mat(0.0, 2.0, 10.0) * avango.osg.make_rot_mat(math.radians(45), 0, 1, 0)
+        self.camera.Matrix.value = self.cameralist(self.camera_id)
         #reset model transform
         self.model_transform.Matrix.value = avango.osg.make_ident_mat()
         
@@ -971,6 +924,9 @@ class Player(avango.script.Script):
         
         #self.light_transform.Matrix.value = lightoffset
         #self.light_transform.Children.value.append(self.light_geometry)
+        
+    def toggle_camera(self):
+        
         
         
 #class Navigation(avango.script.Script):
