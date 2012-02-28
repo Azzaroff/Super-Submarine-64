@@ -338,7 +338,7 @@ class Player(avango.script.Script):
         self.acceleration = 0.0
         self.accelerationstep = .5
         
-        self.streamstep = random.random() * 2 * math.pi
+        self.streamstep = (random.random() * math.pi*2 + ID) % math.pi*2
         
         #distance for previous collision
         self.old_dist = 0
