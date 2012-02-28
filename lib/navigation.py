@@ -289,6 +289,9 @@ class Player(avango.script.Script):
 
         self.mat_in.connect_from(self.head_tracking_sensor.Matrix) # connect tracking sensor matrix with input matrix
         
+        #initialize random number generator
+        random.seed()
+        
         # references
         self.SCENE = SCENE
         self.ID = ID
@@ -335,7 +338,7 @@ class Player(avango.script.Script):
         self.acceleration = 0.0
         self.accelerationstep = .5
         
-        self.streamstep = 0.0
+        self.streamstep = random.random() * 2 * math.pi
         
         #distance for previous collision
         self.old_dist = 0
@@ -551,8 +554,6 @@ class Player(avango.script.Script):
         #self.light_transform.Children.value.append(self.light_geometry)
         #self.SCENE.object_root.Children.value.append(self.light_transform)
         
-        #initialize random number generator
-        random.seed()
         
         # callbacks
     def evaluate(self):
