@@ -20,6 +20,6 @@ export __GL_FSAA_MODE=10 # enable Anti Aliasing
 #export __GL_SYNC_TO_VBLANK=1
 
 # start application and device deamon
-python main.py $1 $2&
-python daemon.py $1 $2&
+python main.py $1 $2 $3&
+python daemon.py $1 $2 $3&
 

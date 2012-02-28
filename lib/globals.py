@@ -33,10 +33,15 @@ import socket
 # viewing setup mode
 gl_viewing_setup = "desktop" # default setup
 anaglyph_flag = False
+rundenanzahl = 1
 if len(sys.argv) >= 2: # check for further command line options
 	gl_viewing_setup = str(sys.argv[1])
 	if (len(sys.argv) >= 3) and (str(sys.argv[2]) == str("anaglyph")):
 		anaglyph_flag = True
+		if (len(sys.argv) >= 4):
+			rundenzahl = int(str(sys.argv[3]))
+	elif (len(sys.argv) >= 3) and (str(sys.argv[2]) != str("anaglyph")):
+		rundenzahl = int(str(sys.argv[2]))
 
 _supported_viewing_setups = ["desktop", "anaglyph", "checkerboard", "splitscreen"]
 if _supported_viewing_setups.count(gl_viewing_setup) == 0: # check if viewing setup is supported

@@ -32,7 +32,7 @@ import random
 from avango.script import field_has_changed
 
 # import modules from local library
-from lib.globals import *
+#from lib.globals import *
 from mako.runtime import UNDEFINED
 from lib.hud import *
 
