@@ -65,8 +65,7 @@ class GAMECONTROLLER(avango.script.Script):
                 self.Scene.Player0.lap_time = now
                 self.Scene.Player1.lap_time = now
                 self.always_evaluate(False) # deactivate evaluate callback
-
-
+                
     def start_countdown(self, countdown):
         self.counter = countdown
         self.oldcounter = self.counter

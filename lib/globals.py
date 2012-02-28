@@ -43,7 +43,7 @@ if len(sys.argv) >= 2: # check for further command line options
 	elif (len(sys.argv) >= 3) and (str(sys.argv[2]) != str("anaglyph")):
 		rundenzahl = int(str(sys.argv[2]))
 
-_supported_viewing_setups = ["desktop", "anaglyph", "checkerboard", "splitscreen"]
+_supported_viewing_setups = ["desktop", "anaglyph", "checkerboard", "splitscreen", "lcd", "lcd_splitscreen"]
 if _supported_viewing_setups.count(gl_viewing_setup) == 0: # check if viewing setup is supported
 	print "Viewing Setup NOT supported!"
 	sys.exit(1) # terminate application
@@ -66,6 +66,9 @@ elif _host_name == "nestor": # stereo-tv: Samsung 56'
 
 elif _host_name == "eris": # stereo-tv: table
 	gl_display_configuration = 1 #5
+	
+elif _host_name == "medusa": # wall: LCD wall
+	gl_display_configuration = 6
 
 
 
@@ -177,6 +180,23 @@ elif gl_display_configuration == 5: # stereo-tv: table
 	gl_background_color = avango.osg.Vec4(0.3, 0.3, 0.3, 1.0)
 
 	print "display configuration: Stereo-TV Table"
+	
+elif gl_display_configuration == 6: # lcd stereo wall
+
+	gl_headtracking_flag		= 	True
+
+	gl_physical_screen_width 	= 3.0
+	gl_physical_screen_height 	= 1.98
+	
+	gl_eye_transform 			= 	avango.osg.make_trans_mat(0.0,0.0,1.5) # default head position 50cm in front of display
+
+	gl_background_color			= avango.osg.Vec4(0.5, 0.5, 0.5, 1.0)
+	gl_transmitter_offset 		= avango.osg.make_trans_mat(0.0,-1.42,2.0)
+
+	gl_ground_flag				= 	True
+	gl_ground_plane_transform	= 	avango.osg.make_scale_mat(gl_physical_screen_width * 0.75, gl_physical_screen_height * 0.75, 1.0) * \
+									avango.osg.make_rot_mat(math.radians(90),-1,0,0) * \
+									avango.osg.make_trans_mat(0.0,-1.4,0.0)
 
 
 gl_device_service = avango.daemon.DeviceService()

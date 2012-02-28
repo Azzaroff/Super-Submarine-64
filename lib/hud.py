@@ -36,7 +36,7 @@ class HUD(avango.script.Script):
         self.player0_transform.Matrix.connect_from(self.Scene.Player0.group.Matrix)
         self.player0_transform.Children.value.append(self.player0)
         
-        if gl_viewing_setup == "splitscreen":
+        if gl_viewing_setup == "splitscreen" or gl_viewing_setup == "lcd_splitscreen":
             self.player1 = avango.osg.nodes.Sphere(Matrix = _mat)
             self.player1.get_field(8).value = avango.osg.Vec4(1,0,0,1)
             self.player1_transform = avango.osg.nodes.MatrixTransform()
@@ -51,13 +51,13 @@ class HUD(avango.script.Script):
         
         self.minimapgroup.Children.value.append(self.minimap)
         self.minimapgroup.Children.value.append(self.player0_transform)
-        if gl_viewing_setup == "splitscreen":
+        if gl_viewing_setup == "splitscreen"  or gl_viewing_setup == "lcd_splitscreen":
             self.minimapgroup.Children.value.append(self.player1_transform)
         
         
         
         # mode visualization nodes
-        if gl_viewing_setup == "desktop":
+        if gl_viewing_setup == "" or gl_viewing_setup == "lcd":
             #move minimap
             leftminimapoffset = 0.034
             self.minimapgroup.Matrix.value = avango.osg.make_scale_mat(.000015,.000015,.000015) * \
@@ -109,6 +109,32 @@ class HUD(avango.script.Script):
             
             self.label5 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - rightlabeloffset), -.008, 0.0), "Beste Runde:", 0.01, 1, 32);
             self.text5 = self.create_text(avango.osg.Vec3((gl_physical_screen_width * 0.5 - righttextoffset), -.008, 0.0), "--:--:---", 0.01, 1, 32);
+        
+        elif gl_viewing_setup == "lcd_splitscreen":
+            #move minimap
+            leftminimapoffset = 0.034
+            self.minimapgroup.Matrix.value = avango.osg.make_scale_mat(.0001,.0001,.0001) * \
+                                                avango.osg.make_rot_mat(math.radians(90), 1, 0, 0) * \
+                                                avango.osg.make_trans_mat(-.55,0.2-(gl_physical_screen_height * 0.5),0)
+            #move hud
+            leftlabeloffset = 0.012
+            lefttextoffset = 0.068
+            rightlabeloffset = 0.15
+            righttextoffset = 0.45
+            self.label0 = self.create_text(avango.osg.Vec3(-.75, -0.1 + (gl_physical_screen_height * 0.5), 0.0), "Runde:", 0.05, 1, 32);
+            num_of_laps = "1/" + "%d" % (self.Scene.GameController.number_of_laps)
+            self.text0 = self.create_text(avango.osg.Vec3(-.35, -0.1 + (gl_physical_screen_height * 0.5), 0.0), num_of_laps, 0.05, 1, 32);
+            self.label1 = self.create_text(avango.osg.Vec3(-.75, -0.18 + (gl_physical_screen_height * 0.5), 0.0), "Position:", 0.05, 1, 32);
+            self.text1 = self.create_text(avango.osg.Vec3(-.35, -0.18 + (gl_physical_screen_height * 0.5), 0.0), "1/2", 0.05, 1, 32);
+            self.label2 = self.create_text(avango.osg.Vec3(0.0,  -0.1 + (gl_physical_screen_height * 0.5), 0.0), "Zeit:", 0.05, 1, 32);
+            self.text2 = self.create_text(avango.osg.Vec3(righttextoffset,  -0.1 + (gl_physical_screen_height * 0.5), 0.0), "--:--:---", 0.05, 1, 32);
+            self.label3 = self.create_text(avango.osg.Vec3(0.0,  -0.18 + (gl_physical_screen_height * 0.5), 0.0), "Rundenzeit:", 0.05, 1, 32);
+            self.text3 = self.create_text(avango.osg.Vec3(righttextoffset,  -0.18 + (gl_physical_screen_height * 0.5), 0.0), "--:--:---", 0.05, 1, 32);
+            
+            self.text4 = self.create_text(avango.osg.Vec3(-.1, 0, 0.0), "3", 0.5, 2, 120);
+            
+            self.label5 = self.create_text(avango.osg.Vec3(0.0,  -0.26 + (gl_physical_screen_height * 0.5), 0.0), "Beste Runde:", 0.05, 1, 32);
+            self.text5 = self.create_text(avango.osg.Vec3(righttextoffset,  -0.26 + (gl_physical_screen_height * 0.5), 0.0), "--:--:---", 0.05, 1, 32);
             
         self.geode = avango.osg.nodes.LayerGeode(Drawables = [self.label0, self.text0, self.label1, self.text1, self.label2, self.text2, self.label3, self.text3, self.text4, self.label5, self.text5], StateSet = avango.osg.nodes.StateSet(LightingMode = 0), Name="HUD" + str(self.id))
         self.geode2 = avango.osg.nodes.LayerGeode(Drawables = [], StateSet = avango.osg.nodes.StateSet(LightingMode = 0), Name="Results" + str(self.id))
@@ -152,7 +178,12 @@ class HUD(avango.script.Script):
         self.text5.String.value = ""
         #self.hud_transform.Children.value.remove(self.geode)
         
-        if gl_viewing_setup == "desktop":
+        #debug only
+        #player0_data = [5, 6, 3, 7]
+        #player1_data = [3, 6, 11, 1]
+        #end
+        
+        if gl_viewing_setup == "desktop" or gl_viewing_setup == "lcd":
             self.score_label0 = self.create_text(avango.osg.Vec3(0, gl_physical_screen_height * 0.44, 0.0), "Gewonnen!", 0.01, 1, 32);        
             self.score_label1 = self.create_text(avango.osg.Vec3(-0.065, gl_physical_screen_height * 0.41, 0.0), "Rundenzeit", 0.01, 1, 32);
             self.score_label2 = self.create_text(avango.osg.Vec3(0.065, gl_physical_screen_height * 0.41, 0.0), "Position", 0.01, 1, 32);
@@ -174,7 +205,6 @@ class HUD(avango.script.Script):
                 help.append(positionentry)               
             
             self.geode2.get_field(3).value = help
-            #print "laenge: ",len(help)
             
         elif gl_viewing_setup == "splitscreen":
             self.score_label0 = self.create_text(avango.osg.Vec3(0, .16, 0.0), "Gewonnen!", 0.01, 1, 32);        
@@ -208,7 +238,39 @@ class HUD(avango.script.Script):
                 self.score_label0.String.value = "Verloren!"
             
             self.geode2.get_field(3).value = help
-            print len(help)
+        
+        elif gl_viewing_setup == "lcd_splitscreen":
+            self.score_label0 = self.create_text(avango.osg.Vec3(0, -0.1 + (gl_physical_screen_height * 0.5), 0.0), "Gewonnen!", 0.05, 1, 32);        
+            self.score_label1 = self.create_text(avango.osg.Vec3(-0.35, -0.18 + (gl_physical_screen_height * 0.5), 0.0), "Rundenzeit", 0.05, 1, 32);
+            self.score_label2 = self.create_text(avango.osg.Vec3(0.35, -0.18 + (gl_physical_screen_height * 0.5), 0.0), "Position", 0.05, 1, 32);
+            help = []
+            help.append(self.score_label0)
+            help.append(self.score_label1)
+            help.append(self.score_label2)
+            sum0 = 0
+            sum1 = 0
+            #print data
+            for x in range(0, len(player0_data)):
+                time0 = player0_data[x]
+                time1 = player1_data[x]
+                sum0 += time0
+                sum1 += time1                
+                seconds = math.floor(time0)
+                minutes = math.floor(seconds / 60)
+                milliseconds = math.floor((time0 - seconds)*1000)
+                seconds = seconds - (minutes * 60)
+                text = "%02d%s%02d%s%02d" % (minutes, ":", seconds, ":", milliseconds)
+                timeentry = self.create_text(avango.osg.Vec3(-0.35, (-0.26 + (gl_physical_screen_height * 0.5)-0.08*x), 0.0), text, 0.05, 1, 32);
+                positionentry = self.create_text(avango.osg.Vec3(0.35, (-0.26 + (gl_physical_screen_height * 0.5)-0.08*x), 0.0), "1/2", 0.05, 1, 32);
+                if sum0 > sum1:
+                    positionentry.String.value = "2/2"
+                help.append(timeentry)
+                help.append(positionentry)
+            
+            if sum0 > sum1:
+                self.score_label0.String.value = "Verloren!"
+            
+            self.geode2.get_field(3).value = help
             
     def reset_hud(self):
         #self.hud_transform.Children.value.remove(self.geode2)

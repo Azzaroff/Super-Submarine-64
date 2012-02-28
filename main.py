@@ -277,12 +277,12 @@ class Application:
 		self.time_sav = time.time()
 		self.Scene.GameController = GAMECONTROLLER()
 		
-		if gl_viewing_setup == "desktop" or gl_viewing_setup == "anaglyph":
+		if gl_viewing_setup == "desktop" or gl_viewing_setup == "anaglyph" or gl_viewing_setup == "lcd":
 			self.Scene.Player0 = Player()
 			self.Scene.Player0.my_constructor(self.Scene, self.ImpactController, "./data/Submarine/My_YellowSubmarine.obj", self.collision_root, 0, self.time_sav)
 			self.Scene.Player0.create_hud()
 			self.Scene.GameController.my_constructor(self.Scene, 1)
-		elif gl_viewing_setup == "splitscreen":
+		elif gl_viewing_setup == "splitscreen" or gl_viewing_setup == "lcd_splitscreen":
 			self.Scene.Player0 = Player()
 			self.Scene.Player1 = Player()
 			self.Scene.Player0.my_constructor(self.Scene, self.ImpactController, "./data/Submarine/My_YellowSubmarine.obj", self.collision_root, 0, self.time_sav)
@@ -295,9 +295,10 @@ class Application:
 		#print self.Scene.Player1
 		
 		
-
-		self.Scene.GameController.start_countdown(10)
-
+		if gl_viewing_setup == "lcd_splitscreen":
+			self.Scene.GameController.start_countdown(30)
+		else:
+			self.Scene.GameController.start_countdown(10)
 		#####  run evaluation and render loop  #####		
 		self.ViewingSetup = ViewingSetup(self.Scene, self.Menu)
 		
