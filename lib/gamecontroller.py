@@ -28,7 +28,7 @@ class GAMECONTROLLER(avango.script.Script):
     def my_constructor(self, SCENE, NUM_OF_PLAYERS):
         self.num_of_players = NUM_OF_PLAYERS
         self.Scene = SCENE
-        self.number_of_laps = rundenzahl
+        self.number_of_laps = rundenanzahl
         
     # callbacks
     def evaluate(self):
