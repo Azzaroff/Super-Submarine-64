@@ -31,8 +31,8 @@ class Scene:
 		self.environment_state = avango.osg.nodes.StateSet(RescaleNormalMode = 1, NormalizeMode = 1, CullFaceMode = 0, Program = self.environment_prog, Uniforms = [self.environment_uniform1, self.environment_uniform2])
 		#skybox
 		# setup shader (phong lighting + texturing + diffuse color override)
-		self.sky_vshader = avango.osg.nodes.Shader(Type = avango.osg.shadertype.VERTEX, FileName = "./shader_example/phong_texture_no_material.vert")
-		self.sky_fshader = avango.osg.nodes.Shader(Type = avango.osg.shadertype.FRAGMENT, FileName = "./shader_example/phong_texture_no_material.frag")
+		self.sky_vshader = avango.osg.nodes.Shader(Type = avango.osg.shadertype.VERTEX, FileName = "./shader_example/texture.vert")
+		self.sky_fshader = avango.osg.nodes.Shader(Type = avango.osg.shadertype.FRAGMENT, FileName = "./shader_example/texture.frag")
 
 		self.sky_prog = avango.osg.nodes.Program(ShaderList = [self.sky_vshader, self.sky_fshader])
 
@@ -119,10 +119,11 @@ class Scene:
 	def make_light(self, AMBIENT, DIFFUSE, SPECULAR, POSITION):
 
 		_light = avango.osg.nodes.Light(LightNum = self.light_number, Ambient = AMBIENT, Diffuse = DIFFUSE, Specular = SPECULAR, Position = POSITION)		
-		_lightsource = avango.osg.nodes.LightSource(Light = _light, Children = [self.object_root])
+		_lightsource = avango.osg.nodes.LightSource(Light = _light, Children = [self.object_root, self.environment_root])
 
 		if self.light_number == 0:
 			self.root.Children.value.remove(self.object_root)
+			self.root.Children.value.remove(self.environment_root)
 			self.root.Children.value.append(_lightsource) # append first light to the scene
 		else:
 			self.lightsources[self.light_number-1].Children.value = [_lightsource] # append further lights
@@ -131,7 +132,7 @@ class Scene:
 		self.light_number += 1
 		
 		self.environment_uniform3.Values.value = [self.light_number] # forward light number to shader
-		self.sky_uniform3.Values.value = [self.light_number] # forward light number to shader
+		self.sky_uniform3.Values.value = [1] # forward light number to shader
 		self.map_uniform2.Values.value = [self.light_number] # forward light number to shader
 		self.uniform2.Values.value = [self.light_number] # forward light number to shader
 		self.object_uniform1.Values.value = [self.light_number] # forward light number to shader
@@ -145,7 +146,7 @@ class Scene:
 																								avango.osg.nodes.Shader(Name = "VertexShader", Type = avango.osg.shadertype.VERTEX,ShaderSource = "void main() { gl_Position = ftransform(); }"),
 																								avango.osg.nodes.Shader(Name = "VertexShader", Type = avango.osg.shadertype.FRAGMENT,ShaderSource = "void main() { gl_FragColor = gl_FrontMaterial.diffuse; }")
 																		]))
-		self.root.Children.value.append(_geometry)
+		#self.root.Children.value.append(_geometry)
 		
 		return _light
 

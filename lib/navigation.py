@@ -555,7 +555,7 @@ class Player(avango.script.Script):
             self.update_HUD()
             self.navigate()
             self.update_light()
-        
+            
         if self.buttons_in.value[4] == True:    #reset
             self.race_start = False
             self.SCENE.GameController.start_countdown(4)

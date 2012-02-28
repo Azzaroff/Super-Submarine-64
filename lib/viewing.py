@@ -85,6 +85,8 @@ class DesktopSetup:
 			self.window.StereoMode.value = avango.osg.viewer.stereo_mode.STEREO_MODE_NONE
 		
 		# screen parameters
+		self.window.ShowCursor.value = False
+		self.window.ToggleFullScreen.value = True
 		self.window.WantedWidth.value = gl_pixels_width
 		self.window.WantedHeight.value = gl_pixels_height
 		self.window.WantedPositionX.value = gl_wanted_position_x
@@ -99,7 +101,7 @@ class DesktopSetup:
 		self.camera.Far.value = 40000000
 		
 		if anaglyph_flag:
-			self.eye_offset = 0.065
+			self.eye_offset = 0.65
 			self.camera.EyeOffset.value = self.eye_offset * 0.01
 
 		# init field connections
@@ -146,6 +148,8 @@ class SplitScreenSetup:
 		
 		# init window
 		self.window = avango.osg.viewer.nodes.GraphicsWindow()
+		self.window.ShowCursor.value = False
+		self.window.ToggleFullScreen.value = True
 		self.window.ScreenIdentifier.value = ":0.0"
 		self.window.ShowCursor.value = False
 		self.window.AutoHeight.value = False

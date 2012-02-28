@@ -48,10 +48,10 @@ class Application:
 
 
 		# init lights (if no lights are defined --> default OpenGL headlight is applied)
-		self.Scene.make_light(avango.osg.Vec4(0.0,0.0,0.0,1.0), avango.osg.Vec4(0.65,0.65,0.65,1.0), avango.osg.Vec4(0.2,0.2,0.2,1.0), avango.osg.Vec4(-80,300,-50,1.0))
-		self.Scene.make_light(avango.osg.Vec4(0.0,0.0,0.0,1.0), avango.osg.Vec4(0.65,0.65,0.65,1.0), avango.osg.Vec4(0.2,0.2,0.2,1.0), avango.osg.Vec4(60,300,-50,1.0))
-		self.Scene.make_light(avango.osg.Vec4(0.0,0.0,0.0,1.0), avango.osg.Vec4(0.65,0.65,0.65,1.0), avango.osg.Vec4(0.2,0.2,0.2,1.0), avango.osg.Vec4(-80,300,40,1.0)) 
-		self.Scene.make_light(avango.osg.Vec4(0.0,0.0,0.0,1.0), avango.osg.Vec4(0.65,0.65,0.65,1.0), avango.osg.Vec4(0.2,0.2,0.2,1.0), avango.osg.Vec4(60,300,40,1.0)) 
+		self.Scene.make_light(avango.osg.Vec4(0.0,0.0,0.0,1.0), avango.osg.Vec4(0.15,0.15,0.15,1.0), avango.osg.Vec4(0.2,0.2,0.2,1.0), avango.osg.Vec4(-80,300,-50,1.0))
+		self.Scene.make_light(avango.osg.Vec4(0.0,0.0,0.0,1.0), avango.osg.Vec4(0.15,0.15,0.15,1.0), avango.osg.Vec4(0.2,0.2,0.2,1.0), avango.osg.Vec4(60,300,-50,1.0))
+		self.Scene.make_light(avango.osg.Vec4(0.0,0.0,0.0,1.0), avango.osg.Vec4(0.15,0.15,0.15,1.0), avango.osg.Vec4(0.2,0.2,0.2,1.0), avango.osg.Vec4(-80,300,40,1.0)) 
+		self.Scene.make_light(avango.osg.Vec4(0.0,0.0,0.0,1.0), avango.osg.Vec4(0.15,0.15,0.15,1.0), avango.osg.Vec4(0.2,0.2,0.2,1.0), avango.osg.Vec4(60,300,40,1.0)) 
 		
 	
 		# init scene objects
@@ -263,6 +263,7 @@ class Application:
 		
 		#print self.Scene.Player0
 		#print self.Scene.Player1
+		
 		
 
 		self.Scene.GameController.start_countdown(10)
