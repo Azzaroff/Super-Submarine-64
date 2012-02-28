@@ -294,9 +294,10 @@ class Application:
 		#print self.Scene.Player1
 		
 		
-
-		self.Scene.GameController.start_countdown(10)
-
+		if gl_viewing_setup == "lcd_splitscreen":
+			self.Scene.GameController.start_countdown(30)
+		else:
+			self.Scene.GameController.start_countdown(10)
 		#####  run evaluation and render loop  #####		
 		self.ViewingSetup = ViewingSetup(self.Scene, self.Menu)
 		
