@@ -1,0 +1,671 @@
+LWSC
+3
+
+FirstFrame 1
+LastFrame 60
+FrameStep 1
+PreviewFirstFrame 0
+PreviewLastFrame 60
+PreviewFrameStep 1
+CurrentFrame 60
+FramesPerSecond 30
+Plugin MasterHandler 1 .HyperVoxels
+EndPlugin
+
+LoadObjectLayer 1 Objects/Great White.lwo
+ShowObject 6 3
+ObjectMotion
+NumChannels 9
+Channel 0
+{ Envelope
+  2
+  Key -0.87183398 0 0 0 0 0 0 0 0
+  Key -0.87183398 2 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 1
+{ Envelope
+  2
+  Key 2.4099982 0 0 0 0 0 0 0 0
+  Key 2.4099982 2 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 2
+{ Envelope
+  2
+  Key -1.3131166 0 0 0 0 0 0 0 0
+  Key -1.3131166 2 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 3
+{ Envelope
+  2
+  Key -1.9373163 0 0 0 0 0 0 0 0
+  Key -1.9373163 2 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 4
+{ Envelope
+  2
+  Key 0.44156811 0 0 0 0 0 0 0 0
+  Key 0.44156811 2 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 5
+{ Envelope
+  2
+  Key -0.13439037 0 0 0 0 0 0 0 0
+  Key -0.13439037 2 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 6
+{ Envelope
+  2
+  Key 1 0 0 0 0 0 0 0 0
+  Key 1 2 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 7
+{ Envelope
+  2
+  Key 1 0 0 0 0 0 0 0 0
+  Key 1 2 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 8
+{ Envelope
+  2
+  Key 1 0 0 0 0 0 0 0 0
+  Key 1 2 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+
+PivotPosition -0.545 0.2899999 0
+ShadowOptions 7
+
+AddNullObject HVEmitter
+ShowObject 6 3
+ObjectMotion
+NumChannels 9
+Channel 0
+{ Envelope
+  1
+  Key -1.6547556 0 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 1
+{ Envelope
+  1
+  Key 0 0 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 2
+{ Envelope
+  1
+  Key 0 0 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 3
+{ Envelope
+  1
+  Key 0 0 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 4
+{ Envelope
+  1
+  Key 0 0 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 5
+{ Envelope
+  1
+  Key 0 0 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 6
+{ Envelope
+  1
+  Key 8.8380022 0 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 7
+{ Envelope
+  1
+  Key 8.8380022 0 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 8
+{ Envelope
+  1
+  Key 8.8380022 0 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+
+Plugin CustomObjHandler 1 FX_Emitter
+format 1
+ s0 1 1 1 
+ p0 0 0 0 1000 100
+ v0 0 3.88 0 1 1 0
+ g0 0 0 0 1 
+ b0 0 100 1 1 1 60 0 0 1 0 0 0 0 0 0 0 1 0 0
+ ve 1 1 0 0 0 0 0 0 0 0 1 0 1 1 0.1
+EndPlugin
+Plugin CustomObjHandler 2 HyperVoxelsDrawing
+EndPlugin
+ShadowOptions 7
+
+AmbientColor 1 1 1
+AmbientIntensity 0
+EnableRadiosity 1
+RadiosityType 0
+RadiosityIntensity 1
+RadiosityRays 48
+
+AddLight
+LightName Main Light
+ShowLight 1 5
+LightMotion
+NumChannels 9
+Channel 0
+{ Envelope
+  3
+  Key 2.4368942 0 0 0 0 0 0 0 0
+  Key 2.4368942 0.73333335 0 0 0 0 0 0 0
+  Key 2.4368942 2 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 1
+{ Envelope
+  3
+  Key 12.525003 0 0 0 0 0 0 0 0
+  Key 12.525003 0.73333335 0 0 0 0 0 0 0
+  Key 12.525003 2 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 2
+{ Envelope
+  3
+  Key 9.6179314 0 0 0 0 0 0 0 0
+  Key 9.6179314 0.73333335 0 0 0 0 0 0 0
+  Key 9.6179314 2 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 3
+{ Envelope
+  3
+  Key -2.8476691 0 0 0 0 0 0 2.8465908 0
+  Key 0 0.73333335 0 0 0 0 0 0 0
+  Key -2.8476691 2 0 0 0 0 -2.8470447 0 0
+  Behaviors 1 1
+}
+Channel 4
+{ Envelope
+  3
+  Key 0.72483712 0 0 0 0 0 0 0.84563881 0
+  Key 1.5707963 0.73333335 0 0 0 0 0 0 0
+  Key 0.72483712 2 0 0 0 0 -0.84577364 0 0
+  Behaviors 1 1
+}
+Channel 5
+{ Envelope
+  3
+  Key 0 0 0 0 0 0 0 0 0
+  Key 0 0.73333335 0 0 0 0 0 0 0
+  Key 0 2 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 6
+{ Envelope
+  3
+  Key 1 0 0 0 0 0 0 0 0
+  Key 1 0.73333335 0 0 0 0 0 0 0
+  Key 1 2 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 7
+{ Envelope
+  3
+  Key 1 0 0 0 0 0 0 0 0
+  Key 1 0.73333335 0 0 0 0 0 0 0
+  Key 1 2 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 8
+{ Envelope
+  3
+  Key 1 0 0 0 0 0 0 0 0
+  Key 1 0.73333335 0 0 0 0 0 0 0
+  Key 1 2 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+
+HController 1
+PController 1
+TargetItem 10000000
+LightColor 1 1 1
+LightIntensity 1
+AffectCaustics 0
+LightType 2
+LightConeAngle 30
+LightEdgeAngle 5
+ShadowType 1
+ShadowColor 0 0 0
+
+AddLight
+LightName causticlight
+ShowLight 1 5
+LightMotion
+NumChannels 9
+Channel 0
+{ Envelope
+  1
+  Key -6.566258 2 0 0 0 0 -3.3801897 0 0
+  Behaviors 1 1
+}
+Channel 1
+{ Envelope
+  1
+  Key 8.0338202 2 0 0 0 0 -1.326001 0 0
+  Behaviors 1 1
+}
+Channel 2
+{ Envelope
+  1
+  Key 3.4491322 2 0 0 0 0 0.80552763 0 0
+  Behaviors 1 1
+}
+Channel 3
+{ Envelope
+  1
+  Key -4.0185966 2 0 0 0 0 0.4738743 0 0
+  Behaviors 1 1
+}
+Channel 4
+{ Envelope
+  1
+  Key 0.6486671 2 0 0 0 0 -0.11235789 0 0
+  Behaviors 1 1
+}
+Channel 5
+{ Envelope
+  1
+  Key 0 2 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 6
+{ Envelope
+  1
+  Key 1 2 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 7
+{ Envelope
+  1
+  Key 1 2 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 8
+{ Envelope
+  1
+  Key 1 2 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+
+HController 1
+PController 1
+TargetItem 10000000
+LightColor 1 1 1
+LightIntensity 0.84
+AffectCaustics 1
+LightType 2
+LightConeAngle 21.5
+LightEdgeAngle 0
+LightProjImage
+
+{ Clip
+  { Still
+    "C:Documents and Settings/Administrator/My Documents/My Pictures/gwshark/waves.jpg"
+  }
+}
+VolumetricLighting 1
+{ Volumetrics
+  { Options
+    Flags 1 1 1 1 1 1 0
+    Sprite 0 1
+    Dissolve 0 0
+    Shadow 0.5 0
+    Radius 0.37524578 0
+    Base 0 0
+    Height 19.105 0
+    Luminosity 0.31999999 0
+    Opacity 0 0
+    Attenuation 0.25 0
+    RedShift 0 0
+    Density 1 0
+    Color 1 1 1 0
+  }
+  { Texture
+    { ImageMap
+      "(-128)"
+      Channel 1954051186
+      { Opacity
+        0
+        1
+        0
+      }
+      Enable 1
+      Negative 0
+    }
+    { TextureMap
+      { Center
+        0 0 0
+        0
+      }
+      { Size
+        1 1 1
+        0
+      }
+      { Rotation
+        0 0 0
+        0
+      }
+      { Falloff
+        0
+        0 0 0
+        0
+      }
+      RefObject "(none)"
+      Coordinates 0
+    }
+    Projection 0
+    Axis 2
+    { Image
+    }
+    WrapOptions 1 1
+    { WidthWrap
+      1
+      0
+    }
+    { HeightWrap
+      1
+      0
+    }
+    AntiAliasing 1 1
+    PixelBlending 1
+  }
+}
+ShadowType 1
+ShadowColor 0 0 0
+
+AddLight
+LightName Fill Light
+ShowLight 1 5
+SchematicPosition 0.600000 -0.400000
+LightMotion
+NumChannels 9
+Channel 0
+{ Envelope
+  2
+  Key -2.0223203 0 0 0 0 0 0 -0.72672099 0
+  Key -2.7491422 2 0 0 0 0 -0.72672099 0 0
+  Behaviors 1 1
+}
+Channel 1
+{ Envelope
+  2
+  Key 2.4149983 0 0 0 0 0 0 -1.5897791 0
+  Key 0.82499832 2 0 0 0 0 -1.5897791 0 0
+  Behaviors 1 1
+}
+Channel 2
+{ Envelope
+  2
+  Key -4.4104676 0 0 0 0 0 0 -1.7617682 0
+  Key -6.1724806 2 0 0 0 0 -1.7617682 0 0
+  Behaviors 1 1
+}
+Channel 3
+{ Envelope
+  2
+  Key 0.35564768 0 0 0 0 0 0 0.01301534 0
+  Key 0.36866483 2 0 0 0 0 0.01301534 0 0
+  Behaviors 1 1
+}
+Channel 4
+{ Envelope
+  2
+  Key 0.0015132962 0 0 0 0 0 0 -0.29709858 0
+  Key -0.29562655 2 0 0 0 0 -0.29709858 0 0
+  Behaviors 1 1
+}
+Channel 5
+{ Envelope
+  2
+  Key 0 0 0 0 0 0 0 0 0
+  Key 0 2 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 6
+{ Envelope
+  2
+  Key 1 0 0 0 0 0 0 0 0
+  Key 1 2 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 7
+{ Envelope
+  2
+  Key 1 0 0 0 0 0 0 0 0
+  Key 1 2 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 8
+{ Envelope
+  2
+  Key 1 0 0 0 0 0 0 0 0
+  Key 1 2 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+
+HController 1
+PController 1
+TargetItem 10000000
+LightColor 1 1 1
+LightIntensity 0.105
+LightType 1
+ShadowType 1
+ShadowColor 0 0 0
+
+AddCamera
+CameraName Camera
+ShowCamera 1 2
+CameraMotion
+NumChannels 6
+Channel 0
+{ Envelope
+  2
+  Key -1.0576763 0 0 0 0 0 0 0 0
+  Key -1.0576763 2 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 1
+{ Envelope
+  2
+  Key 2.9199979 0 0 0 0 0 0 0 0
+  Key 2.9199979 2 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 2
+{ Envelope
+  2
+  Key -6.0595417 0 0 0 0 0 0 0 0
+  Key -6.0595417 2 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 3
+{ Envelope
+  2
+  Key 0.099483728 0 0 0 0 0 0 0 0
+  Key 0.099483728 2 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 4
+{ Envelope
+  2
+  Key -0.010472055 0 0 0 0 0 0 0 0
+  Key -0.010472055 2 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+Channel 5
+{ Envelope
+  2
+  Key 0 0 0 0 0 0 0 0 0
+  Key 0 2 0 0 0 0 0 0 0
+  Behaviors 1 1
+}
+
+ZoomFactor 3.2
+ResolutionMultiplier 1.0
+FrameSize 640 480
+PixelAspect 1
+MaskPosition 0 0 640 480
+MotionBlur 0
+FieldRendering 0
+
+ApertureHeight 0.015
+Antialiasing 1
+AdaptiveSampling 1
+AdaptiveThreshold 0.1
+
+SolidBackdrop 1
+BackdropColor 0 0.1843137 0.2431373
+ZenithColor 0 0.1569 0.3137
+SkyColor 0.4706 0.7059 0.9412
+GroundColor 0.1961 0.1569 0.1176
+NadirColor 0.3922 0.3137 0.2353
+FogType 1
+FogMinDistance 0
+FogMaxDistance 8.17
+FogMinAmount 0
+FogMaxAmount 1
+FogColor 0.5098 0.5098 0.549
+BackdropFog 1
+Plugin VolumetricHandler 1 HyperVoxelsFilter
+{ HyperVoxelData
+  HVFlags 2 0 0 1
+  HVBlendingGroups 0
+  { HVObject
+    { HVFlags
+      "HVEmitter"
+      1 0 0 0 0 0 0
+    }
+    { HVChannels
+      ParticleSize 0.015 0
+      SizeVariation 1 0
+      Specular 1 0
+      Reflective 0.155 0
+      Transparency 1 0
+      RefractiveInd 1.33 0
+      Glossiness 0.24000001 0
+      DiffuseSharp 0 0
+      ColorFilter 0 0
+      ColorHilight 0 0
+      AdditiveTransp 1.4450001 0
+      Sidedness 1
+      SurfaceShadows 0
+      VLight1 536870912
+      AlignToPath 1
+    }
+    { HVTextures
+      { TextureBlock
+        -1
+        { Texture
+          { Procedural
+            "(-128)"
+            Channel 65535
+            { Opacity
+              0
+              1
+              0
+            }
+            Enable 1
+            Negative 0
+          }
+          { TextureMap
+            { Center
+              0 0 0
+              0
+            }
+            { Size
+              0.5 0.5 0.5
+              0
+            }
+            { Rotation
+              0 0 0
+              0
+            }
+            { Falloff
+              0
+              0 0 0
+              0
+            }
+            RefObject "(none)"
+            Coordinates 0
+          }
+          Axis 2
+          TextureValue 1
+        }
+      }
+    }
+    { Shaders
+    }
+    { HVParticles
+      Color 0 "(none)"
+      Weight 0 "(none)"
+    }
+    { HVoxelCache
+      FileName ""
+      Min 0 0 0
+      Max 0 0 0
+    }
+  }
+}
+EndPlugin
+DitherIntensity 1
+AnimatedDither 0
+
+RenderMode 2
+RayTraceEffects 15
+RayRecursionLimit 16
+RayTraceOptimization 1
+DataOverlayLabel  
+SaveRGB 0
+SaveAlpha 0
+
+ViewConfiguration 0
+DefineView 0
+ViewType 9
+CenterItem 1
+ViewAimpoint -1.654756 0 0
+ViewZoomFactor 1.506884
+
+GridNumber 0
+GridSize 1
+CameraViewBG 0
+ShowMotionPath 1
+ShowFogRadius 1
+ShowFogEffect 1
+ShowSafeAreas 0
+ShowFieldChart 0
+OverlayColor 7
+
+CurrentObject 1
+CurrentLight 1
+CurrentCamera 0
+GraphEditorData
+{ GraphEd_Favorites
+}
+{ GE_Expression_Lib
+  1
+}

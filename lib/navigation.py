@@ -562,7 +562,7 @@ class Player(avango.script.Script):
             
         #print "object: ", self.mat_out.value
         #print "camera: ", self.camera_absolute.get_absolute_transform(self.camera_absolute)
-        #print self.mat_out.value
+        print self.mat_out.value
         
         
         #print self.hud
