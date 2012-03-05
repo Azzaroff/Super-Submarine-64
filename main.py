@@ -33,7 +33,7 @@ from vr_lib.simple_navigation import *
 from lib.scene import *
 from lib.navigation import *
 from lib.gamecontroller import *
-
+import lib.logger
 import time
 
 class Application:
@@ -135,25 +135,25 @@ class Application:
 				avango.osg.make_rot_mat(math.radians(0),1,0,0) * \
 				avango.osg.make_rot_mat(math.radians(-90),1,0,0) * \
 				avango.osg.make_trans_mat(120.0, -200.0,250.0)
-		self.landscape = avango.osg.nodes.LoadFile(Filename = "data/Map/graben_new.obj", Matrix = _mat)
+		self.landscape = avango.osg.nodes.LoadFile(Filename = "data/Map/graben_new.obj", Matrix = _mat, Name = "Landscape")
 		self.Scene.environment_root.Children.value.append(self.landscape)
 		
 		#self.Scene.deko_root.Matrix.value = avango.osg.make_trans_mat(120.0, -200.0,250.0)
 		
 		#Ziel
 		_mat = avango.osg.make_rot_mat(math.radians(270),1,0,0) * avango.osg.make_trans_mat(1170.637451, -84.802658, -63.487019)
-		self.finish_1 = avango.osg.nodes.LoadFile(Filename = "data/weed2.obj", Matrix = avango.osg.make_ident_mat())
-		self.finish_2 = avango.osg.nodes.LoadFile(Filename = "data/weed2.obj", Matrix = avango.osg.make_rot_mat(math.radians(90),0,1,0) * avango.osg.make_trans_mat(-145, 0, 0))
-		self.Scene.finish_group = avango.osg.nodes.MatrixTransform(Matrix = _mat)
+		self.finish_1 = avango.osg.nodes.LoadFile(Filename = "data/weed2.obj", Matrix = avango.osg.make_ident_mat(), Name = "Weed1 finish")
+		self.finish_2 = avango.osg.nodes.LoadFile(Filename = "data/weed2.obj", Matrix = avango.osg.make_rot_mat(math.radians(90),0,1,0) * avango.osg.make_trans_mat(-145, 0, 0), Name = "Weed2 finish")
+		self.Scene.finish_group = avango.osg.nodes.MatrixTransform(Matrix = _mat, Name = "Finish Group")
 		self.Scene.finish_group.Children.value = [self.finish_1, self.finish_2]
 		self.Scene.deko_root.Children.value.append(self.Scene.finish_group)
 		
 		#Checkpoint1
 		#-287.149078 -63.845512 830.017517
 		_mat = avango.osg.make_rot_mat(math.radians(270),1,0,0) * avango.osg.make_trans_mat(-287.149078, -63.845512, 830.017517)
-		self.checkpoint1_1 = avango.osg.nodes.LoadFile(Filename = "data/weed2.obj", Matrix = avango.osg.make_ident_mat())
-		self.checkpoint1_2 = avango.osg.nodes.LoadFile(Filename = "data/weed2.obj", Matrix = avango.osg.make_rot_mat(math.radians(90),0,0,1) * avango.osg.make_trans_mat(-145, 0, 0))
-		self.Scene.checkpoint1_group = avango.osg.nodes.MatrixTransform(Matrix = _mat)
+		self.checkpoint1_1 = avango.osg.nodes.LoadFile(Filename = "data/weed2.obj", Matrix = avango.osg.make_ident_mat(), Name = "Weed1 check1")
+		self.checkpoint1_2 = avango.osg.nodes.LoadFile(Filename = "data/weed2.obj", Matrix = avango.osg.make_rot_mat(math.radians(90),0,0,1) * avango.osg.make_trans_mat(-145, 0, 0), Name = "Weed2 check1")
+		self.Scene.checkpoint1_group = avango.osg.nodes.MatrixTransform(Matrix = _mat, Name = "Check1 Group")
 		self.Scene.checkpoint1_group.Children.value = [self.checkpoint1_1, self.checkpoint1_2]
 		self.Scene.deko_root.Children.value.append(self.Scene.checkpoint1_group)
 		
@@ -163,9 +163,9 @@ class Application:
 		#-1070.442871 -79.164711 -329.316742
 		#-901.965027 -57.412403 -444.109253
 		_mat = avango.osg.make_rot_mat(math.radians(270),1,0,0) * avango.osg.make_trans_mat(-1060.442871, -70.164711, -329.316742)
-		self.checkpoint2_1 = avango.osg.nodes.LoadFile(Filename = "data/weed2.obj", Matrix = avango.osg.make_rot_mat(math.radians(20),0,1,0) * avango.osg.make_rot_mat(math.radians(180),0,0,1))
-		self.checkpoint2_2 = avango.osg.nodes.LoadFile(Filename = "data/weed2.obj", Matrix = avango.osg.make_rot_mat(math.radians(20),0,1,0) * avango.osg.make_rot_mat(math.radians(180),0,0,1) * avango.osg.make_trans_mat(130, 0, 0))
-		self.Scene.checkpoint2_group = avango.osg.nodes.MatrixTransform(Matrix = _mat)
+		self.checkpoint2_1 = avango.osg.nodes.LoadFile(Filename = "data/weed2.obj", Matrix = avango.osg.make_rot_mat(math.radians(20),0,1,0) * avango.osg.make_rot_mat(math.radians(180),0,0,1), Name = "Weed1 check2")
+		self.checkpoint2_2 = avango.osg.nodes.LoadFile(Filename = "data/weed2.obj", Matrix = avango.osg.make_rot_mat(math.radians(20),0,1,0) * avango.osg.make_rot_mat(math.radians(180),0,0,1) * avango.osg.make_trans_mat(130, 0, 0), Name = "Weed2 check2")
+		self.Scene.checkpoint2_group = avango.osg.nodes.MatrixTransform(Matrix = _mat, Name = "Check2 Group")
 		self.Scene.checkpoint2_group.Children.value = [self.checkpoint2_1, self.checkpoint2_2]
 		self.Scene.deko_root.Children.value.append(self.Scene.checkpoint2_group)
 		
@@ -173,7 +173,7 @@ class Application:
 				avango.osg.make_rot_mat(math.pi*0.5,-1,0,0) * \
 				avango.osg.make_rot_mat(math.radians(90.0),0,0,0) * \
 				avango.osg.make_trans_mat(-855, -64, 1191)
-		self.boat = avango.osg.nodes.LoadFile(Filename = "/opt/3d_models/exhibition/Diesel_Tug.3ds", Matrix = _mat)
+		self.boat = avango.osg.nodes.LoadFile(Filename = "/opt/3d_models/exhibition/Diesel_Tug.3ds", Matrix = _mat, Name = "Boat")
 		self.Scene.deko_root.Children.value.append(self.boat)
 		
 		#-320.791777  -50.348597 -631.051344
@@ -181,7 +181,7 @@ class Application:
 				avango.osg.make_rot_mat(math.pi*0.5,-1,0,0) * \
 				avango.osg.make_rot_mat(math.radians(258.0),0,1,0) * \
 				avango.osg.make_trans_mat(-325.791777, -50.348597, -636.051344)
-		self.shark = avango.osg.nodes.LoadFile(Filename = "data/Deko/Fische/shark/Great White.lwo", Matrix = _mat)
+		self.shark = avango.osg.nodes.LoadFile(Filename = "data/Deko/Fische/shark/Great White.lwo", Matrix = _mat, Name = "White Shark")
 		self.Scene.deko_root.Children.value.append(self.shark)
 		
 
@@ -204,7 +204,7 @@ class Application:
 				avango.osg.make_rot_mat(math.pi*0.5,-1,0,0) * \
 				avango.osg.make_rot_mat(math.radians(-90.0),0,1,0) * \
 				avango.osg.make_trans_mat(1027.791777, -24.348597, -517.051344)
-		self.whale = avango.osg.nodes.LoadFile(Filename = "data/Deko/Fische/whale/whale.3ds", Matrix = _mat)
+		self.whale = avango.osg.nodes.LoadFile(Filename = "data/Deko/Fische/whale/whale.3ds", Matrix = _mat, Name = "Whale")
 		self.Scene.deko_root.Children.value.append(self.whale)
 		
 		
@@ -213,18 +213,18 @@ class Application:
 				avango.osg.make_rot_mat(math.pi*0.5,-1,0,0) * \
 				avango.osg.make_rot_mat(math.radians(90.0),0,1,0) * \
 				avango.osg.make_trans_mat(634.717487, 50.079331, 935.262169)
-		self.turtle = avango.osg.nodes.LoadFile(Filename = "data/Deko/TURTLE/TURTLE/TURTLE_L.3DS", Matrix = _mat)
+		self.turtle = avango.osg.nodes.LoadFile(Filename = "data/Deko/TURTLE/TURTLE/TURTLE_L.3DS", Matrix = _mat, Name = "Turtle")
 		self.Scene.deko_root.Children.value.append(self.turtle)
 
 		_mat = 	avango.osg.make_scale_mat(0.13,.13,.13) * \
 				avango.osg.make_rot_mat(math.pi*0.5,-1,0,0) * \
 				avango.osg.make_rot_mat(math.radians(90.0),0,0,0) * \
 				avango.osg.make_trans_mat(-858, -38.5, -722)
-		self.anchor = avango.osg.nodes.LoadFile(Filename = "data/Deko/anchor1.obj", Matrix = _mat)
+		self.anchor = avango.osg.nodes.LoadFile(Filename = "data/Deko/anchor1.obj", Matrix = _mat, Name = "Anchor")
 		self.Scene.deko_root.Children.value.append(self.anchor)
 		
 		#bounding sphere buggy deswegen dieser hack
-		self.anchorsphere = avango.osg.nodes.Sphere(Radius = 23, Matrix = avango.osg.make_trans_mat(-858, -24.5, -722))
+		self.anchorsphere = avango.osg.nodes.Sphere(Radius = 23, Matrix = avango.osg.make_trans_mat(-858, -24.5, -722), Name = "Anchor Sphere")
 		#self.Scene.deko_root.Children.value.append(self.anchorsphere)
 		
 		#Collision Map
@@ -235,7 +235,7 @@ class Application:
 				avango.osg.make_rot_mat(math.radians(0),1,0,0) * \
 				avango.osg.make_rot_mat(math.radians(-90),1,0,0) * \
 				avango.osg.make_trans_mat(120.0, -200.0,250.0)
-		self.collision_landscape = avango.osg.nodes.LoadFile(Filename = "data/Map/graben_new_reduced.obj", Matrix = _mat)
+		self.collision_landscape = avango.osg.nodes.LoadFile(Filename = "data/Map/graben_new_reduced.obj", Matrix = _mat, Name = "Reduced Landscape")
 		
 		self.collision_root.Children.value.append(self.collision_landscape)
 		self.collision_root.Children.value.append(self.boat)
@@ -302,6 +302,9 @@ class Application:
 		#####  run evaluation and render loop  #####		
 		self.ViewingSetup = ViewingSetup(self.Scene, self.Menu)
 		
+		lib.logger.log_scene_graph(self.Scene.root,200)
+		lib.logger.log_scene_graph(self.Scene.environment_root,200)
+		
 		self.ViewingSetup.start_render_loop()
 		
 	def snow(self, value):
@@ -326,7 +329,7 @@ def make_sky():
 	_mat = avango.osg.make_scale_mat(10000,10000,10000) * \
     avango.osg.make_rot_mat(math.radians(180),1,0,0) * \
     avango.osg.make_rot_mat(math.radians(90),1,0,0)
-	sky = avango.osg.nodes.LoadFile(Filename = "data/Skybox/skybox.obj", Matrix = _mat)
+	sky = avango.osg.nodes.LoadFile(Filename = "data/Skybox/skybox.obj", Matrix = _mat, Name = "Skybox")
 	skystate = avango.osg.nodes.StateSet(Fog = avango.osg.nodes.Fog(), FogMode = 1)
 	sky.StateSet.value = skystate
 	return sky, skystate.Fog.value

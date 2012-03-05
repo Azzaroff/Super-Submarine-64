@@ -18,7 +18,7 @@ class HUD(avango.script.Script):
     
     def my_constructor(self, SCENE, CAMERA_TANSFORM, PLAYERID):
         
-        self.hud_transform = avango.osg.nodes.MatrixTransform()
+        self.hud_transform = avango.osg.nodes.MatrixTransform(Name = "Hud Transform")
         self.camera = CAMERA_TANSFORM
         self.id = PLAYERID
         self.Scene = SCENE
@@ -26,20 +26,20 @@ class HUD(avango.script.Script):
         
         
         #minimap
-        self.minimapgroup = avango.osg.nodes.MatrixTransform()
+        self.minimapgroup = avango.osg.nodes.MatrixTransform(Name = "Minimap Group")
         
         _mat = avango.osg.make_scale_mat(150,150,150) * avango.osg.make_trans_mat(0, 500, 0)
         
-        self.player0 = avango.osg.nodes.Sphere(StateSet = self.Scene.underwater_state, Matrix = _mat)
+        self.player0 = avango.osg.nodes.Sphere(StateSet = self.Scene.underwater_state, Matrix = _mat, Name = "Playersphere0")
         self.player0.get_field(8).value = avango.osg.Vec4(1,1,0,1)
-        self.player0_transform = avango.osg.nodes.MatrixTransform()
+        self.player0_transform = avango.osg.nodes.MatrixTransform(Name = "Player0 Transform")
         self.player0_transform.Matrix.connect_from(self.Scene.Player0.group.Matrix)
         self.player0_transform.Children.value.append(self.player0)
         
         if gl_viewing_setup == "splitscreen" or gl_viewing_setup == "lcd_splitscreen":
-            self.player1 = avango.osg.nodes.Sphere(Matrix = _mat)
+            self.player1 = avango.osg.nodes.Sphere(Matrix = _mat, Name = "Playersphere1")
             self.player1.get_field(8).value = avango.osg.Vec4(1,0,0,1)
-            self.player1_transform = avango.osg.nodes.MatrixTransform()
+            self.player1_transform = avango.osg.nodes.MatrixTransform(Name = "Player1 Transform")
             self.player1_transform.Matrix.connect_from(self.Scene.Player1.group.Matrix)
             self.player1_transform.Children.value.append(self.player1)
         
@@ -47,7 +47,7 @@ class HUD(avango.script.Script):
                 avango.osg.make_rot_mat(math.radians(0),1,0,0) * \
                 avango.osg.make_rot_mat(math.radians(-90),1,0,0)# * \
                 #avango.osg.make_trans_mat(20.0, -200.0,250.0)
-        self.minimap = avango.osg.nodes.LoadFile(StateSet = self.Scene.environment_state ,Filename = "data/Map/minimap.obj", Matrix = _mat)
+        self.minimap = avango.osg.nodes.LoadFile(StateSet = self.Scene.environment_state ,Filename = "data/Map/minimap.obj", Matrix = _mat,Name = "Minimap")
         
         self.minimapgroup.Children.value.append(self.minimap)
         self.minimapgroup.Children.value.append(self.player0_transform)

@@ -111,7 +111,7 @@ class DesktopSetup:
 		#self.camera.ViewerTransform.connect_from(SCENE.navigation_transform.Matrix)
 		self.camera.ViewerTransform.connect_from(SCENE.Player0.camera_absolute.AbsoluteMatrix)
 
-		if gl_headtracking_flag == True:
+		if gl_headtracking_flag == False:
 			self.tracking_sensor = avango.daemon.nodes.DeviceSensor(DeviceService = avango.daemon.DeviceService(), Station = "tracking-head0", TransmitterOffset = gl_transmitter_offset) # init tracking sensor
 			self.camera.EyeTransform.connect_from(self.tracking_sensor.Matrix)
 
@@ -193,7 +193,7 @@ class SplitScreenSetup:
 		self.camera1.Viewport.value = avango.osg.Vec4(0.0, 0.5, 1.0, 1.0)		
 		self.camera2.Viewport.value = avango.osg.Vec4(0.0, 0.0, 1.0, 0.5)
 
-		if gl_headtracking_flag == True:
+		if gl_headtracking_flag == False:
 			self.tracking_sensor1 = avango.daemon.nodes.DeviceSensor(DeviceService = avango.daemon.DeviceService(), Station = "tracking-head0", TransmitterOffset = gl_transmitter_offset) # init tracking sensor
 			self.tracking_sensor2 = avango.daemon.nodes.DeviceSensor(DeviceService = avango.daemon.DeviceService(), Station = "tracking-head1", TransmitterOffset = gl_transmitter_offset) # init tracking sensor
 

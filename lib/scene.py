@@ -100,8 +100,8 @@ class Scene:
 		self.object_root = avango.osg.nodes.Group(StateSet = self.object_state, Name = "object_root")
 		self.root.Children.value.append(self.object_root)
 														
-		self.interface_root = avango.osg.nodes.Group(StateSet = self.object_state, Name = "interface_root")
-		self.root.Children.value.append(self.interface_root)
+		#self.interface_root = avango.osg.nodes.Group(StateSet = self.object_state, Name = "interface_root")
+		#self.root.Children.value.append(self.interface_root)
 																				
 		self.navigation_transform = avango.osg.nodes.MatrixTransform(StateSet = self.state, Name = "navigation_transform")
 		self.root.Children.value.append(self.navigation_transform)

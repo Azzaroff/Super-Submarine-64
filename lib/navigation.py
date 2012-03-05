@@ -297,34 +297,34 @@ class Player(avango.script.Script):
         self.ID = ID
         
         #object container
-        self.group = avango.osg.nodes.MatrixTransform()
+        self.group = avango.osg.nodes.MatrixTransform(Name = "Group")
         
         #camera
-        self.camera = avango.osg.nodes.MatrixTransform()
-        self.camera_absolute = avango.osg.nodes.AbsoluteTransform()
+        self.camera = avango.osg.nodes.MatrixTransform(Name = "Camera")
+        self.camera_absolute = avango.osg.nodes.AbsoluteTransform(Name = "Camera Absolute")
         
         #self.camerabutton = avango.SFBool()
         self.cameratoggle = avango.SFBool()
         self.camerabuttonlast = avango.SFBool()
-        self.camera2 = avango.osg.nodes.MatrixTransform()   
+        self.camera2 = avango.osg.nodes.MatrixTransform(Name = "Camera2")   
         
         #self.camerabutton2 = avango.SFBool()
         self.cameratoggle2 = avango.SFBool()
         self.camerabuttonlast2 = avango.SFBool()
-        self.camera3 = avango.osg.nodes.MatrixTransform()
+        self.camera3 = avango.osg.nodes.MatrixTransform(Name = "Camera3")
         
         #self.camerabutton3 = avango.SFBool()
         self.cameratoggle3 = avango.SFBool()
         self.camerabuttonlast3 = avango.SFBool()
-        self.camera4 = avango.osg.nodes.MatrixTransform()
+        self.camera4 = avango.osg.nodes.MatrixTransform(Name = "Camera4")
         
         #self.camerabutton4 = avango.SFBool()
         self.cameratoggle4 = avango.SFBool()
         self.camerabuttonlast4 = avango.SFBool()
-        self.camera5 = avango.osg.nodes.MatrixTransform()
+        self.camera5 = avango.osg.nodes.MatrixTransform(Name = "Camera5")
         
         #navigation
-        self.model_transform = avango.osg.nodes.MatrixTransform()
+        self.model_transform = avango.osg.nodes.MatrixTransform(Name = "Model Transform")
         self.pitchthreshold = 25 # rund 45 Grad
         self.rollthreshold = 15 # rund 35 Grad
         self.velocity = 0.0 # -1 ... volles abbremsen, 1...volle beschleunigung
@@ -362,28 +362,28 @@ class Player(avango.script.Script):
         
         #pickraylength
         self.raylength = 20.
-        self.ray_transform_pos_y = avango.osg.nodes.MatrixTransform()
-        self.ray_absolute_pos_y = avango.osg.nodes.AbsoluteTransform()
+        self.ray_transform_pos_y = avango.osg.nodes.MatrixTransform(Name = "Ray Trans +y")
+        self.ray_absolute_pos_y = avango.osg.nodes.AbsoluteTransform(Name = "Ray Trans +y abs")
         #self.selected_targets_pos_y = avango.tools.MFTargetHolder()
 
-        self.ray_transform_neg_y = avango.osg.nodes.MatrixTransform()
-        self.ray_absolute_neg_y = avango.osg.nodes.AbsoluteTransform()
+        self.ray_transform_neg_y = avango.osg.nodes.MatrixTransform(Name = "Ray Trans -y")
+        self.ray_absolute_neg_y = avango.osg.nodes.AbsoluteTransform(Name = "Ray Trans -y abs")
         #self.selected_targets_neg_y = avango.tools.MFTargetHolder()
         
-        self.ray_transform_pos_z = avango.osg.nodes.MatrixTransform()
-        self.ray_absolute_pos_z = avango.osg.nodes.AbsoluteTransform()
+        self.ray_transform_pos_z = avango.osg.nodes.MatrixTransform(Name = "Ray Trans +z")
+        self.ray_absolute_pos_z = avango.osg.nodes.AbsoluteTransform(Name = "Ray Trans +z abs")
         #self.selected_targets_pos_z = avango.tools.MFTargetHolder()
         
-        self.ray_transform_neg_z = avango.osg.nodes.MatrixTransform()
-        self.ray_absolute_neg_z = avango.osg.nodes.AbsoluteTransform()
+        self.ray_transform_neg_z = avango.osg.nodes.MatrixTransform(Name = "Ray Trans -z")
+        self.ray_absolute_neg_z = avango.osg.nodes.AbsoluteTransform(Name = "Ray Trans -z abs")
         #self.selected_targets_neg_z = avango.tools.MFTargetHolder()
         
-        self.ray_transform_pos_x = avango.osg.nodes.MatrixTransform()
-        self.ray_absolute_pos_x = avango.osg.nodes.AbsoluteTransform()
+        self.ray_transform_pos_x = avango.osg.nodes.MatrixTransform(Name = "Ray Trans +x")
+        self.ray_absolute_pos_x = avango.osg.nodes.AbsoluteTransform(Name = "Ray Trans +x abs")
         #self.selected_targets_pos_x = avango.tools.MFTargetHolder()
         
-        self.ray_transform_neg_x = avango.osg.nodes.MatrixTransform()
-        self.ray_absolute_neg_x = avango.osg.nodes.AbsoluteTransform()
+        self.ray_transform_neg_x = avango.osg.nodes.MatrixTransform(Name = "Ray Trans -x")
+        self.ray_absolute_neg_x = avango.osg.nodes.AbsoluteTransform(Name = "Ray Trans -x abs")
         #self.selected_targets_neg_x = avango.tools.MFTargetHolder()
         
         self.race_start = False
@@ -438,7 +438,7 @@ class Player(avango.script.Script):
                 avango.osg.make_rot_mat(math.pi*0.5,-1,0,0) * \
                 avango.osg.make_rot_mat(math.radians(90),0,1,0) * \
                 avango.osg.make_trans_mat(0.0,0.0,0.0)
-        self.submarine = avango.osg.nodes.LoadFile(Filename = MODELPATH, Matrix = self._mat)
+        self.submarine = avango.osg.nodes.LoadFile(Filename = MODELPATH, Matrix = self._mat, Name = "Sub"+str(self.ID))
         
         #append objects to group
         self.model_transform.Children.value.append(self.submarine)
