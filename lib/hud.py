@@ -26,7 +26,7 @@ class HUD(avango.script.Script):
         
         
         #minimap
-        self.minimapgroup = avango.osg.nodes.MatrixTransform(Name = "Minimap Group")
+        self.minimapgroup = avango.osg.nodes.MatrixTransform(Name = "Hud Group")
         
         _mat = avango.osg.make_scale_mat(150,150,150) * avango.osg.make_trans_mat(0, 500, 0)
         
